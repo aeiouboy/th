@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+node_modules/
+.DS_Store
+logs/
+.mcp.json
+.claude/data/
+.claude/settings.local.json
+.claude/hooks/validators/*.log
+.claude/skills/playwright-skill/.temp-*
