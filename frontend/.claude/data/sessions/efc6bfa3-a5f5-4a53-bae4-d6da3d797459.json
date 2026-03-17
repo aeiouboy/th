@@ -1,0 +1,7 @@
+{
+  "session_id": "efc6bfa3-a5f5-4a53-bae4-d6da3d797459",
+  "prompts": [
+    "<task-notification>\n<task-id>b9tjmv3n1</task-id>\n<tool-use-id>toolu_01UFhkd8uxzrJZU9hPdWPGvD</tool-use-id>\n<output-file>/private/tmp/claude-502/-Users-tachongrak-Projects-ts/84ce479a-3d8d-4f51-a879-f155757b1bad/tasks/b9tjmv3n1.output</output-file>\n<status>completed</status>\n<summary>Background command \"Run full Playwright suite to see failures\" completed (exit code 0)</summary>\n</task-notification>\nRead the output file to retrieve the result: /private/tmp/claude-502/-Users-tachongrak-Projects-ts/84ce479a-3d8d-4f51-a879-f155757b1bad/tasks/b9tjmv3n1.output",
+    "<task-notification>\n<task-id>bzffacuyr</task-id>\n<tool-use-id>toolu_01HLXmz9LajTCacznHE84ptn</tool-use-id>\n<output-file>/private/tmp/claude-502/-Users-tachongrak-Projects-ts/84ce479a-3d8d-4f51-a879-f155757b1bad/tasks/bzffacuyr.output</output-file>\n<status>completed</status>\n<summary>Background command \"Run all Playwright E2E tests\" completed (exit code 0)</summary>\n</task-notification>\nRead the output file to retrieve the result: /private/tmp/claude-502/-Users-tachongrak-Projects-ts/84ce479a-3d8d-4f51-a879-f155757b1bad/tasks/bzffacuyr.output"
+  ]
+}

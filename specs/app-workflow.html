@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timesheet System — Application Workflow</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf9f7;
+  --bg-warm: #f5f3ef;
+  --bg-card: #ffffff;
+  --bg-dark: #1a1c23;
+  --border: #e5e2dc;
+  --border-strong: #d4cfc7;
+  --text: #1a1c23;
+  --text-mid: #5c5a56;
+  --text-dim: #9c9890;
+  --ink: #2c2b28;
+
+  --teal: #0d9488;
+  --teal-bg: #ccfbf1;
+  --teal-soft: #f0fdfa;
+  --sky: #0284c7;
+  --sky-bg: #e0f2fe;
+  --sky-soft: #f0f9ff;
+  --amber: #d97706;
+  --amber-bg: #fef3c7;
+  --amber-soft: #fffbeb;
+  --rose: #e11d48;
+  --rose-bg: #ffe4e6;
+  --rose-soft: #fff1f2;
+  --violet: #7c3aed;
+  --violet-bg: #ede9fe;
+  --violet-soft: #f5f3ff;
+  --emerald: #059669;
+  --emerald-bg: #d1fae5;
+  --emerald-soft: #ecfdf5;
+  --slate: #475569;
+  --slate-bg: #f1f5f9;
+  --orange: #ea580c;
+  --orange-bg: #ffedd5;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', 'Noto Sans Thai', sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.hero {
+  background: var(--bg-dark);
+  color: #fff;
+  padding: 52px 56px 44px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -120px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(13,148,136,0.15), transparent 70%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: 30%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(124,58,237,0.1), transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--teal);
+  background: rgba(13,148,136,0.12);
+  padding: 5px 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.hero h1 {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.hero p {
+  font-size: 15px;
+  color: rgba(255,255,255,0.55);
+  max-width: 620px;
+  font-weight: 300;
+}
+
+/* Navigation tabs */
+.tabs-bar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 56px;
+  display: flex;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.tab {
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.tab:hover { color: var(--text-mid); }
+.tab.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 600; }
+
+/* Section */
+.section {
+  display: none;
+  padding: 40px 56px 60px;
+  animation: fadeIn 0.3s ease;
+}
+
+.section.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.section-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+}
+
+/* Flowchart */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 900px;
+}
+
+.flow-step {
+  display: flex;
+  gap: 20px;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.flow-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.flow-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid;
+  background: var(--bg);
+  flex-shrink: 0;
+  z-index: 2;
+  position: relative;
+}
+
+.flow-dot.filled {
+  background: currentColor;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.flow-line {
+  width: 2px;
+  flex: 1;
+  min-height: 20px;
+}
+
+.flow-content {
+  flex: 1;
+  padding-bottom: 24px;
+}
+
+.flow-label {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flow-desc {
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.6;
+}
+
+.flow-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-mid);
+  line-height: 1.7;
+}
+
+.flow-card code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  background: var(--slate-bg);
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: var(--slate);
+}
+
+/* Branch / Decision */
+.flow-branch {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.branch-option {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.branch-approve {
+  border-color: color-mix(in srgb, var(--emerald) 30%, transparent);
+  background: var(--emerald-soft);
+  color: var(--emerald);
+}
+
+.branch-reject {
+  border-color: color-mix(in srgb, var(--rose) 30%, transparent);
+  background: var(--rose-soft);
+  color: var(--rose);
+}
+
+/* Role badge */
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.role-employee { background: var(--sky-bg); color: var(--sky); }
+.role-manager { background: var(--amber-bg); color: var(--amber); }
+.role-cc-owner { background: var(--violet-bg); color: var(--violet); }
+.role-pmo { background: var(--teal-bg); color: var(--teal); }
+.role-admin { background: var(--rose-bg); color: var(--rose); }
+.role-system { background: var(--slate-bg); color: var(--slate); }
+
+/* State machine diagram */
+.state-machine {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.state {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 2px solid;
+  text-align: center;
+  min-width: 110px;
+  position: relative;
+}
+
+.state-arrow {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  color: var(--text-dim);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.state-arrow .arrow-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: absolute;
+  top: -14px;
+  white-space: nowrap;
+  color: var(--text-dim);
+}
+
+.s-draft { border-color: var(--slate); background: var(--slate-bg); color: var(--slate); }
+.s-submitted { border-color: var(--sky); background: var(--sky-soft); color: var(--sky); }
+.s-mgr-approved { border-color: var(--amber); background: var(--amber-soft); color: var(--amber); }
+.s-cc-approved { border-color: var(--violet); background: var(--violet-soft); color: var(--violet); }
+.s-locked { border-color: var(--emerald); background: var(--emerald-soft); color: var(--emerald); }
+.s-rejected { border-color: var(--rose); background: var(--rose-soft); color: var(--rose); }
+
+/* Charge code hierarchy */
+.hierarchy {
+  margin: 20px 0;
+  font-size: 13px;
+}
+
+.h-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 8px;
+  position: relative;
+}
+
+.h-node::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+}
+
+.h-indent-1 { padding-left: 0; }
+.h-indent-2 { padding-left: 32px; }
+.h-indent-3 { padding-left: 64px; }
+.h-indent-4 { padding-left: 96px; }
+
+.h-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+.h-prg .h-badge { background: var(--slate-bg); color: var(--slate); }
+.h-prj .h-badge { background: var(--teal-bg); color: var(--teal); }
+.h-act .h-badge { background: var(--amber-bg); color: var(--amber); }
+.h-tsk .h-badge { background: var(--violet-bg); color: var(--violet); }
+
+.h-name { font-weight: 500; }
+.h-meta { color: var(--text-dim); font-size: 12px; margin-left: auto; }
+
+/* Budget visualization */
+.budget-bar-wrap {
+  margin: 12px 0;
+}
+
+.budget-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.budget-bar {
+  height: 10px;
+  background: var(--slate-bg);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.budget-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 1s ease;
+}
+
+.budget-bar-threshold {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--rose);
+  opacity: 0.6;
+}
+
+/* Cost formula */
+.formula-box {
+  background: var(--bg-dark);
+  color: #e2e4ea;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 20px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin: 16px 0;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.formula-box .var { color: var(--teal); font-weight: 600; }
+.formula-box .op { color: var(--amber); }
+
+/* Reports grid */
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.report-card {
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.report-card .rc-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.report-card .rc-name {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.report-card .rc-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* RBAC table */
+.rbac-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin: 20px 0;
+}
+
+.rbac-table th {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--bg-warm);
+  border-bottom: 2px solid var(--border);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-mid);
+}
+
+.rbac-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.rbac-table tr:hover td { background: var(--bg-warm); }
+
+.check { color: var(--emerald); font-weight: 700; }
+.cross { color: var(--text-dim); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero, .section, .tabs-bar { padding-left: 20px; padding-right: 20px; }
+  .hero h1 { font-size: 26px; }
+  .reports-grid { grid-template-columns: 1fr; }
+  .state-machine { flex-direction: column; align-items: stretch; }
+  .state-arrow { transform: rotate(90deg); padding: 4px 0; justify-content: center; }
+  .flow-branch { flex-direction: column; }
+  .rbac-table { font-size: 11px; }
+  .rbac-table th, .rbac-table td { padding: 8px 10px; }
+  .tabs-bar { overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Application Workflow</div>
+  <h1>Timesheet &amp; Cost Allocation System</h1>
+  <p>ระบบบันทึกเวลาทำงานและจัดสรรต้นทุน — แสดง workflow ทุกขั้นตอนตั้งแต่ login จนถึง report</p>
+</div>
+
+<div class="tabs-bar" id="tabs">
+  <div class="tab active" data-tab="time-entry">Time Entry</div>
+  <div class="tab" data-tab="approval">Approval Flow</div>
+  <div class="tab" data-tab="charge-codes">Charge Codes</div>
+  <div class="tab" data-tab="budget">Budget &amp; Cost</div>
+  <div class="tab" data-tab="reports">Reports</div>
+  <div class="tab" data-tab="roles">Roles &amp; Access</div>
+  <div class="tab" data-tab="auto">Auto &amp; System</div>
+</div>
+
+<!-- ==================== TIME ENTRY ==================== -->
+<div class="section active" id="time-entry">
+  <div class="section-title">Time Entry Workflow</div>
+  <div class="section-sub">พนักงานบันทึกชั่วโมงทำงานรายวัน/รายสัปดาห์ ลงใน Charge Code ที่ได้รับอนุญาต</div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--sky);"></div>
+        <div class="flow-line" style="background: var(--sky-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-employee">Employee</span> Login เข้าสู่ระบบ</div>
+        <div class="flow-desc">Login ด้วย email/password หรือ Microsoft SSO ผ่าน Supabase Auth → เข้า Dashboard</div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--sky);"></div>
+        <div class="flow-line" style="background: var(--sky-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label">ดู Dashboard สรุปสัปดาห์</div>
+        <div class="flow-desc">แสดง progress bar ชั่วโมงที่บันทึก vs ที่ต้องบันทึก (เช่น 32h / 40h) พร้อม alert วันที่ยังไม่ครบ</div>
+        <div class="flow-card">
+          <strong>Status Banner:</strong> Week Mar 16-22 → 32h/40h logged (80%)<br>
+          <strong>Missing:</strong> Friday — 8h required<br>
+          กดปุ่ม <code>[Open Timesheet →]</code> เพื่อไปหน้าบันทึก
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--teal);"></div>
+        <div class="flow-line" style="background: var(--teal-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label">เลือก Charge Code</div>
+        <div class="flow-desc">เลือกจาก dropdown เฉพาะ charge codes ที่ได้รับอนุญาต (owner assign ให้) เพิ่ม/ลบแถวได้</div>
+        <div class="flow-card">
+          แต่ละแถว = 1 charge code → กรอกชั่วโมงรายวัน (Mon-Fri)<br>
+          แสดง tag <code>[billable]</code> หรือ <code>[non-billable]</code> ของแต่ละ code<br>
+          เพิ่มคำอธิบายงานได้ (optional note icon)
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--teal);"></div>
+        <div class="flow-line" style="background: var(--teal-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label">กรอกชั่วโมงใน Grid</div>
+        <div class="flow-desc">พิมพ์ชั่วโมงในแต่ละ cell → Tab ไปช่องถัดไป → Enter ลงแถวถัดไป</div>
+        <div class="flow-card">
+          <strong>Validation:</strong><br>
+          • แต่ละวันต้องครบ <strong>8 ชั่วโมงขั้นต่ำ</strong> (แสดง ✓ สีเขียว หรือ -8.0 สีแดง)<br>
+          • วันหยุด/weekend → cell สีเทา disabled<br>
+          • Auto-save ทุก 30 วินาที → status: <code>DRAFT</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--emerald);"></div>
+        <div class="flow-line" style="background: var(--emerald-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label">Submit for Approval</div>
+        <div class="flow-desc">กดปุ่ม <strong>[Submit →]</strong> เพื่อส่งให้ Line Manager อนุมัติ → Status เปลี่ยนเป็น "Submitted"</div>
+        <div class="flow-card">
+          หลัง submit แล้ว<strong>แก้ไขไม่ได้</strong>จนกว่าจะถูก reject<br>
+          ระบบส่ง notification ให้ Line Manager ทันที
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot" style="color: var(--amber); border-color: var(--amber);"></div>
+        <div class="flow-line" style="background: transparent;"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label">รอผลอนุมัติ</div>
+        <div class="flow-branch">
+          <div class="branch-option branch-approve">
+            <strong>✓ Approved</strong><br>
+            Notification แจ้ง "อนุมัติแล้ว" → Timesheet ถูก lock
+          </div>
+          <div class="branch-option branch-reject">
+            <strong>✗ Rejected</strong><br>
+            Notification แจ้ง "ถูก reject พร้อมเหตุผล" → กลับเป็น Draft → แก้ไขแล้ว submit ใหม่
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APPROVAL FLOW ==================== -->
+<div class="section" id="approval">
+  <div class="section-title">Approval Workflow</div>
+  <div class="section-sub">3-stage approval: Employee → Line Manager → Charge Code Owner → Lock</div>
+
+  <h3 style="font-size: 14px; color: var(--text-mid); margin-bottom: 12px; font-weight: 600;">Timesheet Status — State Machine</h3>
+
+  <div class="state-machine">
+    <div class="state s-draft">Draft</div>
+    <div class="state-arrow">→</div>
+    <div class="state s-submitted">Submitted</div>
+    <div class="state-arrow">→</div>
+    <div class="state s-mgr-approved">Manager<br>Approved</div>
+    <div class="state-arrow">→</div>
+    <div class="state s-cc-approved">CC Owner<br>Approved</div>
+    <div class="state-arrow">→</div>
+    <div class="state s-locked">Locked ✓</div>
+  </div>
+
+  <div style="display: flex; justify-content: center; margin: 8px 0 28px;">
+    <div class="state s-rejected" style="opacity: 0.85;">Rejected → กลับเป็น Draft</div>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--amber);"></div>
+        <div class="flow-line" style="background: var(--amber-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-manager">Line Manager</span> ขั้นที่ 1: Manager Approval</div>
+        <div class="flow-desc">Manager เห็น pending timesheets ใน dashboard → เข้าหน้า Approvals</div>
+        <div class="flow-card">
+          <strong>วิธีอนุมัติ:</strong><br>
+          • กด <code>[Eye]</code> ดูรายละเอียดแบบ inline expand → เห็น grid เต็ม<br>
+          • เลือก checkbox หลายใบ → กด <code>[Bulk Approve]</code><br>
+          • หรือกด <code>[Reject]</code> → ใส่เหตุผล → timesheet กลับเป็น Draft<br>
+          <br>
+          <strong>สิ่งที่ Manager ตรวจ:</strong> ชั่วโมงครบ? charge code ถูกต้อง? คำอธิบายสมเหตุสมผล?
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--violet);"></div>
+        <div class="flow-line" style="background: var(--violet-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-cc-owner">CC Owner</span> ขั้นที่ 2: Charge Code Owner Approval</div>
+        <div class="flow-desc">หลัง Manager อนุมัติ → Charge Code Owner เห็นเฉพาะ entries ที่ charge ใน code ของตัวเอง</div>
+        <div class="flow-card">
+          <strong>Toggle:</strong> <code>[As Manager | As CC Owner]</code> บน Approval page<br>
+          CC Owner เห็นเฉพาะ entries ที่เกี่ยวข้องกับ codes ที่ตัวเองดูแล<br>
+          อนุมัติ = ยืนยันว่างานนี้ควร charge ไปที่ code นี้จริง
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--emerald);"></div>
+        <div class="flow-line" style="background: transparent;"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-system">System</span> Lock Timesheet</div>
+        <div class="flow-desc">หลังผ่านทั้ง 2 ขั้น → ระบบ lock timesheet → <strong>แก้ไขไม่ได้อีก</strong> → ต้นทุนถูกคำนวณเข้า budget</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CHARGE CODES ==================== -->
+<div class="section" id="charge-codes">
+  <div class="section-title">Charge Code Hierarchy</div>
+  <div class="section-sub">โครงสร้าง 4 ระดับ: Program → Project → Activity → Task</div>
+
+  <div class="hierarchy">
+    <div class="h-node h-indent-1 h-prg">
+      <span class="h-badge">PRG-001</span>
+      <span class="h-name">Digital Transformation Program</span>
+      <span class="h-meta">Budget: $500,000</span>
+    </div>
+    <div class="h-node h-indent-2 h-prj">
+      <span class="h-badge">PRJ-001</span>
+      <span class="h-name">Web Portal Redesign</span>
+      <span class="h-meta">Budget: $200,000</span>
+    </div>
+    <div class="h-node h-indent-3 h-act">
+      <span class="h-badge">ACT-001</span>
+      <span class="h-name">Development</span>
+      <span class="h-meta">Budget: $120,000</span>
+    </div>
+    <div class="h-node h-indent-4 h-tsk">
+      <span class="h-badge">TSK-001</span>
+      <span class="h-name">Frontend Implementation</span>
+      <span class="h-meta">Budget: $60,000</span>
+    </div>
+    <div class="h-node h-indent-4 h-tsk">
+      <span class="h-badge">TSK-002</span>
+      <span class="h-name">Backend API</span>
+      <span class="h-meta">Budget: $60,000</span>
+    </div>
+    <div class="h-node h-indent-3 h-act">
+      <span class="h-badge">ACT-002</span>
+      <span class="h-name">Testing</span>
+      <span class="h-meta">Budget: $50,000</span>
+    </div>
+    <div class="h-node h-indent-3 h-act">
+      <span class="h-badge">ACT-003</span>
+      <span class="h-name">Project Management</span>
+      <span class="h-meta">Budget: $30,000</span>
+    </div>
+    <div class="h-node h-indent-2 h-prj">
+      <span class="h-badge">PRJ-002</span>
+      <span class="h-name">Mobile App</span>
+      <span class="h-meta">Budget: $150,000</span>
+    </div>
+    <div class="h-node h-indent-2 h-prj">
+      <span class="h-badge">PRJ-003</span>
+      <span class="h-name">Data Migration</span>
+      <span class="h-meta">Budget: $150,000</span>
+    </div>
+  </div>
+
+  <div class="flow-card" style="margin-top: 24px;">
+    <strong>Access Control:</strong><br>
+    • <strong>Owner</strong> ของแต่ละ charge code กำหนดว่าใครสามารถ charge ได้<br>
+    • Owner ระดับ Program ควบคุม sub-levels ทั้งหมดได้<br>
+    • Materialized path (<code>PRG001/PRJ001/ACT001/TSK001</code>) ใช้สำหรับ query hierarchy<br>
+    • ต้นทุนจาก child <strong>roll-up</strong> ขึ้น parent อัตโนมัติ<br>
+    • แต่ละ code มี <strong>valid date range</strong> และ flag <strong>Billable/Non-billable</strong>
+  </div>
+</div>
+
+<!-- ==================== BUDGET ==================== -->
+<div class="section" id="budget">
+  <div class="section-title">Budget &amp; Cost Tracking</div>
+  <div class="section-sub">คำนวณต้นทุนจริงจากชั่วโมงที่บันทึก เทียบกับ budget ที่ตั้งไว้</div>
+
+  <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">สูตรคำนวณต้นทุน</h3>
+  <div class="formula-box">
+    <span class="var">Actual Cost</span> <span class="op">=</span> <span class="var">Logged Hours</span> <span class="op">×</span> <span class="var">Cost Rate</span> <span style="color: var(--text-dim); font-size: 12px;">(by Job Grade)</span>
+  </div>
+
+  <div class="flow-card">
+    <strong>Cost Rate Lookup:</strong> ดึง hourly rate จากตาราง <code>CostRate</code> ตาม job grade ของพนักงาน + วันที่ effective<br>
+    <strong>ตัวอย่าง:</strong> Senior Engineer (Grade E4) → $85/hr → ทำงาน 8h → ต้นทุน $680/วัน
+  </div>
+
+  <h3 style="font-size: 14px; font-weight: 600; margin: 28px 0 12px;">Budget Tracking — ตัวอย่าง</h3>
+
+  <div class="budget-bar-wrap">
+    <div class="budget-bar-label">
+      <span><strong>PRG-001</strong> Digital Transformation</span>
+      <span style="color: var(--amber); font-weight: 600;">$390K / $500K (78%)</span>
+    </div>
+    <div class="budget-bar">
+      <div class="budget-bar-fill" style="width: 78%; background: linear-gradient(90deg, var(--teal), var(--amber));"></div>
+      <div class="budget-bar-threshold" style="left: 80%;"></div>
+    </div>
+  </div>
+
+  <div class="budget-bar-wrap">
+    <div class="budget-bar-label">
+      <span><strong>PRJ-001</strong> Web Portal Redesign</span>
+      <span style="color: var(--rose); font-weight: 600;">$184K / $200K (92%) ⚠</span>
+    </div>
+    <div class="budget-bar">
+      <div class="budget-bar-fill" style="width: 92%; background: linear-gradient(90deg, var(--amber), var(--rose));"></div>
+      <div class="budget-bar-threshold" style="left: 80%;"></div>
+    </div>
+  </div>
+
+  <div class="budget-bar-wrap">
+    <div class="budget-bar-label">
+      <span><strong>PRJ-003</strong> Data Migration</span>
+      <span style="color: var(--emerald); font-weight: 600;">$90K / $150K (60%)</span>
+    </div>
+    <div class="budget-bar">
+      <div class="budget-bar-fill" style="width: 60%; background: var(--emerald);"></div>
+      <div class="budget-bar-threshold" style="left: 80%;"></div>
+    </div>
+  </div>
+
+  <div class="flow-card" style="margin-top: 20px; border-left: 3px solid var(--rose);">
+    <strong>Alerts ระบบแจ้งเตือนเมื่อ:</strong><br>
+    • Budget ถึง <strong>80%</strong> → แจ้ง Warning (สีเหลือง)<br>
+    • Budget ถึง <strong>90%</strong> → แจ้ง Critical (สีแดง)<br>
+    • Budget <strong>เกิน 100%</strong> → แจ้ง Overrun + ระบุ Activity/Task ที่เป็นต้นเหตุ<br>
+    • <strong>Forecast:</strong> คาดการณ์ budget ณ สิ้นงวดจาก burn rate ปัจจุบัน
+  </div>
+</div>
+
+<!-- ==================== REPORTS ==================== -->
+<div class="section" id="reports">
+  <div class="section-title">Reports &amp; Analytics</div>
+  <div class="section-sub">6 รายงานหลักสำหรับ PMO, Finance และ Management</div>
+
+  <div class="reports-grid">
+    <div class="report-card" style="border-top: 3px solid var(--teal);">
+      <div class="rc-icon">📊</div>
+      <div class="rc-name">Project Cost Report</div>
+      <div class="rc-desc">Budget vs Actual แยกตาม charge code พร้อม drill-down ถึงระดับ Task</div>
+    </div>
+    <div class="report-card" style="border-top: 3px solid var(--sky);">
+      <div class="rc-icon">📈</div>
+      <div class="rc-name">Program Financial Tracking</div>
+      <div class="rc-desc">Roll-up ต้นทุนทุก Project ภายใต้ Program เทียบงบรวม</div>
+    </div>
+    <div class="report-card" style="border-top: 3px solid var(--emerald);">
+      <div class="rc-icon">👥</div>
+      <div class="rc-name">Resource Utilization</div>
+      <div class="rc-desc">ชั่วโมงที่บันทึก / ชั่วโมงที่ available แยกตามคนและทีม</div>
+    </div>
+    <div class="report-card" style="border-top: 3px solid var(--amber);">
+      <div class="rc-icon">🎯</div>
+      <div class="rc-name">Chargeability Analysis</div>
+      <div class="rc-desc">Billable hours / Total hours ของแต่ละทีม เทียบ target (เช่น 80%)</div>
+    </div>
+    <div class="report-card" style="border-top: 3px solid var(--violet);">
+      <div class="rc-icon">🔴</div>
+      <div class="rc-name">Budget Overrun Alerts</div>
+      <div class="rc-desc">รายการ charge codes ที่เกิน threshold พร้อมระบุ root-cause activity</div>
+    </div>
+    <div class="report-card" style="border-top: 3px solid var(--rose);">
+      <div class="rc-icon">💰</div>
+      <div class="rc-name">Financial P/L Impact</div>
+      <div class="rc-desc">ผลกระทบทางการเงินจาก over-budget + low chargeability รวมเป็น net impact</div>
+    </div>
+  </div>
+
+  <div class="flow-card">
+    <strong>PMO/Finance Workflow:</strong><br>
+    1. เข้าหน้า Reports → เห็น KPI cards + charts<br>
+    2. Filter ตาม Program, Period, Team<br>
+    3. คลิก budget overrun alert → drill-down ถึง Activity/Task ที่เป็นต้นเหตุ<br>
+    4. Export เป็น PDF/CSV เพื่อส่งให้ stakeholders
+  </div>
+</div>
+
+<!-- ==================== ROLES ==================== -->
+<div class="section" id="roles">
+  <div class="section-title">Roles &amp; Access Control</div>
+  <div class="section-sub">5 roles หลักกำหนดสิทธิ์การเข้าถึงในระบบ</div>
+
+  <table class="rbac-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th><span class="role-pill role-employee">Employee</span></th>
+        <th><span class="role-pill role-manager">Charge Mgr</span></th>
+        <th><span class="role-pill role-pmo">PMO</span></th>
+        <th><span class="role-pill role-cc-owner">Finance</span></th>
+        <th><span class="role-pill role-admin">Admin</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Log own time</td>
+        <td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Submit timesheet</td>
+        <td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Approve timesheets (as manager)</td>
+        <td class="cross">–</td><td class="check">✓</td><td class="cross">–</td><td class="cross">–</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Approve charges (as CC owner)</td>
+        <td class="cross">–</td><td class="check">✓</td><td class="cross">–</td><td class="cross">–</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Manage charge codes</td>
+        <td class="cross">–</td><td class="check">✓</td><td class="check">✓</td><td class="cross">–</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>View budget vs actual</td>
+        <td class="cross">–</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>View all reports</td>
+        <td class="cross">–</td><td class="cross">–</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Export PDF/CSV</td>
+        <td class="cross">–</td><td class="cross">–</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Manage users &amp; roles</td>
+        <td class="cross">–</td><td class="cross">–</td><td class="cross">–</td><td class="cross">–</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Manage calendar &amp; holidays</td>
+        <td class="cross">–</td><td class="cross">–</td><td class="cross">–</td><td class="cross">–</td><td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Configure cost rates</td>
+        <td class="cross">–</td><td class="cross">–</td><td class="cross">–</td><td class="check">✓</td><td class="check">✓</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="flow-card">
+    <strong>Access Control เพิ่มเติม:</strong><br>
+    • Charge Code Access — นอกจาก role แล้ว charge code owner ยังกำหนดว่าใคร charge ได้อีกชั้น<br>
+    • Sidebar Navigation — ซ่อน menu ADMIN สำหรับ role ที่ไม่ใช่ Admin/PMO/Finance<br>
+    • Supabase RLS — Row Level Security เป็น defense-in-depth บน database layer
+  </div>
+</div>
+
+<!-- ==================== AUTO & SYSTEM ==================== -->
+<div class="section" id="auto">
+  <div class="section-title">Automated &amp; System Processes</div>
+  <div class="section-sub">Scheduled jobs ที่ทำงานอัตโนมัติ + Teams integration</div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--rose);"></div>
+        <div class="flow-line" style="background: var(--rose-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-system">Cron</span> Auto-Cutoff: Lock Timesheets</div>
+        <div class="flow-desc">ระบบ lock timesheets อัตโนมัติ <strong>วันที่ 15</strong> และ <strong>สิ้นเดือน</strong> ของทุกเดือน</div>
+        <div class="flow-card">
+          ใช้ <code>@nestjs/schedule</code> — cron job ทำงานตอน 00:00 ของวันที่ 15 และวันสุดท้ายของเดือน<br>
+          Timesheets ที่ยังเป็น Draft/Submitted จะถูก lock โดยอัตโนมัติ → ไม่สามารถแก้ไขได้
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--amber);"></div>
+        <div class="flow-line" style="background: var(--amber-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-system">Daily</span> Reminder: Incomplete Timesheets</div>
+        <div class="flow-desc">ทุกวัน 09:00 — ตรวจสอบพนักงานที่ยังไม่กรอกชั่วโมงครบ → ส่ง notification</div>
+        <div class="flow-card">
+          ส่งผ่าน Teams notification + in-app bell icon<br>
+          Manager ได้รับสรุปว่าทีมใครยังไม่ครบ
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--amber);"></div>
+        <div class="flow-line" style="background: var(--amber-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-system">Daily</span> Budget Alert Check</div>
+        <div class="flow-desc">ตรวจสอบ charge codes ทุกตัวว่าเกิน threshold หรือไม่ (80%, 90%, 100%)</div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--violet);"></div>
+        <div class="flow-line" style="background: var(--violet-bg);"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-system">Weekly</span> Insight Summary</div>
+        <div class="flow-desc">ทุกวันจันทร์ 08:00 — สรุปสถานะ budget, chargeability, utilization ส่งให้ Program Owner และ Cost Center Owner</div>
+      </div>
+    </div>
+
+    <div class="flow-step">
+      <div class="flow-rail">
+        <div class="flow-dot filled" style="color: var(--sky);"></div>
+        <div class="flow-line" style="background: transparent;"></div>
+      </div>
+      <div class="flow-content">
+        <div class="flow-label"><span class="role-pill role-system">Teams</span> Chatbot Integration</div>
+        <div class="flow-desc">พนักงานพิมพ์ใน Teams chat เพื่อบันทึกเวลาหรือถามข้อมูล</div>
+        <div class="flow-card">
+          <strong>ตัวอย่างคำสั่ง:</strong><br>
+          • <code>"Logged 4h on PRJ-042 today"</code> → ระบบ parse + บันทึกลง timesheet<br>
+          • <code>"What's my budget status for PRJ-042?"</code> → ตอบ budget vs actual<br>
+          • <code>"Show my hours this week"</code> → สรุปชั่วโมงที่บันทึกในสัปดาห์นี้
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

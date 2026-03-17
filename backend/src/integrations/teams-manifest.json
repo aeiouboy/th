@@ -1,0 +1,66 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.16",
+  "version": "1.0.0",
+  "id": "{{MICROSOFT_APP_ID}}",
+  "developer": {
+    "name": "Timesheet System",
+    "websiteUrl": "https://timesheet.example.com",
+    "privacyUrl": "https://timesheet.example.com/privacy",
+    "termsOfUseUrl": "https://timesheet.example.com/terms"
+  },
+  "name": {
+    "short": "Timesheet Bot",
+    "full": "Timesheet System Bot"
+  },
+  "description": {
+    "short": "Log time and check status via Teams chat",
+    "full": "A Microsoft Teams bot for the Timesheet System. Log time entries, check timesheet status, view budget information, and manage your work hours — all from within Teams conversations."
+  },
+  "icons": {
+    "outline": "outline-icon.png",
+    "color": "color-icon.png"
+  },
+  "accentColor": "#4F46E5",
+  "bots": [
+    {
+      "botId": "{{MICROSOFT_APP_ID}}",
+      "scopes": ["personal", "team", "groupChat"],
+      "isNotificationOnly": false,
+      "supportsFiles": true,
+      "commandLists": [
+        {
+          "scopes": ["personal"],
+          "commands": [
+            {
+              "title": "log",
+              "description": "Log time entry — e.g., 'Log 4h on PRJ-042 today'"
+            },
+            {
+              "title": "timesheet",
+              "description": "Show your timesheet for this week"
+            },
+            {
+              "title": "hours",
+              "description": "Show hours logged today"
+            },
+            {
+              "title": "codes",
+              "description": "List your assigned charge codes"
+            },
+            {
+              "title": "budget",
+              "description": "Check budget status — e.g., 'budget PRJ-042'"
+            },
+            {
+              "title": "help",
+              "description": "Show available commands and examples"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "permissions": ["identity", "messageTeamMembers"],
+  "validDomains": ["timesheet.example.com"]
+}

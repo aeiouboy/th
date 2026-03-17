@@ -1,0 +1,442 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Plus, Search, Archive } from 'lucide-react';
+import { api } from '@/lib/api';
+import {
+  ChargeCodeTree,
+  type ChargeCodeNode,
+} from '@/components/charge-codes/ChargeCodeTree';
+import { ChargeCodeForm } from '@/components/charge-codes/ChargeCodeForm';
+import { AccessManager } from '@/components/charge-codes/AccessManager';
+
+interface ChargeCodeDetail {
+  id: string;
+  name: string;
+  level: string | null;
+  parentId: string | null;
+  budgetAmount: string | null;
+  isBillable: boolean | null;
+  costCenter: string | null;
+  programName: string | null;
+  validFrom: string | null;
+  validTo: string | null;
+  path: string | null;
+  activityCategory: string | null;
+  ownerId?: string | null;
+  ownerName?: string | null;
+  approverName?: string | null;
+  actualSpent?: number;
+  assignedUsers: { userId: string; email: string; fullName: string | null }[];
+}
+
+const LEVEL_BADGE: Record<string, { label: string; className: string }> = {
+  program: { label: 'Program', className: 'bg-slate-600 text-white' },
+  project: { label: 'Project', className: 'bg-[var(--accent-teal)] text-white' },
+  activity: { label: 'Activity', className: 'bg-[var(--accent-amber)] text-white' },
+  task: { label: 'Task', className: 'bg-[var(--accent-purple)] text-white' },
+};
+
+
+export default function ChargeCodesPage() {
+  const [tree, setTree] = useState<ChargeCodeNode[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<ChargeCodeDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [search, setSearch] = useState('');
+  const [levelFilter, setLevelFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [billableFilter, setBillableFilter] = useState('all');
+  const [myCodesOnly, setMyCodesOnly] = useState(false);
+
+  const loadTree = useCallback(async () => {
+    try {
+      const data = await api.get<ChargeCodeNode[]>('/charge-codes/tree');
+      setTree(data);
+    } catch {
+      setTree([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const loadSelected = useCallback(async (id: string) => {
+    try {
+      const data = await api.get<ChargeCodeDetail>(`/charge-codes/${id}`);
+      setSelected(data);
+    } catch {
+      setSelected(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTree();
+  }, [loadTree]);
+
+  useEffect(() => {
+    if (selectedId) {
+      loadSelected(selectedId);
+    } else {
+      setSelected(null);
+    }
+  }, [selectedId, loadSelected]);
+
+  const handleRefresh = () => {
+    loadTree();
+    if (selectedId) loadSelected(selectedId);
+  };
+
+  const filterTree = (nodes: ChargeCodeNode[]): ChargeCodeNode[] => {
+    return nodes
+      .map((node) => {
+        const children = filterTree(node.children);
+        const matchesSearch =
+          !search ||
+          node.name.toLowerCase().includes(search.toLowerCase()) ||
+          node.id.toLowerCase().includes(search.toLowerCase());
+        const matchesLevel =
+          levelFilter === 'all' || node.level === levelFilter;
+        const matchesBillable =
+          billableFilter === 'all' ||
+          (billableFilter === 'true' && node.isBillable) ||
+          (billableFilter === 'false' && !node.isBillable);
+        const selfMatch = matchesSearch && matchesLevel && matchesBillable;
+
+        if (selfMatch || children.length > 0) {
+          return { ...node, children };
+        }
+        return null;
+      })
+      .filter(Boolean) as ChargeCodeNode[];
+  };
+
+  const filteredTree = filterTree(tree);
+
+  const budgetTotal = selected?.budgetAmount ? parseFloat(selected.budgetAmount) : 0;
+  const actualSpent = selected?.actualSpent ?? 0;
+  const budgetPercent = budgetTotal > 0 ? Math.min(100, Math.round((actualSpent / budgetTotal) * 100)) : 0;
+  const budgetRemaining = budgetTotal - actualSpent;
+
+  return (
+    <div className="flex h-full gap-4">
+      {/* Left Panel - Tree */}
+      <div className="flex w-[40%] shrink-0 flex-col rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        {/* Toolbar */}
+        <div className="space-y-2 border-b border-[var(--border-default)] p-3">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search codes..."
+                className="pl-7 h-8 text-sm"
+              />
+            </div>
+            <Button
+              size="sm"
+              className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white h-8"
+              onClick={() => setShowCreate(true)}
+            >
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Create New
+            </Button>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={levelFilter} onValueChange={(v) => setLevelFilter(v ?? 'all')}>
+              <SelectTrigger size="sm" className="h-7 text-xs">
+                <SelectValue placeholder="Level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Levels</SelectItem>
+                <SelectItem value="program">Program</SelectItem>
+                <SelectItem value="project">Project</SelectItem>
+                <SelectItem value="activity">Activity</SelectItem>
+                <SelectItem value="task">Task</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? 'all')}>
+              <SelectTrigger size="sm" className="h-7 text-xs">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="expired">Expired</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={billableFilter} onValueChange={(v) => setBillableFilter(v ?? 'all')}>
+              <SelectTrigger size="sm" className="h-7 text-xs">
+                <SelectValue placeholder="Billable" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="true">Billable</SelectItem>
+                <SelectItem value="false">Non-Billable</SelectItem>
+              </SelectContent>
+            </Select>
+            <label className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+              <input
+                type="checkbox"
+                checked={myCodesOnly}
+                onChange={(e) => setMyCodesOnly(e.target.checked)}
+                className="h-3.5 w-3.5 rounded border-stone-300 text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]"
+              />
+              My Codes
+            </label>
+          </div>
+        </div>
+
+        {/* Tree */}
+        <div className="flex-1 overflow-y-auto p-2">
+          {loading ? (
+            <div className="space-y-2 p-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="h-8 animate-pulse bg-stone-100 rounded" />
+              ))}
+            </div>
+          ) : (
+            <ChargeCodeTree
+              tree={filteredTree}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Right Panel - Detail */}
+      <div className="flex flex-1 flex-col rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        {!selected ? (
+          <div className="flex flex-1 items-center justify-center">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-stone-100 mx-auto mb-3 flex items-center justify-center">
+                <Search className="w-5 h-5 text-[var(--text-muted)]" />
+              </div>
+              <p className="text-sm text-[var(--text-muted)]">Select a charge code to view details</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[var(--border-default)] p-4">
+              <div className="flex items-center gap-3">
+                <span className="font-[family-name:var(--font-mono)] text-sm text-[var(--text-secondary)]">
+                  {selected.id}
+                </span>
+                <h2 className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
+                  {selected.name}
+                </h2>
+                {selected.level && LEVEL_BADGE[selected.level] && (
+                  <Badge
+                    className={`rounded-[999px] text-[10px] font-semibold ${LEVEL_BADGE[selected.level].className}`}
+                  >
+                    {LEVEL_BADGE[selected.level].label}
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowEdit(true)}
+                >
+                  Edit
+                </Button>
+                <Button size="sm" variant="ghost" className="text-[var(--text-secondary)]">
+                  <Archive className="h-3.5 w-3.5 mr-1" />
+                  Archive
+                </Button>
+              </div>
+            </div>
+
+            {/* Tabs */}
+            <Tabs defaultValue="overview" className="flex-1 overflow-hidden">
+              <TabsList variant="line" className="px-4 pt-2">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="access">Access</TabsTrigger>
+                <TabsTrigger value="budget">Budget</TabsTrigger>
+              </TabsList>
+
+              <TabsContent
+                value="overview"
+                className="overflow-y-auto p-4"
+              >
+                <div className="space-y-5">
+                  {/* Key-Value Pairs */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <InfoItem label="Level" value={selected.level ? selected.level.charAt(0).toUpperCase() + selected.level.slice(1) : '-'} />
+                    <InfoItem label="Owner" value={selected.ownerName || '-'} />
+                    <InfoItem label="Approver" value={selected.approverName || '-'} />
+                    <InfoItem label="Cost Center" value={selected.costCenter || '-'} />
+                    <InfoItem label="Valid" value={
+                      selected.validFrom && selected.validTo
+                        ? `${formatShortDate(selected.validFrom)} - ${formatShortDate(selected.validTo)}`
+                        : '-'
+                    } />
+                    <InfoItem
+                      label="Billable"
+                      value={selected.isBillable ? 'Yes' : 'No'}
+                      valueClassName={selected.isBillable ? 'text-[var(--accent-teal)]' : 'text-[var(--text-secondary)]'}
+                    />
+                  </div>
+
+                  {/* Budget Mini-bar */}
+                  {selected.budgetAmount && budgetTotal > 0 && (
+                    <div className="rounded-lg border border-[var(--border-default)] p-3 bg-stone-50/50 dark:bg-stone-900/50">
+                      <div className="mb-2 flex items-center justify-between text-xs">
+                        <span className="text-[var(--text-secondary)] font-medium">Budget</span>
+                        <span className="font-[family-name:var(--font-mono)] font-medium text-[var(--text-primary)]">
+                          ${actualSpent.toLocaleString()} / ${budgetTotal.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="h-2.5 overflow-hidden rounded-full bg-stone-200">
+                        <div
+                          className={`h-full rounded-full transition-all duration-600 ${
+                            budgetPercent >= 90 ? 'bg-[var(--accent-red)]' :
+                            budgetPercent >= 70 ? 'bg-[var(--accent-amber)]' :
+                            'bg-[var(--accent-teal)]'
+                          }`}
+                          style={{ width: `${budgetPercent}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 text-[11px] font-[family-name:var(--font-mono)] text-[var(--text-muted)]">
+                        {budgetPercent}% consumed
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent
+                value="access"
+                className="overflow-y-auto p-4"
+              >
+                <AccessManager
+                  chargeCodeId={selected.id}
+                  assignedUsers={selected.assignedUsers || []}
+                  onUpdate={handleRefresh}
+                />
+              </TabsContent>
+
+              <TabsContent
+                value="budget"
+                className="overflow-y-auto p-4"
+              >
+                <div className="space-y-5">
+                  <div className="grid grid-cols-2 gap-3">
+                    <InfoItem
+                      label="Total Budget"
+                      value={budgetTotal > 0 ? `$${budgetTotal.toLocaleString()}` : '-'}
+                      mono
+                    />
+                    <InfoItem
+                      label="Actual Spent"
+                      value={`$${actualSpent.toLocaleString()}`}
+                      mono
+                    />
+                    <InfoItem
+                      label="Remaining"
+                      value={budgetTotal > 0 ? `$${budgetRemaining.toLocaleString()}` : '-'}
+                      mono
+                      valueClassName={budgetRemaining < 0 ? 'text-[var(--accent-red)]' : 'text-[var(--accent-green)]'}
+                    />
+                    <InfoItem
+                      label="Usage"
+                      value={`${budgetPercent}%`}
+                      mono
+                      valueClassName={
+                        budgetPercent >= 90 ? 'text-[var(--accent-red)]' :
+                        budgetPercent >= 70 ? 'text-[var(--accent-amber)]' :
+                        'text-[var(--accent-teal)]'
+                      }
+                    />
+                  </div>
+                  {budgetTotal > 0 && (
+                    <div>
+                      <div className="mb-1 text-xs text-[var(--text-secondary)] font-medium">Budget Progress</div>
+                      <div className="h-3 overflow-hidden rounded-full bg-stone-200">
+                        <div
+                          className={`h-full rounded-full transition-all duration-600 ${
+                            budgetPercent >= 90 ? 'bg-[var(--accent-red)]' :
+                            budgetPercent >= 70 ? 'bg-[var(--accent-amber)]' :
+                            'bg-[var(--accent-teal)]'
+                          }`}
+                          style={{ width: `${budgetPercent}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between mt-1.5 text-[11px] font-[family-name:var(--font-mono)]">
+                        <span className="text-[var(--text-muted)]">$0</span>
+                        <span className="text-[var(--text-muted)]">${budgetTotal.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </>
+        )}
+      </div>
+
+      {/* Create Dialog */}
+      <ChargeCodeForm
+        open={showCreate}
+        onOpenChange={setShowCreate}
+        onSuccess={handleRefresh}
+      />
+
+      {/* Edit Dialog */}
+      {selected && (
+        <ChargeCodeForm
+          open={showEdit}
+          onOpenChange={setShowEdit}
+          onSuccess={handleRefresh}
+          editData={selected}
+        />
+      )}
+    </div>
+  );
+}
+
+function InfoItem({
+  label,
+  value,
+  mono,
+  valueClassName,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+  valueClassName?: string;
+}) {
+  return (
+    <div>
+      <dt className="text-xs text-[var(--text-muted)] font-medium">{label}</dt>
+      <dd className={`text-sm font-medium ${valueClassName || 'text-[var(--text-primary)]'} ${mono ? 'font-[family-name:var(--font-mono)]' : ''}`}>
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function formatShortDate(dateStr: string): string {
+  try {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  } catch {
+    return dateStr;
+  }
+}

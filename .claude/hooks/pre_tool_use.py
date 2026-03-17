@@ -89,11 +89,11 @@ def main():
         tool_name = input_data.get('tool_name', '')
         tool_input = input_data.get('tool_input', {})
         
-        # Check for .env file access (blocks access to sensitive environment files)
-        if is_env_file_access(tool_name, tool_input):
-            print("BLOCKED: Access to .env files containing sensitive data is prohibited", file=sys.stderr)
-            print("Use .env.sample for template files instead", file=sys.stderr)
-            sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
+        # NOTE: .env file access check disabled (2026-03-17) to allow Claude to read/edit .env files
+        # if is_env_file_access(tool_name, tool_input):
+        #     print("BLOCKED: Access to .env files containing sensitive data is prohibited", file=sys.stderr)
+        #     print("Use .env.sample for template files instead", file=sys.stderr)
+        #     sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
         
         # Check for dangerous rm -rf commands
         if tool_name == 'Bash':

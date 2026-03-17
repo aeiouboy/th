@@ -21,6 +21,8 @@ hooks:
             --contains '## Relevant Files'
             --contains '## Step by Step Tasks'
             --contains '## Acceptance Criteria'
+            --contains '## Validation Commands'
+            --contains '## Healing Rules'
             --contains '## Tech Stack'
             --contains '## Technical Design'
             --contains '## Team Orchestration'
@@ -403,7 +405,7 @@ Use these files to complete the task:
 
 <MANDATORY POST-BUILD TASKS — these 3 tasks MUST always be the final tasks in every plan>
 
-### N-2. Code Review
+### N-3. Code Review
 - **Task ID**: code-review
 - **Depends On**: <all build task IDs>
 - **Assigned To**: <code-reviewer team member>
@@ -413,7 +415,7 @@ Use these files to complete the task:
 - Fix all issues found directly
 - Report what was fixed and what was skipped
 
-### N-1. Write Tests
+### N-2. Write Tests
 - **Task ID**: write-tests
 - **Depends On**: code-review
 - **Assigned To**: <test-writer team member>
@@ -422,17 +424,86 @@ Use these files to complete the task:
 - Write comprehensive automated tests for the implemented code
 - Cover: correctness, edge cases, error paths, data integrity
 - Run all tests and ensure they pass
+- **MANDATORY: Save test results to `docs/test-results/`** with this structure:
+  ```
+  docs/test-results/
+  ├── summary.md                          # Human-readable overview: date, pass/fail counts, coverage areas
+  ├── test-cases.md                       # Catalog of all test cases with ID, description, type, status
+  ├── unit/
+  │   ├── unit-results.json               # Machine-readable test runner output (e.g. vitest --reporter=json)
+  │   └── unit-results.md                 # Human-readable unit test report
+  ├── e2e/                                # End-to-end test results (if applicable)
+  │   ├── e2e-results.json                # Playwright JSON report
+  │   └── e2e-results.md                  # Human-readable e2e test report
+  ├── screenshots/                        # Visual captures (if project has UI)
+  │   ├── <page-name>--desktop.png        # Desktop viewport screenshot
+  │   ├── <page-name>--mobile.png         # Mobile viewport screenshot (if responsive)
+  │   └── ...
+  └── healing-log.md                      # Auto-heal iterations (created by cook if healing occurs)
+  ```
+- **File naming rules** (engineers must follow these exactly):
+  - Use **kebab-case** for all file and folder names (e.g. `order-list--desktop.png`, not `OrderList_desktop.png`)
+  - Screenshots: `<page-or-component>--<viewport>.png` (double dash separates name from variant)
+  - Test results: `<type>-results.<ext>` where type is `unit`, `e2e`, `integration`, etc.
+  - Always include both `.json` (machine-readable) and `.md` (human-readable) for each test type
+- Configure the test runner to output JSON results (e.g. `vitest run --reporter=json --outputFile=docs/test-results/unit/unit-results.json`)
+- If the project has UI pages, use Playwright to capture screenshots of each key page and save to `docs/test-results/screenshots/` following the naming convention above
+- Write `docs/test-results/test-cases.md` with a table of all test cases:
+  ```markdown
+  # Test Cases
+  | ID | Test Name | Type | File | Status | Notes |
+  |----|-----------|------|------|--------|-------|
+  | TC-001 | Create order validates required fields | unit | tests/orders/create.test.ts | pass | |
+  | TC-002 | Dashboard loads within 3s | e2e | tests/e2e/dashboard.spec.ts | pass | |
+  ```
+- Write `docs/test-results/summary.md` with: date, total tests, passed/failed counts, list of test files, coverage areas, and any notable findings
 - Report coverage areas and results
+
+### N-1. Update Docs
+- **Task ID**: update-docs
+- **Depends On**: write-tests
+- **Assigned To**: <docs-writer team member>
+- **Agent Type**: docs-writer
+- **Parallel**: false
+- Review the implemented features and write/update documentation (e.g. README.md, API docs)
+- Ensure documentation is clear, accurate, and helpful for future developers
+- **MANDATORY**: Create the following documentation files:
+  - `docs/env-setup.md` — environment variables with descriptions and example values (sourced from `.env*` files)
+  - `docs/architecture.md` — Mermaid data flow diagram + component tree
+  - `docs/troubleshooting.md` — common errors and how to fix them
+- **IMPORTANT**: If creating an index/README that links to other doc files, ALL linked files MUST be created. Never create links to files that don't exist.
+- After writing docs, verify every internal link resolves to an existing file
+- Report the documentation created or modified
 
 ### N. Validate Final Output
 - **Task ID**: validate-all
-- **Depends On**: code-review, write-tests
+- **Depends On**: code-review, write-tests, update-docs
 - **Assigned To**: <validator team member>
 - **Agent Type**: validator
 - **Parallel**: false
 - Run all validation commands
 - Run all automated tests
 - Verify acceptance criteria met
+- **Verify all documentation links**: Check that every file referenced in docs/README.md or any index file actually exists on disk
+- **Verify runtime**: If the project has a dev server, start it and confirm all routes return HTTP 200 (not just that `npm run build` passes)
+
+### N+1. Heal Failures (if any)
+- **Task ID**: heal
+- **Depends On**: validate-all
+- **Assigned To**: team-lead (you)
+- **Parallel**: false
+- **Max Retries**: 2
+- Only run this step if step N (validate-all) has failures
+- Run: `python3 .claude/skills/validate/validate.py --json <plan-name>`
+- Parse the JSON output — each failure has a `heal` field:
+  - `heal.agent` — which agent type should fix it (builder, test-writer, code-reviewer)
+  - `heal.instruction` — what to fix
+- For each failure with a heal recommendation:
+  1. Create a new task assigned to `heal.agent` with context: the failure description, command output, and heal instruction
+  2. Wait for the agent to complete the fix
+- After all fixes are applied, re-run validation: `python3 .claude/skills/validate/validate.py --json <plan-name>`
+- If still failing after 2 retries, stop and report remaining failures to the user
+- If all checks pass, mark the plan as complete
 
 <continue with additional build tasks as needed before the mandatory post-build tasks. Agent types must exist in .claude/agents/team/*.md>
 
@@ -441,27 +512,104 @@ Use these files to complete the task:
 Every plan follows this mandatory execution pipeline:
 
 ```
-Research (if needed) → Build → Code Review → Write Tests → Validate Final
+Research (if needed) → Infra Verify → Build → Code Review → Write Tests (unit + E2E smoke) → Update Docs → Validate (real runtime) → Heal (if needed) → Re-validate
 ```
 
 - **Research**: Optional. Gather information needed before building.
+- **Infra Verify**: MANDATORY for projects with external services (DB, auth, APIs). A builder agent must verify all external connections BEFORE any feature code is written:
+  - Database: execute a simple query (`SELECT 1`) using the configured connection string
+  - Auth: fetch JWKS/auth endpoint and confirm it returns valid keys
+  - APIs: curl any external service endpoints to confirm reachability
+  - Env vars: confirm all required env vars are set and valid (not placeholder values like `your-xxx` or `[ref]`)
+  - If ANY infra check fails, STOP and fix before proceeding. Do not build features on broken infra.
+  - Save verified connection details to the plan or CLAUDE.md for downstream agents.
 - **Build**: Core implementation work by builder agents. Can be parallelized.
 - **Code Review**: MANDATORY. code-reviewer agent reviews and fixes quality/efficiency/reuse issues.
-- **Write Tests**: MANDATORY. test-writer agent creates automated tests for the implementation.
-- **Validate Final**: MANDATORY. validator agent confirms all acceptance criteria met and all tests pass.
-
-If the validator fails, the lead sends findings back to a builder to fix, then re-runs Code Review → Write Tests → Validate (max 2 retries).
+- **Write Tests**: MANDATORY. test-writer agent creates automated tests:
+  - **Unit tests** (mocked): business logic, state machines, validation rules
+  - **E2E smoke tests** (real): At minimum 1 full user flow against real running services — e.g., login → create resource → read resource → verify response. These tests must connect to the actual database and auth provider, NOT mocks. If the project has a dev server, the smoke test must start it, run the flow, and stop it.
+  - Test results clearly separate unit (mocked) from E2E (real) in `docs/test-results/`
+- **Update Docs**: MANDATORY. docs-writer agent creates/updates documentation in a dedicated `docs/` folder or root `README.md`.
+- **Validate Final**: MANDATORY. validator agent confirms all acceptance criteria met:
+  - Run all automated tests (both unit AND E2E)
+  - Start dev servers and curl key endpoints for HTTP 200 with valid response bodies (not just status codes)
+  - Verify at least one authenticated API call returns real data from the database
+  - Check documentation exists and links resolve
+  - This is a REAL runtime validation, not just file existence checks
+- **Heal**: CONDITIONAL. If validation fails, parse failures and route each to the correct agent per Healing Rules. Max 2 retries.
 
 ## Acceptance Criteria
 <list specific, measurable criteria that must be met for the task to be considered complete>
+
+### Infrastructure Criteria (verified by Infra Verify stage)
+- All external service connections verified with real queries/requests (not just config file checks)
+- No placeholder values remain in .env files (`your-xxx`, `[ref]`, `[password]`)
+- Auth endpoint returns valid JWKS/keys
+- Database accepts queries via configured connection string
+
+### Quality Criteria
 - Code review passes with no remaining quality issues
-- All automated tests pass
+- All unit tests pass (mocked dependencies)
+- All E2E smoke tests pass (real services — at least 1 full user flow: auth → create → read → verify)
+
+### Documentation Criteria
+- All documentation files referenced in indexes/READMEs actually exist (no broken internal links)
+- `docs/env-setup.md` exists with environment variable descriptions and example values
+- `docs/architecture.md` exists with a Mermaid data flow diagram and component tree
+- `docs/troubleshooting.md` exists with at least one documented issue and fix
+
+### Runtime Criteria (verified by Validate Final stage with REAL running servers)
+- If project has a dev server: all routes return HTTP 200 at runtime (not just build-time)
+- At least one authenticated API call returns real data from the database (not mock/empty)
+- Auth flow works end-to-end: obtain token → call protected endpoint → receive valid response
+- Test case CSV saved to `docs/test-results/test-cases.csv` with columns: ID, Test Name, Type, Category, File, Status, Notes
+- Test case markdown saved to `docs/test-results/test-cases.md` (same data for git review)
+- Test results summary saved to `docs/test-results/summary.md` with pass/fail counts and date
+- Unit test JSON output saved to `docs/test-results/unit/unit-results.json`
+- Unit test human-readable report saved to `docs/test-results/unit/unit-results.md`
+- If project has e2e tests: results saved to `docs/test-results/e2e/e2e-results.json` and `e2e-results.md`
+- If project has UI: screenshots saved to `docs/test-results/screenshots/` using `<name>--<viewport>.png` naming
 
 ## Validation Commands
 Execute these commands to validate the task is complete:
 
 <list specific commands to validate the work. Be precise about what to run>
 - Example: `uv run python -m py_compile apps/*.py` - Test to ensure the code compiles
+- <MANDATORY: include a command to verify all internal doc links resolve to existing files>
+- <MANDATORY if project has a dev server: include a command that starts the server, curls key routes for HTTP 200, then kills the server>
+- <MANDATORY: include a command to verify `docs/test-results/test-cases.csv` exists and has header + data rows>
+- <MANDATORY: include a command to verify `docs/test-results/test-cases.md` exists and contains a table>
+- <MANDATORY: include a command to verify `docs/test-results/summary.md` exists>
+- `test -f docs/env-setup.md` — Verify env-setup doc exists
+- `test -f docs/architecture.md` — Verify architecture doc exists
+- `grep -q 'mermaid' docs/architecture.md` — Verify architecture doc has a Mermaid diagram
+- `test -f docs/troubleshooting.md` — Verify troubleshooting doc exists
+- `grep -q '### Issue\|### Problem' docs/troubleshooting.md` — Verify troubleshooting doc has at least one issue
+- <MANDATORY: include a command to verify `docs/test-results/unit/unit-results.json` exists and contains test results>
+- <MANDATORY: include a command to verify `docs/test-results/unit/unit-results.md` exists>
+- <MANDATORY if project has e2e tests: include a command to verify `docs/test-results/e2e/` has results>
+- <MANDATORY if project has UI: include a command to verify `docs/test-results/screenshots/` has .png files with `--<viewport>` naming>
+
+## Healing Rules
+When a validation check fails, assign it to the right agent to fix:
+
+<list failure keyword → agent → instruction mappings, one per line>
+- `<failure keyword>` → <agent type> — <what to fix>
+- Example: `compile error` → builder — Fix syntax or import errors in the failing file
+- Example: `pytest` → test-writer — Fix failing tests or update test expectations to match implementation
+- Example: `code review` → code-reviewer — Re-review and fix remaining quality issues
+- `test-cases.md` → test-writer — Generate the missing test case catalog
+- `test-results/summary.md` → test-writer — Generate the missing test summary report
+- `unit-results` → test-writer — Re-run tests and save results to `docs/test-results/unit/`
+- `unit-results.json` → test-writer — Configure test runner JSON output and re-run tests
+- `screenshots` → test-writer — Capture missing page screenshots via Playwright
+- `broken link` → docs-writer — Create missing documentation files referenced in indexes
+- `missing env-setup` → docs-writer — Create docs/env-setup.md with all env vars from .env*
+- `missing architecture` → docs-writer — Create docs/architecture.md with Mermaid diagram
+- `missing troubleshooting` → docs-writer — Create docs/troubleshooting.md with common issues
+- `infra verify` → builder — Fix failing infrastructure connection (DB, auth, external service)
+- `E2E smoke` → test-writer — Fix E2E smoke test or the underlying issue it exposes
+- `runtime` → builder — Fix runtime errors caught by real server validation
 
 ## Notes
 <optional additional context, considerations, or dependencies. If new libraries are needed, specify using `uv add`>

@@ -1,0 +1,11 @@
+
+> backend@1.0.0 test:json /Users/tachongrak/Projects/ts/backend
+> jest --json --outputFile=../docs/test-results/unit/unit-results.json
+
+
+Test Suites: 7 passed, 7 total
+Tests:       106 passed, 106 total
+Snapshots:   0 total
+Time:        5.669 s, estimated 6 s
+Ran all test suites.
+Test results written to: ../docs/test-results/unit/unit-results.json

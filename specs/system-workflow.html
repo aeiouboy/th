@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timesheet System — Build Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --bg-card: #12151c;
+    --bg-card-hover: #181c26;
+    --border: #1e2330;
+    --border-glow: #2a3040;
+    --text: #e2e4ea;
+    --text-dim: #6b7280;
+    --text-muted: #3d4555;
+    --accent-teal: #2dd4bf;
+    --accent-teal-dim: rgba(45, 212, 191, 0.12);
+    --accent-amber: #f59e0b;
+    --accent-amber-dim: rgba(245, 158, 11, 0.12);
+    --accent-violet: #8b5cf6;
+    --accent-violet-dim: rgba(139, 92, 246, 0.12);
+    --accent-rose: #f43f5e;
+    --accent-rose-dim: rgba(244, 63, 94, 0.12);
+    --accent-sky: #38bdf8;
+    --accent-sky-dim: rgba(56, 189, 248, 0.12);
+    --accent-emerald: #34d399;
+    --accent-emerald-dim: rgba(52, 211, 153, 0.12);
+    --accent-orange: #fb923c;
+    --accent-orange-dim: rgba(251, 146, 60, 0.12);
+    --accent-lime: #a3e635;
+    --accent-lime-dim: rgba(163, 230, 53, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45, 212, 191, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  header {
+    position: relative;
+    padding: 48px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(45, 212, 191, 0.04) 0%, transparent 100%);
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-teal), transparent);
+    opacity: 0.4;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-mark {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, var(--accent-teal), var(--accent-violet));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--bg);
+    letter-spacing: -1px;
+  }
+
+  .logo-text h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+
+  .logo-text span {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+
+  .tech-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 480px;
+  }
+
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    background: var(--bg-card);
+    white-space: nowrap;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 32px;
+  }
+
+  .stat {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent-teal);
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  main {
+    position: relative;
+    padding: 40px 48px 80px;
+  }
+
+  /* Pipeline section */
+  .pipeline-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .pipeline-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+  }
+
+  .pipeline-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Phase containers */
+  .phase {
+    margin-bottom: 48px;
+    position: relative;
+    animation: fadeUp 0.6s ease-out both;
+  }
+
+  .phase:nth-child(2) { animation-delay: 0.1s; }
+  .phase:nth-child(3) { animation-delay: 0.2s; }
+  .phase:nth-child(4) { animation-delay: 0.3s; }
+  .phase:nth-child(5) { animation-delay: 0.4s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .phase-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .phase-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .phase-name {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+  }
+
+  .phase-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: 8px;
+  }
+
+  /* Task cards */
+  .tasks-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .task-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    min-width: 200px;
+    flex: 1;
+    max-width: 320px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    cursor: default;
+  }
+
+  .task-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-glow);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+
+  .task-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+
+  .task-card .task-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .task-card .task-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .task-card .task-agent {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  .task-card .task-agent .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .task-card .task-details {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .task-card .task-deps {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Color variants */
+  .c-teal .task-card::before { background: var(--accent-teal); }
+  .c-teal .task-id { color: var(--accent-teal); }
+  .c-teal .task-agent { background: var(--accent-teal-dim); color: var(--accent-teal); }
+  .c-teal .task-agent .dot { background: var(--accent-teal); }
+  .c-teal .phase-number { background: var(--accent-teal-dim); color: var(--accent-teal); }
+
+  .c-sky .task-card::before { background: var(--accent-sky); }
+  .c-sky .task-id { color: var(--accent-sky); }
+  .c-sky .task-agent { background: var(--accent-sky-dim); color: var(--accent-sky); }
+  .c-sky .task-agent .dot { background: var(--accent-sky); }
+  .c-sky .phase-number { background: var(--accent-sky-dim); color: var(--accent-sky); }
+
+  .c-amber .task-card::before { background: var(--accent-amber); }
+  .c-amber .task-id { color: var(--accent-amber); }
+  .c-amber .task-agent { background: var(--accent-amber-dim); color: var(--accent-amber); }
+  .c-amber .task-agent .dot { background: var(--accent-amber); }
+  .c-amber .phase-number { background: var(--accent-amber-dim); color: var(--accent-amber); }
+
+  .c-violet .task-card::before { background: var(--accent-violet); }
+  .c-violet .task-id { color: var(--accent-violet); }
+  .c-violet .task-agent { background: var(--accent-violet-dim); color: var(--accent-violet); }
+  .c-violet .task-agent .dot { background: var(--accent-violet); }
+  .c-violet .phase-number { background: var(--accent-violet-dim); color: var(--accent-violet); }
+
+  .c-emerald .task-card::before { background: var(--accent-emerald); }
+  .c-emerald .task-id { color: var(--accent-emerald); }
+  .c-emerald .task-agent { background: var(--accent-emerald-dim); color: var(--accent-emerald); }
+  .c-emerald .task-agent .dot { background: var(--accent-emerald); }
+  .c-emerald .phase-number { background: var(--accent-emerald-dim); color: var(--accent-emerald); }
+
+  .c-rose .task-card::before { background: var(--accent-rose); }
+  .c-rose .task-id { color: var(--accent-rose); }
+  .c-rose .task-agent { background: var(--accent-rose-dim); color: var(--accent-rose); }
+  .c-rose .task-agent .dot { background: var(--accent-rose); }
+  .c-rose .phase-number { background: var(--accent-rose-dim); color: var(--accent-rose); }
+
+  .c-orange .task-card::before { background: var(--accent-orange); }
+  .c-orange .task-id { color: var(--accent-orange); }
+  .c-orange .task-agent { background: var(--accent-orange-dim); color: var(--accent-orange); }
+  .c-orange .task-agent .dot { background: var(--accent-orange); }
+  .c-orange .phase-number { background: var(--accent-orange-dim); color: var(--accent-orange); }
+
+  .c-lime .task-card::before { background: var(--accent-lime); }
+  .c-lime .task-id { color: var(--accent-lime); }
+  .c-lime .task-agent { background: var(--accent-lime-dim); color: var(--accent-lime); }
+  .c-lime .task-agent .dot { background: var(--accent-lime); }
+  .c-lime .phase-number { background: var(--accent-lime-dim); color: var(--accent-lime); }
+
+  /* Parallel badge */
+  .parallel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent-amber);
+    background: var(--accent-amber-dim);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* Flow connector */
+  .flow-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    position: relative;
+  }
+
+  .flow-connector::before {
+    content: '';
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--border), var(--border-glow));
+  }
+
+  .flow-connector .arrow {
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--border-glow);
+  }
+
+  /* Team section */
+  .team-section {
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .team-member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+
+  .team-member:hover {
+    border-color: var(--border-glow);
+    background: var(--bg-card-hover);
+  }
+
+  .team-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .team-info .name {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .team-info .role {
+    font-size: 10px;
+    color: var(--text-dim);
+    line-height: 1.2;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  /* Heal loop */
+  .heal-loop {
+    position: relative;
+    margin-top: -8px;
+    padding: 16px 20px;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(244, 63, 94, 0.03) 8px,
+      rgba(244, 63, 94, 0.03) 16px
+    );
+    border: 1px dashed rgba(244, 63, 94, 0.25);
+    border-radius: 10px;
+  }
+
+  .heal-loop .heal-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent-rose);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .heal-loop .heal-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .heal-loop .heal-text code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: rgba(244, 63, 94, 0.1);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent-rose);
+  }
+
+  @media (max-width: 768px) {
+    header, main { padding-left: 20px; padding-right: 20px; }
+    .tasks-grid { flex-direction: column; }
+    .task-card { max-width: 100%; }
+    .stats-row { gap: 16px; flex-wrap: wrap; }
+    .header-top { flex-direction: column; gap: 16px; }
+    .tech-pills { justify-content: flex-start; max-width: 100%; }
+    .team-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="grid-bg"></div>
+
+<header>
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-mark">TS</div>
+      <div class="logo-text">
+        <h1>Timesheet System</h1>
+        <span>Build Pipeline &amp; Workflow</span>
+      </div>
+    </div>
+    <div class="tech-pills">
+      <span class="pill">NestJS 11</span>
+      <span class="pill">Next.js 16</span>
+      <span class="pill">Drizzle ORM</span>
+      <span class="pill">Supabase</span>
+      <span class="pill">TypeScript</span>
+      <span class="pill">pnpm</span>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num">15</span><span class="stat-label">Tasks</span></div>
+    <div class="stat"><span class="stat-num">12</span><span class="stat-label">Agents</span></div>
+    <div class="stat"><span class="stat-num">5</span><span class="stat-label">Phases</span></div>
+    <div class="stat"><span class="stat-num">5</span><span class="stat-label">Parallel Tracks</span></div>
+  </div>
+</header>
+
+<main>
+  <div class="pipeline-header">
+    <h2>Execution Pipeline</h2>
+  </div>
+
+  <!-- PHASE 1: Foundation -->
+  <div class="phase c-teal">
+    <div class="phase-label">
+      <span class="phase-number">PHASE 1</span>
+      <span class="phase-name">Foundation</span>
+      <span class="phase-desc">— Sequential. All other tasks depend on this.</span>
+    </div>
+    <div class="tasks-grid">
+      <div class="task-card">
+        <div class="task-id">Task 1 &middot; foundation-setup</div>
+        <div class="task-name">Project Scaffolding &amp; Database Foundation</div>
+        <div class="task-agent"><span class="dot"></span> builder-foundation</div>
+        <div class="task-details">
+          NestJS backend + Next.js frontend scaffold<br>
+          Drizzle schema (9 tables) + migrations<br>
+          Supabase Auth guard + RBAC decorators<br>
+          Login page + sidebar layout + API client
+        </div>
+        <div class="task-deps">depends: none</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-connector"><span class="arrow"></span></div>
+
+  <!-- PHASE 2: Core Features (Parallel) -->
+  <div class="phase c-sky">
+    <div class="phase-label">
+      <span class="phase-number">PHASE 2</span>
+      <span class="phase-name">Core Features</span>
+      <span class="parallel-badge">&#9736; PARALLEL</span>
+      <span class="phase-desc">— 5 agents build simultaneously</span>
+    </div>
+    <div class="tasks-grid">
+      <div class="task-card">
+        <div class="task-id">Task 2 &middot; time-logging</div>
+        <div class="task-name">Time Logging Module</div>
+        <div class="task-agent"><span class="dot"></span> builder-time-logging</div>
+        <div class="task-details">
+          Timesheet CRUD controller + service<br>
+          Weekly grid frontend + auto-save<br>
+          Min 8h/day validation + cutoff logic
+        </div>
+        <div class="task-deps">depends: foundation-setup</div>
+      </div>
+      <div class="task-card">
+        <div class="task-id">Task 3 &middot; charge-codes</div>
+        <div class="task-name">Charge Code Management</div>
+        <div class="task-agent"><span class="dot"></span> builder-charge-codes</div>
+        <div class="task-details">
+          4-level hierarchy (PRG/PRJ/ACT/TSK)<br>
+          Materialized path + tree view<br>
+          Owner access control + roll-up
+        </div>
+        <div class="task-deps">depends: foundation-setup</div>
+      </div>
+      <div class="task-card">
+        <div class="task-id">Task 4 &middot; approvals</div>
+        <div class="task-name">Approval Workflow</div>
+        <div class="task-agent"><span class="dot"></span> builder-approvals</div>
+        <div class="task-details">
+          3-stage state machine<br>
+          Bulk approve + reject w/ comments<br>
+          Approval queue + inline detail
+        </div>
+        <div class="task-deps">depends: foundation-setup</div>
+      </div>
+      <div class="task-card">
+        <div class="task-id">Task 5 &middot; budget-tracking</div>
+        <div class="task-name">Budget Tracking</div>
+        <div class="task-agent"><span class="dot"></span> builder-budget</div>
+        <div class="task-details">
+          Cost = Hours &times; Rate by Job Grade<br>
+          Forecast at completion<br>
+          Overrun alerts + root cause
+        </div>
+        <div class="task-deps">depends: foundation-setup</div>
+      </div>
+      <div class="task-card">
+        <div class="task-id">Task 6 &middot; calendar</div>
+        <div class="task-name">Calendar &amp; Holidays</div>
+        <div class="task-agent"><span class="dot"></span> builder-calendar</div>
+        <div class="task-details">
+          Weekends + public holidays<br>
+          Vacation requests<br>
+          Working days calculation
+        </div>
+        <div class="task-deps">depends: foundation-setup</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-connector"><span class="arrow"></span></div>
+
+  <!-- PHASE 3: Dashboard + Reports -->
+  <div class="phase c-amber">
+    <div class="phase-label">
+      <span class="phase-number">PHASE 3</span>
+      <span class="phase-name">Dashboard &amp; Reports</span>
+      <span class="phase-desc">— Depends on all core feature APIs</span>
+    </div>
+    <div class="tasks-grid">
+      <div class="task-card">
+        <div class="task-id">Task 7 &middot; dashboard</div>
+        <div class="task-name">Dashboard &amp; Navigation</div>
+        <div class="task-agent"><span class="dot"></span> builder-time-logging</div>
+        <div class="task-details">
+          Employee + Manager views<br>
+          Weekly summary + metric cards<br>
+          Quick actions + alerts
+        </div>
+        <div class="task-deps">depends: tasks 2-6</div>
+      </div>
+      <div class="task-card">
+        <div class="task-id">Task 8 &middot; reports</div>
+        <div class="task-name">Reporting &amp; Analytics</div>
+        <div class="task-agent"><span class="dot"></span> builder-reports</div>
+        <div class="task-details">
+          6 report types + Recharts dashboard<br>
+          Budget vs Actual + Chargeability<br>
+          Financial P/L impact + export
+        </div>
+        <div class="task-deps">depends: tasks 2, 3, 5</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-connector"><span class="arrow"></span></div>
+
+  <!-- PHASE 4: Advanced -->
+  <div class="phase c-violet">
+    <div class="phase-label">
+      <span class="phase-number">PHASE 4</span>
+      <span class="phase-name">Advanced Features</span>
+      <span class="phase-desc">— Teams integration + scheduled jobs</span>
+    </div>
+    <div class="tasks-grid">
+      <div class="task-card">
+        <div class="task-id">Task 9 &middot; advanced-features</div>
+        <div class="task-name">Teams Chatbot &amp; Notifications</div>
+        <div class="task-agent"><span class="dot"></span> builder-advanced</div>
+        <div class="task-details">
+          NL time logging via Teams chat<br>
+          Budget inquiry chatbot<br>
+          Reminders + weekly insights
+        </div>
+        <div class="task-deps">depends: tasks 2, 4, 8</div>
+      </div>
+      <div class="task-card">
+        <div class="task-id">Task 10 &middot; scheduled-jobs</div>
+        <div class="task-name">Scheduled Jobs &amp; Cutoff</div>
+        <div class="task-agent"><span class="dot"></span> builder-foundation</div>
+        <div class="task-details">
+          @nestjs/schedule cron jobs<br>
+          Auto-lock on 15th + month-end<br>
+          Daily reminders + budget checks
+        </div>
+        <div class="task-deps">depends: tasks 2, 4, 6</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-connector"><span class="arrow"></span></div>
+
+  <!-- PHASE 5: Quality Assurance -->
+  <div class="phase c-emerald">
+    <div class="phase-label">
+      <span class="phase-number">PHASE 5</span>
+      <span class="phase-name">Quality Assurance</span>
+      <span class="phase-desc">— Sequential pipeline: Review → Test → Docs → Validate → Heal</span>
+    </div>
+    <div class="tasks-grid">
+      <div class="task-card" style="border-left: 3px solid var(--accent-emerald);">
+        <div class="task-id" style="color: var(--accent-emerald);">Task 11 &middot; code-review</div>
+        <div class="task-name">Code Review</div>
+        <div class="task-agent" style="background: var(--accent-emerald-dim); color: var(--accent-emerald);"><span class="dot" style="background: var(--accent-emerald);"></span> reviewer</div>
+        <div class="task-details">
+          Reuse, quality, efficiency<br>
+          Fix all issues directly<br>
+          Report skipped items
+        </div>
+        <div class="task-deps">depends: all build tasks (1-10)</div>
+      </div>
+      <div class="task-card" style="border-left: 3px solid var(--accent-sky);">
+        <div class="task-id" style="color: var(--accent-sky);">Task 12 &middot; write-tests</div>
+        <div class="task-name">Write Tests</div>
+        <div class="task-agent" style="background: var(--accent-sky-dim); color: var(--accent-sky);"><span class="dot" style="background: var(--accent-sky);"></span> tester</div>
+        <div class="task-details">
+          jest (backend) + vitest (frontend)<br>
+          Unit + integration + RBAC tests<br>
+          Output: docs/test-results/
+        </div>
+        <div class="task-deps">depends: code-review</div>
+      </div>
+      <div class="task-card" style="border-left: 3px solid var(--accent-orange);">
+        <div class="task-id" style="color: var(--accent-orange);">Task 13 &middot; update-docs</div>
+        <div class="task-name">Update Docs</div>
+        <div class="task-agent" style="background: var(--accent-orange-dim); color: var(--accent-orange);"><span class="dot" style="background: var(--accent-orange);"></span> doc-writer</div>
+        <div class="task-details">
+          README + env-setup + architecture<br>
+          API reference + DB schema (Mermaid)<br>
+          Deployment + known issues
+        </div>
+        <div class="task-deps">depends: write-tests</div>
+      </div>
+      <div class="task-card" style="border-left: 3px solid var(--accent-amber);">
+        <div class="task-id" style="color: var(--accent-amber);">Task 14 &middot; validate-all</div>
+        <div class="task-name">Validate Final</div>
+        <div class="task-agent" style="background: var(--accent-amber-dim); color: var(--accent-amber);"><span class="dot" style="background: var(--accent-amber);"></span> validator</div>
+        <div class="task-details">
+          Run all validation commands<br>
+          Check docs, tests, runtime<br>
+          Verify acceptance criteria
+        </div>
+        <div class="task-deps">depends: code-review, write-tests, update-docs</div>
+      </div>
+    </div>
+
+    <!-- Heal loop -->
+    <div style="margin-top: 16px;">
+      <div class="heal-loop">
+        <div class="heal-label">&#x21bb; Task 15 &middot; Heal Failures (conditional)</div>
+        <div class="heal-text">
+          If validation fails → run <code>validate.py --json timesheet-system-full-build</code><br>
+          Parse failures → route each to the correct agent via <code>heal.agent</code> + <code>heal.instruction</code><br>
+          Re-validate after fixes applied &middot; <strong>Max 2 retries</strong> &middot; If still failing → report to user
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Members -->
+  <div class="team-section">
+    <div class="pipeline-header">
+      <h2>Team Members</h2>
+    </div>
+
+    <div class="team-grid">
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-teal-dim); color: var(--accent-teal);">BF</div>
+        <div class="team-info">
+          <div class="name">builder-foundation</div>
+          <div class="role">Scaffolding, DB, auth, scheduled jobs</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-sky-dim); color: var(--accent-sky);">BT</div>
+        <div class="team-info">
+          <div class="name">builder-time-logging</div>
+          <div class="role">Time entry API + frontend + dashboard</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-sky-dim); color: var(--accent-sky);">BC</div>
+        <div class="team-info">
+          <div class="name">builder-charge-codes</div>
+          <div class="role">Hierarchical charge code CRUD + tree</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-sky-dim); color: var(--accent-sky);">BA</div>
+        <div class="team-info">
+          <div class="name">builder-approvals</div>
+          <div class="role">Approval state machine + queue UI</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-sky-dim); color: var(--accent-sky);">BB</div>
+        <div class="team-info">
+          <div class="name">builder-budget</div>
+          <div class="role">Cost calculation, forecast, alerts</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-sky-dim); color: var(--accent-sky);">BK</div>
+        <div class="team-info">
+          <div class="name">builder-calendar</div>
+          <div class="role">Weekends, holidays, vacations</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-amber-dim); color: var(--accent-amber);">BR</div>
+        <div class="team-info">
+          <div class="name">builder-reports</div>
+          <div class="role">Analytics APIs + chart dashboard</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-violet-dim); color: var(--accent-violet);">BX</div>
+        <div class="team-info">
+          <div class="name">builder-advanced</div>
+          <div class="role">Teams bot, reminders, insights, uploads</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-emerald-dim); color: var(--accent-emerald);">CR</div>
+        <div class="team-info">
+          <div class="name">reviewer</div>
+          <div class="role">Code quality review + fixes</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-sky-dim); color: var(--accent-sky);">TW</div>
+        <div class="team-info">
+          <div class="name">tester</div>
+          <div class="role">Automated test suite + results</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-orange-dim); color: var(--accent-orange);">DW</div>
+        <div class="team-info">
+          <div class="name">doc-writer</div>
+          <div class="role">README, API ref, schema, deployment</div>
+        </div>
+      </div>
+      <div class="team-member">
+        <div class="team-avatar" style="background: var(--accent-amber-dim); color: var(--accent-amber);">VA</div>
+        <div class="team-info">
+          <div class="name">validator</div>
+          <div class="role">Final acceptance + healing triggers</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background: var(--accent-teal);"></div> Foundation</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: var(--accent-sky);"></div> Core Features (parallel)</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: var(--accent-amber);"></div> Dashboard &amp; Reports</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: var(--accent-violet);"></div> Advanced Features</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: var(--accent-emerald);"></div> Code Review</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: var(--accent-orange);"></div> Documentation</div>
+    <div class="legend-item"><div class="legend-swatch" style="background: var(--accent-rose);"></div> Heal Loop</div>
+  </div>
+</main>
+
+</body>
+</html>

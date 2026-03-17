@@ -26,18 +26,151 @@ When invoked, you must follow these steps:
 1. **Understand the task.** Use TaskGet to retrieve the current task details and understand what was built, which files were created or modified, and the acceptance criteria.
 2. **Read the implementation.** Thoroughly read all implementation files referenced in the task to understand the code's behavior, inputs, outputs, edge cases, and error paths.
 3. **Discover test patterns.** Search the codebase for existing tests to identify:
-   - The test framework in use (pytest, unittest, etc.)
+   - The test framework in use (pytest, vitest, jest, unittest, etc.)
    - Directory structure and naming conventions for test files
    - Common fixtures, helpers, conftest patterns, and factory functions
    - Assertion styles and mocking approaches
-4. **Write comprehensive tests.** Create test files following the discovered conventions. Cover:
-   - **Unit tests** for individual functions and methods
+4. **Write comprehensive tests.** Create test files following the discovered conventions. You MUST cover BOTH backend and frontend if both exist.
+
+   **Backend tests** (jest / pytest / vitest — whatever the project uses):
+   - **Unit tests** for individual functions, services, and methods
    - **Edge cases** including boundary values, empty inputs, and None/null handling
    - **Error paths** ensuring exceptions are raised correctly and error messages are meaningful
-   - **Integration tests** where components interact, if appropriate
+   - **Integration tests** for API endpoints (controller → service → database)
+   - **Auth/RBAC tests** — verify each role can/cannot access protected endpoints
    - **Parameterized tests** for functions with multiple valid input combinations
+
+   **Frontend tests** (vitest + React Testing Library — MANDATORY if project has UI):
+   - **Component render tests** — every page and key component renders without errors
+   - **User interaction tests** — form inputs, button clicks, dropdown selections, navigation
+   - **State management tests** — data loading, error states, empty states, loading skeletons
+   - **Conditional rendering** — role-based UI visibility (e.g., admin menu hidden for employee)
+   - **Form validation** — required fields, min/max constraints, error message display
+   - **API integration mocks** — mock API calls, verify correct data display from response
+
+   **E2E tests** (Playwright — MANDATORY if project has UI pages):
+   - **Critical user flows** — login → navigate → perform action → verify result
+   - **Page load verification** — all key pages load without console errors
+   - **Screenshots** — capture each page at desktop (1280×720) and mobile (375×667)
+   - Save screenshots to `docs/test-results/screenshots/<page-name>--<viewport>.png`
 5. **Run the tests.** Execute the test suite to confirm all new tests pass. Fix any failures in the test code (never in the implementation code).
-6. **Report and complete.** Use TaskUpdate to mark the task complete with a summary of what was tested.
+6. **Save test results.** You MUST create ALL of the following files before marking the task complete. A PostToolUse validator will **block** your TaskUpdate if any are missing.
+
+### Required output files
+
+```
+docs/test-results/
+├── test-cases.csv             # MANDATORY — CSV catalog for easy validation in Excel/Sheets
+├── test-cases.md              # MANDATORY — markdown catalog (same data, for git review)
+├── summary.md                 # MANDATORY — overall summary with backend + frontend breakdown
+├── backend/                   # MANDATORY if backend exists
+│   ├── unit-results.json      # Machine-readable test runner output (jest --json)
+│   └── unit-results.md        # Human-readable report
+├── frontend/                  # MANDATORY if frontend exists
+│   ├── unit-results.json      # Machine-readable (vitest --reporter=json)
+│   └── unit-results.md        # Human-readable report
+├── e2e/                       # MANDATORY if project has UI pages
+│   ├── e2e-results.json       # Playwright JSON report
+│   └── e2e-results.md         # Human-readable report
+└── screenshots/               # MANDATORY if project has UI pages
+    └── <name>--<viewport>.png # kebab-case, double-dash before viewport
+```
+
+**Detection rule:** If the project has a `frontend/` or `src/app/` directory with `.tsx` files, frontend tests and e2e tests are MANDATORY, not optional.
+
+### test-cases.csv format (MANDATORY — primary deliverable)
+
+Engineers validate test cases in spreadsheets. CSV is the primary format.
+
+```csv
+ID,Test Name,Type,Category,File,Status,Notes
+TC-001,Create order validates required fields,unit,Server Actions — Orders,tests/orders/create.test.ts,pass,
+TC-002,Dashboard loads within 3s,e2e,E2E — Dashboard,tests/e2e/dashboard.spec.ts,pass,
+TC-003,Returns 400 on missing email,unit,Server Actions — Users,tests/users/validate.test.ts,pass,Edge case
+```
+
+**CSV columns (7 columns, this exact order):**
+- **ID**: Sequential `TC-001`, `TC-002`, etc.
+- **Test Name**: Human-readable description of what is being tested
+- **Type**: `unit`, `e2e`, `integration`, or `snapshot`
+- **Category**: Group label for filtering (e.g. `Server Actions — Tasks`, `Components — BoardCard`, `E2E — Calendar`)
+- **File**: Relative path to the test file
+- **Status**: `pass`, `fail`, or `skip`
+- **Notes**: Empty unless notable. Wrap in quotes if contains commas.
+
+### test-cases.md format (MANDATORY — same data as CSV, for git review)
+
+```markdown
+# Test Cases
+
+> Generated: YYYY-MM-DD | Runner: <vitest|jest|pytest|etc> | Total: N | Pass: N | Fail: N
+
+| ID     | Test Name                              | Type | Category                    | File                          | Status | Notes |
+|--------|----------------------------------------|------|-----------------------------|-------------------------------|--------|-------|
+| TC-001 | Create order validates required fields  | unit | Server Actions — Orders      | tests/orders/create.test.ts   | pass   |       |
+| TC-002 | Dashboard loads within 3s               | e2e  | E2E — Dashboard              | tests/e2e/dashboard.spec.ts   | pass   |       |
+```
+
+### summary.md format
+
+```markdown
+# Test Results Summary
+
+- **Date**: YYYY-MM-DD HH:MM
+- **Total Tests**: N
+- **Passed**: N
+- **Failed**: N
+- **Skipped**: N
+
+## Backend Tests
+- **Runner**: jest
+- **Tests**: N pass / N fail
+- **Coverage**: services, controllers, guards, DTOs
+- Files: list each test file + count
+
+## Frontend Tests
+- **Runner**: vitest + React Testing Library
+- **Tests**: N pass / N fail
+- **Coverage**: components, pages, forms, interactions
+- Files: list each test file + count
+
+## E2E Tests
+- **Runner**: Playwright
+- **Tests**: N pass / N fail
+- **Pages tested**: list each page URL
+- **Screenshots**: N captured (desktop + mobile)
+
+## Notable Findings
+- <any issues, bugs discovered, or important observations>
+```
+
+### File naming rules
+- **kebab-case** for all file and folder names
+- `<type>-results.<ext>` for test output files (e.g. `unit-results.json`)
+- `<page-or-component>--<viewport>.png` for screenshots (double-dash separates name from variant)
+- Always provide both `.json` (machine-readable) and `.md` (human-readable) per test type
+
+### Generating results files
+- Configure test runner to output JSON: e.g. `vitest run --reporter=json --outputFile=docs/test-results/unit/unit-results.json`
+- Write the `.md` version by parsing the JSON output into a human-readable format
+- For screenshots, use Playwright to capture each key page at desktop (1280x720) and optionally mobile (375x667)
+
+7. **Self-validate before completing.** Before calling TaskUpdate with status=completed, verify:
+   - [ ] `docs/test-results/test-cases.csv` exists with header row and all 7 columns (ID,Test Name,Type,Category,File,Status,Notes)
+   - [ ] `docs/test-results/test-cases.md` exists and has the same data as CSV in markdown table
+   - [ ] `docs/test-results/summary.md` exists with date, pass/fail counts, AND separate backend/frontend breakdown
+   - [ ] `docs/test-results/backend/unit-results.json` exists (if backend exists)
+   - [ ] `docs/test-results/backend/unit-results.md` exists (if backend exists)
+   - [ ] `docs/test-results/frontend/unit-results.json` exists (if frontend exists with .tsx files)
+   - [ ] `docs/test-results/frontend/unit-results.md` exists (if frontend exists with .tsx files)
+   - [ ] `docs/test-results/e2e/e2e-results.json` exists (if project has UI pages)
+   - [ ] `docs/test-results/e2e/e2e-results.md` exists (if project has UI pages)
+   - [ ] `docs/test-results/screenshots/` has at least 1 screenshot per key page (if project has UI pages)
+   - [ ] Screenshots use `<name>--<viewport>.png` naming (double-dash before viewport)
+   - [ ] test-cases.csv includes BOTH backend AND frontend test entries (if both exist)
+   If any check fails, fix it before completing. Do NOT mark the task done with missing files.
+
+8. **Report and complete.** Use TaskUpdate to mark the task complete with a summary of what was tested.
 
 **Best Practices:**
 - Never modify implementation source code. If tests fail due to implementation bugs, report them rather than fixing them.
@@ -58,3 +191,4 @@ When finished, provide a structured summary:
 - **Test commands run:** The exact commands used to execute tests.
 - **Results:** Pass/fail counts and any notable findings.
 - **Issues found:** Any implementation bugs discovered during testing (reported, not fixed).
+- **Test results saved to:** `docs/test-results/` (list each file created).
