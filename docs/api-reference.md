@@ -187,7 +187,11 @@ Submit a timesheet for approval.
 - **Auth**: Yes (owner only)
 - **Request Body**: None
 - **Response**: Updated timesheet with `status: "submitted"`
-- **Errors**: 400 (not in draft status), 401, 404
+- **Errors**:
+  - `400` — timesheet not in `draft` or `rejected` status
+  - `400` — one or more weekdays have fewer than 8 hours logged (response body includes a `details` array listing each short day, e.g. `{ date: "2026-03-10", logged: 6, required: 8 }`)
+  - `401` — unauthorized
+  - `404` — timesheet not found
 
 ---
 
@@ -370,6 +374,14 @@ Get budget alerts (charge codes exceeding thresholds).
 
 - **Auth**: Yes (any role)
 - **Response**: Array of alert objects
+- **Errors**: 401
+
+### GET /budgets/chargeability-alerts
+
+Get chargeability alerts for employees who are below the target chargeability rate.
+
+- **Auth**: Yes (any role)
+- **Response**: Array of chargeability alert objects
 - **Errors**: 401
 
 ### GET /budgets/summary
@@ -577,10 +589,13 @@ Get chargeability report.
 
 ### GET /reports/financial-impact
 
-Get overall financial impact report.
+Get overall financial impact report with optional period and team filters.
 
 - **Auth**: Yes (any role)
-- **Response**: Aggregated financial metrics
+- **Query Params**:
+  - `period` (optional): month string, e.g. `2026-03` — filters team and charge code breakdowns to that period
+  - `team` (optional): department name — filters the `byTeam` array to a single team
+- **Response**: Aggregated financial metrics with team and charge code breakdowns
 - **Errors**: 401
 
 ### GET /reports/activity-distribution

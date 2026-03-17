@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
-import path from 'path';
+import { authFile } from './e2e/helpers';
 
-const authFile = path.join(__dirname, 'e2e', '.auth', 'user.json');
+const defaultAuthFile = authFile('user');
 
 export default defineConfig({
   testDir: './e2e',
@@ -9,6 +9,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
   workers: 1,
+  timeout: 120000,
   reporter: [
     ['json', { outputFile: '../docs/test-results/e2e/e2e-results.json' }],
     ['list'],
@@ -34,7 +35,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
-        storageState: authFile,
+        storageState: defaultAuthFile,
       },
       dependencies: ['setup'],
     },
@@ -43,7 +44,7 @@ export default defineConfig({
       use: {
         ...devices['iPhone SE'],
         viewport: { width: 375, height: 667 },
-        storageState: authFile,
+        storageState: defaultAuthFile,
       },
       dependencies: ['setup'],
     },

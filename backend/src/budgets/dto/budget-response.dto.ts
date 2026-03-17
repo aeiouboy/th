@@ -46,6 +46,35 @@ export class BudgetAlertDto {
   rootCauseActivity: string | null;
 }
 
+export class ChargeabilityAlertDto {
+  @ApiProperty()
+  type: 'chargeability';
+
+  @ApiProperty()
+  employeeId: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  billableHours: number;
+
+  @ApiProperty()
+  totalHours: number;
+
+  @ApiProperty()
+  chargeability: number;
+
+  @ApiProperty()
+  target: number;
+
+  @ApiProperty({ enum: ['red', 'orange', 'yellow'] })
+  severity: 'red' | 'orange' | 'yellow';
+
+  @ApiProperty()
+  costImpact: number;
+}
+
 export class BudgetSummaryDto {
   @ApiProperty()
   totalBudget: number;

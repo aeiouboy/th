@@ -36,6 +36,8 @@ vi.mock('@/components/approvals/ApprovalQueue', () => ({
 // Mock lucide-react
 vi.mock('lucide-react', () => ({
   Search: () => <span data-testid="search-icon" />,
+  CheckCircle: () => <span data-testid="check-circle-icon" />,
+  History: () => <span data-testid="history-icon" />,
 }));
 
 // Mock UI components

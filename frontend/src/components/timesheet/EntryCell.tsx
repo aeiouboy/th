@@ -8,9 +8,11 @@ interface EntryCellProps {
   disabled?: boolean;
   isBillable?: boolean;
   onNavigate?: (direction: 'right' | 'down') => void;
+  description?: string;
+  onNoteClick?: () => void;
 }
 
-export function EntryCell({ value, onChange, disabled, isBillable, onNavigate }: EntryCellProps) {
+export function EntryCell({ value, onChange, disabled, isBillable, onNavigate, description, onNoteClick }: EntryCellProps) {
   const [editing, setEditing] = useState(false);
   const [localValue, setLocalValue] = useState('');
   const [hovered, setHovered] = useState(false);
@@ -88,13 +90,17 @@ export function EntryCell({ value, onChange, disabled, isBillable, onNavigate }:
       >
         {value > 0 ? value.toFixed(2) : ''}
       </button>
-      {/* Note icon on hover */}
-      {hovered && value > 0 && (
+      {/* Note icon — always visible when description exists, on hover otherwise */}
+      {value > 0 && (hovered || !!description) && (
         <button
           type="button"
-          className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[var(--accent-teal)] text-white flex items-center justify-center text-[8px] shadow-sm opacity-70 hover:opacity-100 transition-opacity"
-          title="Add note"
-          onClick={(e) => { e.stopPropagation(); }}
+          className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-white flex items-center justify-center text-[8px] shadow-sm transition-opacity ${
+            description
+              ? 'bg-[var(--accent-amber)] opacity-100'
+              : 'bg-[var(--accent-teal)] opacity-70 hover:opacity-100'
+          }`}
+          title={description ? 'Edit note' : 'Add note'}
+          onClick={(e) => { e.stopPropagation(); onNoteClick?.(); }}
         >
           <NoteIcon />
         </button>

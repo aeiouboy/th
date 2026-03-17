@@ -30,6 +30,7 @@ function mockFetch(status: number, body: unknown, headers: Record<string, string
     ok: status >= 200 && status < 300,
     status,
     json: vi.fn().mockResolvedValue(body),
+    text: vi.fn().mockResolvedValue(JSON.stringify(body)),
     headers: new Headers(headers),
   };
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response));
@@ -240,6 +241,7 @@ describe('api.ts — session without token', () => {
       ok: true,
       status: 200,
       json: vi.fn().mockResolvedValue([]),
+      text: vi.fn().mockResolvedValue('[]'),
     };
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(response));
 

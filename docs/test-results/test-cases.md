@@ -1,6 +1,6 @@
 # Test Cases
 
-> Generated: 2026-03-17 | Runner: jest / vitest / playwright | Total: 429 | Pass: 428 | Fail: 1
+> Generated: 2026-03-17 | Runner: jest / vitest / playwright | Total: 535 | Pass: 531 | Fail: 0 | Skip: 4
 
 | ID | Test Name | Type | Category | File | Status | Notes |
 |---|---|---|---|---|---|---|
@@ -203,7 +203,8 @@
 | TC-197 | TimesheetReview > success state > should render charge code names | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
 | TC-198 | TimesheetReview > success state > should render charge code IDs | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
 | TC-199 | TimesheetReview > success state > should render Daily Total row | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
-| TC-200 | TimesheetReview > error/fallback state > should render mock data when API fails | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
+| TC-200 | TimesheetReview > error/fallback state > should render error message when API fails | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass | Updated: error state replaces mock-data fallback |
+| TC-200b | TimesheetReview > error/fallback state > should render retry button when API fails | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass | New test added |
 | TC-201 | TimesheetReview > empty state > should render empty state when no entries | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
 | TC-202 | AccessManager > rendering > should render "Assigned Users" heading | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
 | TC-203 | AccessManager > rendering > should render the Add button | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
@@ -433,3 +434,109 @@
 | TC-427 | E2E-TS-02: Submit timesheet for approval | e2e | E2E — Time Entry | `frontend/e2e/time-entry.spec.ts` | pass |  |
 | TC-428 | E2E-TS-03: Submit empty timesheet shows warning (NEGATIVE) | e2e | E2E — Time Entry | `frontend/e2e/time-entry.spec.ts` | pass |  |
 | TC-429 | E2E-TS-04: Week navigation changes the displayed period | e2e | E2E — Time Entry | `frontend/e2e/time-entry.spec.ts` | pass |  |
+| TC-430 | E2E-RBAC-01: Employee sidebar hides admin menu items (nattaya sees limited sidebar) | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
+| TC-431 | E2E-RBAC-02: Admin sidebar shows all items (tachongrak sees all sidebar items) | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
+| TC-432 | E2E-RBAC-03: Charge manager sees Approvals and can create charge codes | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
+| TC-433 | E2E-RBAC-04: PMO can view reports (ploy navigates to reports page) | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
+| TC-434 | E2E-RBAC-05: Employee cannot access admin pages (nattaya blocked from /admin/users) | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
+| TC-435 | E2E-WF-01: Nattaya fills and submits timesheet as employee | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-436 | E2E-WF-02: Somchai fills and submits timesheet as employee | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-437 | E2E-WF-03: Wichai sees pending timesheets as manager on approvals page | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-438 | E2E-WF-04: Wichai approves a pending timesheet as charge_manager | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-439 | E2E-WF-05: Tachongrak sees manager-approved timesheets as CC Owner | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-440 | E2E-WF-06: Tachongrak approves as CC Owner to lock timesheet | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-441 | E2E-WF-07: Nattaya submits timesheet for previous week (rejection setup) | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-442 | E2E-WF-07: Wichai rejects a timesheet with comment | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-443 | E2E-WF-08: Nattaya sees rejection and resubmits timesheet | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-444 | E2E-WF-09: Budget page shows spending data after approvals | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-445 | E2E-WF-10: Reports show utilization data as PMO | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
+| TC-446 | TimesheetsService > getAvailablePeriods > should return empty array when user has no timesheets | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass | New test added |
+| TC-447 | TimesheetsService > getAvailablePeriods > should return periodStart values in descending order | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass | New test added |
+| TC-448 | TimesheetsService > getAvailablePeriods > should return single period when user has one timesheet | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass | New test added |
+| TC-449 | TeamsBotService > parseTimeEntry > should parse "Log 4h on PRJ-042 today" | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-450 | TeamsBotService > parseTimeEntry > should parse fractional hours | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-451 | TeamsBotService > parseTimeEntry > should parse "Logged 2h code review ACT-010 yesterday" | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-452 | TeamsBotService > parseTimeEntry > should use yesterday date when "yesterday" keyword present | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-453 | TeamsBotService > parseTimeEntry > should use today date when no date keyword | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-454 | TeamsBotService > parseTimeEntry > should parse an explicit ISO date | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-455 | TeamsBotService > parseTimeEntry > should extract description after charge code | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-456 | TeamsBotService > parseTimeEntry > should extract description before charge code | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-457 | TeamsBotService > parseTimeEntry > should return null when no hours pattern is found | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
+| TC-458 | TeamsBotService > parseTimeEntry > should return null when hours is 0 | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
+| TC-459 | TeamsBotService > parseTimeEntry > should return null when hours exceed 24 | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
+| TC-460 | TeamsBotService > parseTimeEntry > should return null when no charge code pattern is found | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
+| TC-461 | TeamsBotService > parseTimeEntry > should handle charge codes with underscores | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-462 | TeamsBotService > parseTimeEntry > should parse Add 8h on TSK-001 2026-03-15 | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-463 | TeamsBotService > getSuggestedPrompts > should return a non-empty array of prompt strings | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-464 | TeamsBotService > handleIncomingMessage > should return help message when command is unrecognized | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-465 | TeamsBotService > handleIncomingMessage > should return help for empty string | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-466 | TeamsBotService > handleIncomingMessage log time > should log time successfully for a valid command | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-467 | TeamsBotService > handleIncomingMessage log time > should return error message when charge code is not found | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-468 | TeamsBotService > handleIncomingMessage log time > should return parse error message for invalid format | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
+| TC-469 | TeamsBotService > handleIncomingMessage log time > should preserve existing entries when adding a new one | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-470 | TeamsBotService > handleIncomingMessage log time > should return message with suggestedActions after logging | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-471 | TeamsBotService > handleIncomingMessage budget status > should return budget card when charge code is found | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-472 | TeamsBotService > handleIncomingMessage budget status > should include forecast line when present | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-473 | TeamsBotService > handleIncomingMessage budget status > should return error when no charge code in query | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
+| TC-474 | TeamsBotService > handleIncomingMessage budget status > should return error when budgets service throws | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
+| TC-475 | TeamsBotService > handleIncomingMessage budget status > should route budget how query to handler | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-476 | TeamsBotService > handleIncomingMessage show timesheet > should return no timesheet message when none exists | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-477 | TeamsBotService > handleIncomingMessage show timesheet > should return card with timesheet summary | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-478 | TeamsBotService > handleIncomingMessage show timesheet > should handle timesheet with no entries gracefully | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
+| TC-479 | TeamsBotService > handleIncomingMessage show timesheet > should route my timesheet to handler | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-480 | TeamsBotService > handleIncomingMessage hours today > should return no-hours when no timesheet exists | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-481 | TeamsBotService > handleIncomingMessage hours today > should return no-hours when no entries for today | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-482 | TeamsBotService > handleIncomingMessage hours today > should return total hours logged today | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-483 | TeamsBotService > handleIncomingMessage hours today > should route hours did i log to handler | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-484 | TeamsBotService > handleIncomingMessage charge codes > should return no-codes message | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-485 | TeamsBotService > handleIncomingMessage charge codes > should return card with charge code list | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-486 | TeamsBotService > handleIncomingMessage charge codes > should include suggestedActions | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-487 | TeamsBotService > handleIncomingMessage charge codes > should route my charge codes to handler | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
+| TC-488 | IntegrationNotificationService > getNotifications > should return empty array initially | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-489 | IntegrationNotificationService > clearNotifications > should clear notifications | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-490 | IntegrationNotificationService > sendTimesheetReminders > should send reminders when hours behind | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-491 | IntegrationNotificationService > sendTimesheetReminders > should not send reminder when on track | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-492 | IntegrationNotificationService > sendTimesheetReminders > should skip submitted/approved timesheets | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-493 | IntegrationNotificationService > sendTimesheetReminders > should still remind rejected timesheets | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-494 | IntegrationNotificationService > sendTimesheetReminders > should return empty when all on track | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-495 | IntegrationNotificationService > sendTimesheetReminders > should return empty when no users exist | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
+| TC-496 | IntegrationNotificationService > sendTimesheetReminders > should compute expected hours: daysPassed * 8 | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-497 | IntegrationNotificationService > sendTimesheetReminders > should include notifications in getNotifications() | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-498 | IntegrationNotificationService > sendApprovalReminders > should send reminder to manager | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-499 | IntegrationNotificationService > sendApprovalReminders > should send separate notifications to different managers | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-500 | IntegrationNotificationService > sendApprovalReminders > should skip timesheets with no managerId | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
+| TC-501 | IntegrationNotificationService > sendApprovalReminders > should return empty when no pending | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-502 | IntegrationNotificationService > sendApprovalReminders > should skip manager if profile not found | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
+| TC-503 | IntegrationNotificationService > sendApprovalReminders > should include pending count in subject | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-504 | IntegrationNotificationService > sendManagerSummary > should send weekly summary to manager | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-505 | IntegrationNotificationService > sendManagerSummary > should correctly count completed/pending/not-submitted | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-506 | IntegrationNotificationService > sendManagerSummary > should handle all reports completed | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
+| TC-507 | IntegrationNotificationService > sendManagerSummary > should handle all reports not submitted | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
+| TC-508 | IntegrationNotificationService > sendManagerSummary > should skip manager with no direct reports | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-509 | IntegrationNotificationService > sendManagerSummary > should return empty when no managers exist | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-510 | IntegrationNotificationService > sendManagerSummary > should include employee names and statuses | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-511 | IntegrationNotificationService > sendWeeklyInsights > should send insights to pmo/finance/admin | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-512 | IntegrationNotificationService > sendWeeklyInsights > should calculate chargeability rate correctly | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-513 | IntegrationNotificationService > sendWeeklyInsights > should report 0% chargeability when total=0 | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
+| TC-514 | IntegrationNotificationService > sendWeeklyInsights > should list budget overruns | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-515 | IntegrationNotificationService > sendWeeklyInsights > should report 0 overruns when all under budget | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-516 | IntegrationNotificationService > sendWeeklyInsights > should return empty when no recipients | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
+| TC-517 | IntegrationNotificationService > sendWeeklyInsights > should include total and billable hours in body | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-518 | IntegrationNotificationService > sendWeeklyInsights > should include week date range in subject | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-519 | IntegrationNotificationService > sendAllNotifications > should return counts for all 4 types | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-520 | IntegrationNotificationService > notification ID sequencing > should start at notif-1 | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-521 | IntegrationNotificationService > notification ID sequencing > should increment IDs across calls | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
+| TC-522 | E2E-ACC-01: charge_manager can see assigned charge codes via API | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
+| TC-523 | E2E-ACC-02: charge_manager CAN create charge codes (role is authorized) | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | Confirms RBAC permits charge_manager to POST /charge-codes |
+| TC-524 | E2E-ACC-03 (NEGATIVE): Employee role cannot create charge codes | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
+| TC-525 | E2E-ACC-04: Admin can view full charge code tree | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
+| TC-526 | E2E-ACC-05: Admin can access financial-impact report | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
+| TC-527 | E2E-ACC-06 (NEGATIVE): Verifies financial-impact endpoint structure for admin role | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
+| TC-528 | E2E-DESC-01: Note dialog opens text is typed and saved to entry | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | skip | IMPLEMENTATION BUG: Cannot access 'submitMutation' before initialization |
+| TC-529 | E2E-DESC-02 (NEGATIVE): Cancel discards unsaved note text | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | skip | Same implementation bug |
+| TC-530 | E2E-MIN-01: Submit blocked when weekday < 8hrs warning shown | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | skip | Same implementation bug |
+| TC-531 | E2E-MIN-02 (NEGATIVE): Submit with partial hours keeps page on time-entry | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | skip | Same implementation bug |
+| TC-532 | E2E-PL-01: P/L section displays stat cards and team table on reports page | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
+| TC-533 | E2E-PL-02: Chargeability alerts visible in alert table | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
+| TC-534 | E2E-PL-03 (NEGATIVE): Reports page not accessible to employee role | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
+| TC-535 | E2E-PL-04: Period filter changes financial data query | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |

@@ -52,12 +52,13 @@
   /* Precision Ledger Design System */
   --bg-primary: #0F172A;
   --bg-secondary: #1E293B;
-  --bg-content: #FAFAF9;
+  --bg-content: #F8F7F6;
   --bg-card: #FFFFFF;
-  --bg-card-hover: #F5F5F4;
-  --text-primary: #1C1917;
-  --text-secondary: #78716C;
-  --text-muted: #A8A29E;
+  --bg-card-hover: #F5F4F2;
+  --bg-subtle: #F0EEEC;
+  --text-primary: #1A1614;
+  --text-secondary: #5C554E;
+  --text-muted: #8C857E;
   --text-on-dark: #F5F5F4;
   --accent-teal: #0D9488;
   --accent-teal-light: #CCFBF1;
@@ -68,27 +69,34 @@
   --accent-green: #059669;
   --accent-green-light: #D1FAE5;
   --accent-purple: #7C3AED;
-  --border-default: #E7E5E4;
+  --border-default: #E5E2DF;
+  --border-subtle: #F0EEEC;
   --border-focus: #0D9488;
 
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.03);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.04), 0 4px 6px rgba(0,0,0,0.03);
+
   /* shadcn/ui tokens mapped to Precision Ledger */
-  --background: #FAFAF9;
-  --foreground: #1C1917;
+  --background: #F8F7F6;
+  --foreground: #1A1614;
   --card: #FFFFFF;
-  --card-foreground: #1C1917;
+  --card-foreground: #1A1614;
   --popover: #FFFFFF;
-  --popover-foreground: #1C1917;
+  --popover-foreground: #1A1614;
   --primary: #0D9488;
   --primary-foreground: #FFFFFF;
   --secondary: #F5F5F4;
-  --secondary-foreground: #1C1917;
+  --secondary-foreground: #1A1614;
   --muted: #F5F5F4;
-  --muted-foreground: #78716C;
+  --muted-foreground: #5C554E;
   --accent: #F5F5F4;
-  --accent-foreground: #1C1917;
+  --accent-foreground: #1A1614;
   --destructive: #DC2626;
-  --border: #E7E5E4;
-  --input: #E7E5E4;
+  --border: #E5E2DF;
+  --input: #E5E2DF;
   --ring: #0D9488;
   --chart-1: #0D9488;
   --chart-2: #D97706;
@@ -96,7 +104,7 @@
   --chart-4: #059669;
   --chart-5: #DC2626;
   --radius: 0.5rem;
-  --sidebar: #0F172A;
+  --sidebar: #141B2D;
   --sidebar-foreground: #F5F5F4;
   --sidebar-primary: #0D9488;
   --sidebar-primary-foreground: #FFFFFF;
@@ -110,10 +118,18 @@
   --bg-content: #0C0A09;
   --bg-card: #1C1917;
   --bg-card-hover: #292524;
+  --bg-subtle: #1A1714;
   --text-primary: #F5F5F4;
-  --text-secondary: #A8A29E;
-  --text-muted: #78716C;
+  --text-secondary: #B8B0A8;
+  --text-muted: #8C857E;
   --border-default: #292524;
+  --border-subtle: #1A1714;
+
+  /* Shadows (dark) */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.12);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.16), 0 1px 2px rgba(0,0,0,0.12);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.12), 0 4px 6px rgba(0,0,0,0.08);
 
   --background: #0C0A09;
   --foreground: #F5F5F4;
@@ -126,7 +142,7 @@
   --secondary: #292524;
   --secondary-foreground: #F5F5F4;
   --muted: #292524;
-  --muted-foreground: #A8A29E;
+  --muted-foreground: #B8B0A8;
   --accent: #292524;
   --accent-foreground: #F5F5F4;
   --destructive: #DC2626;

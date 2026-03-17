@@ -1,0 +1,6 @@
+{
+  "session_id": "10d2419a-94ca-4c18-a503-a28cbd4dc586",
+  "prompts": [
+    "<task-notification>\n<task-id>blaxq3l3b</task-id>\n<tool-use-id>toolu_015Vz6dwPHkHS2GkDdFqpfHw</tool-use-id>\n<output-file>/private/tmp/claude-502/-Users-tachongrak-Projects-ts/10d2419a-94ca-4c18-a503-a28cbd4dc586/tasks/blaxq3l3b.output</output-file>\n<status>failed</status>\n<summary>Background command \"Test direct API call for wichai timesheet week 5\" failed with exit code 137</summary>\n</task-notification>\nRead the output file to retrieve the result: /private/tmp/claude-502/-Users-tachongrak-Projects-ts/10d2419a-94ca-4c18-a503-a28cbd4dc586/tasks/blaxq3l3b.output"
+  ]
+}

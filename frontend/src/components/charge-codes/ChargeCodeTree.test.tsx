@@ -70,17 +70,18 @@ describe('ChargeCodeTree', () => {
 
     it('should render correct level badges for each level', () => {
       render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
-      // Programs expanded by default (depth < 1), show children
+      // Programs are visible (top-level, not collapsed)
       const prgBadgesAll = screen.getAllByText('PRG');
       expect(prgBadgesAll.length).toBeGreaterThan(0);
-      // Project level badge also visible since PRG-001 is expanded
-      expect(screen.getByText('PRJ')).toBeInTheDocument();
+      // Project level badge only visible after expanding a program
+      // (nodes start collapsed, so PRJ is NOT visible by default)
+      expect(screen.queryByText('PRJ')).not.toBeInTheDocument();
     });
 
     it('should display budget amount when provided', () => {
       render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
-      // Alpha Program has $100,000 budget
-      expect(screen.getByText('$100,000')).toBeInTheDocument();
+      // Alpha Program has 100,000 budget (formatted with currency symbol)
+      expect(screen.getByText(/[฿$€¥].*100/)).toBeInTheDocument();
     });
 
     it('should not display budget amount when not provided', () => {
@@ -92,44 +93,40 @@ describe('ChargeCodeTree', () => {
   });
 
   describe('expand/collapse', () => {
-    it('should expand top-level nodes by default (depth < 1)', () => {
+    it('should start top-level nodes collapsed by default', () => {
       render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
-      // Project One should be visible since Alpha Program is expanded by default
-      expect(screen.getByText('Project One')).toBeInTheDocument();
+      // All nodes start collapsed — Project One is NOT visible by default
+      expect(screen.queryByText('Project One')).not.toBeInTheDocument();
     });
 
-    it('should show expand icon for nodes with children', () => {
+    it('should show chevron-right icon for collapsed nodes with children', () => {
       render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
-      // Alpha Program has children and is expanded (ChevronDown)
-      const chevronDownIcons = screen.getAllByTestId('chevron-down');
-      expect(chevronDownIcons.length).toBeGreaterThan(0);
-    });
-
-    it('should show collapse icon for collapsed nodes with children', () => {
-      render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
-      // Project One has children and is NOT expanded by default (depth >= 1)
+      // Alpha Program has children and is collapsed (ChevronRight)
       const chevronRightIcons = screen.getAllByTestId('chevron-right');
       expect(chevronRightIcons.length).toBeGreaterThan(0);
     });
 
     it('should expand a collapsed node when chevron is clicked', () => {
       render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
-      // Activity One is a child of Project One which is collapsed
-      expect(screen.queryByText('Activity One')).not.toBeInTheDocument();
+      // Alpha Program starts collapsed — Project One is not visible
+      expect(screen.queryByText('Project One')).not.toBeInTheDocument();
 
-      // Click the chevron for Project One
+      // Click the chevron for Alpha Program to expand it
       const chevronRight = screen.getAllByTestId('chevron-right')[0];
       fireEvent.click(chevronRight);
 
-      expect(screen.getByText('Activity One')).toBeInTheDocument();
+      expect(screen.getByText('Project One')).toBeInTheDocument();
     });
 
-    it('should collapse an expanded node when chevron is clicked', () => {
+    it('should collapse an expanded node when chevron is clicked again', () => {
       render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
-      // Alpha Program is expanded by default, showing Project One
+
+      // First expand Alpha Program by clicking its chevron
+      const chevronRight = screen.getAllByTestId('chevron-right')[0];
+      fireEvent.click(chevronRight);
       expect(screen.getByText('Project One')).toBeInTheDocument();
 
-      // Click the chevron for Alpha Program to collapse it
+      // Now collapse it by clicking the chevron-down
       const chevronDown = screen.getAllByTestId('chevron-down')[0];
       fireEvent.click(chevronDown);
 
@@ -160,15 +157,26 @@ describe('ChargeCodeTree', () => {
   });
 
   describe('hierarchy', () => {
-    it('should render project nodes nested under program', () => {
+    it('should render project nodes nested under program after expanding', () => {
       render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
+      // Programs start collapsed — no PRJ badges visible initially
+      expect(screen.queryAllByText('PRJ').length).toBe(0);
+
+      // Expand Alpha Program
+      const chevronRight = screen.getAllByTestId('chevron-right')[0];
+      fireEvent.click(chevronRight);
+
+      // Now PRJ-001 should be visible
       const prjBadges = screen.queryAllByText('PRJ');
-      // PRJ-001 visible since PRG-001 is expanded by default
       expect(prjBadges.length).toBeGreaterThan(0);
     });
 
     it('should render nodes with increasing indentation for depth', () => {
       render(<ChargeCodeTree tree={sampleTree} selectedId={null} onSelect={vi.fn()} />);
+      // Expand Alpha Program to reveal Project One
+      const chevronRight = screen.getAllByTestId('chevron-right')[0];
+      fireEvent.click(chevronRight);
+
       const projectButton = screen.getByText('Project One').closest('button');
       // Depth 1 -> paddingLeft = 20+8 = 28px
       expect(projectButton).toHaveStyle({ paddingLeft: '28px' });

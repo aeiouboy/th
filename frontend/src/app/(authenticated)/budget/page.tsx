@@ -1,12 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronRight, AlertTriangle, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
+import { ChevronDown, ChevronRight, AlertTriangle, TrendingUp, TrendingDown, DollarSign, BarChart3 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { StatCard } from '@/components/shared/StatCard';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 
 interface BudgetSummaryResponse {
   totalBudget: number;
@@ -41,10 +44,12 @@ const emptySummary: BudgetSummaryResponse = {
 interface BudgetChild {
   chargeCodeId: string;
   chargeCodeName: string;
+  level?: string;
   budgetAmount: number;
   actualSpent: number;
   variance: number;
   percentUsed: number;
+  children?: BudgetChild[];
 }
 
 function severityConfig(severity: string) {
@@ -78,15 +83,10 @@ export default function BudgetPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">
-          Budget Tracking
-        </h2>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
-          Monitor charge code budgets, spending, and forecasts
-        </p>
-      </div>
+      <PageHeader
+        title="Budget Tracking"
+        description="Monitor charge code budgets, spending, and forecasts"
+      />
 
       {/* Overview cards */}
       {isLoading ? (
@@ -101,33 +101,33 @@ export default function BudgetPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <OverviewCard
-            icon={<DollarSign className="w-4 h-4" />}
-            label="Total Budget"
+          <StatCard
+            icon={DollarSign}
+            label="Total budget"
             value={formatCurrency(summary.totalBudget)}
-            subtitle={`${summary.totalChargeCodes} charge codes`}
-            accentColor="var(--accent-teal)"
+            subtext={`${summary.totalChargeCodes} charge codes`}
+            accent="var(--accent-teal)"
           />
-          <OverviewCard
-            icon={<TrendingUp className="w-4 h-4" />}
-            label="Total Spent"
+          <StatCard
+            icon={TrendingUp}
+            label="Total spent"
             value={formatCurrency(summary.totalActualSpent)}
-            subtitle={`${summary.overallPercentage}% consumed`}
-            accentColor="var(--accent-amber)"
+            subtext={`${summary.overallPercentage}% consumed`}
+            accent="var(--accent-amber)"
           />
-          <OverviewCard
-            icon={<TrendingDown className="w-4 h-4" />}
+          <StatCard
+            icon={TrendingDown}
             label="Remaining"
             value={formatCurrency(remaining)}
-            subtitle={`${100 - summary.overallPercentage}% available`}
-            accentColor="var(--accent-green)"
+            subtext={`${100 - summary.overallPercentage}% available`}
+            accent="var(--accent-green)"
           />
-          <OverviewCard
-            icon={<AlertTriangle className="w-4 h-4" />}
+          <StatCard
+            icon={AlertTriangle}
             label="Forecast"
             value={formatCurrency(summary.totalForecast)}
-            subtitle={`${summary.chargeCodesOverBudget} over, ${summary.chargeCodesAtRisk} at risk`}
-            accentColor={summary.totalForecast > summary.totalBudget ? 'var(--accent-red)' : 'var(--accent-green)'}
+            subtext={`${summary.chargeCodesOverBudget} over, ${summary.chargeCodesAtRisk} at risk`}
+            accent={summary.totalForecast > summary.totalBudget ? 'var(--accent-red)' : 'var(--accent-green)'}
           />
         </div>
       )}
@@ -156,30 +156,32 @@ export default function BudgetPage() {
             ))}
           </div>
         ) : alerts.length === 0 ? (
-          <div className="p-12 text-center text-[var(--text-muted)] text-sm">
-            No budget data available - all projects are on track.
-          </div>
+          <EmptyState
+            icon={BarChart3}
+            title="No budget data"
+            description="All projects are on track -- no budget alerts to display"
+          />
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[var(--border-default)] bg-stone-50 dark:bg-stone-900 sticky top-0">
-                <th className="text-left px-5 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider w-8" />
-                <th className="text-left px-2 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
-                  Charge Code
+                <th className="text-left px-5 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider w-8" />
+                <th className="text-left px-2 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
+                  Charge code
                 </th>
-                <th className="text-right px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+                <th className="text-right px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
                   Budget
                 </th>
-                <th className="text-right px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+                <th className="text-right px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
                   Actual
                 </th>
-                <th className="px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider w-[200px]">
+                <th className="px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider w-[200px]">
                   Usage
                 </th>
-                <th className="text-right px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+                <th className="text-right px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
                   Forecast
                 </th>
-                <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+                <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
                   Status
                 </th>
               </tr>
@@ -263,16 +265,16 @@ function BudgetRow({
             </div>
           </div>
         </td>
-        <td className="px-4 py-2.5 text-right font-[family-name:var(--font-mono)] text-xs text-[var(--text-primary)]">
+        <td className="px-4 py-2.5 text-right text-xs text-[var(--text-primary)]">
           {formatCurrency(item.budget)}
         </td>
-        <td className="px-4 py-2.5 text-right font-[family-name:var(--font-mono)] text-xs text-[var(--text-primary)]">
+        <td className="px-4 py-2.5 text-right text-xs text-[var(--text-primary)]">
           {formatCurrency(item.actual)}
         </td>
         <td className="px-4 py-2.5">
           <ProgressBar percent={percentUsed} severity={item.severity} />
         </td>
-        <td className="px-4 py-2.5 text-right font-[family-name:var(--font-mono)] text-xs text-[var(--text-muted)]">
+        <td className="px-4 py-2.5 text-right text-xs text-[var(--text-muted)]">
           {item.forecast ? formatCurrency(item.forecast) : '-'}
         </td>
         <td className="px-4 py-2.5">
@@ -297,29 +299,70 @@ function BudgetRow({
           ) : (
             children.map((child) => {
               const childPercent = child.budgetAmount > 0 ? Math.round((child.actualSpent / child.budgetAmount) * 100) : 0;
+              const isRootCause = childPercent >= 90 && children.length > 1;
               return (
-                <tr
-                  key={child.chargeCodeId}
-                  className="border-b border-[var(--border-default)] bg-stone-50 dark:bg-stone-900/30"
-                  style={{ animation: 'fade-in 200ms ease-out' }}
-                >
-                  <td className="pl-5 py-2" />
-                  <td className="px-2 py-2 pl-8">
-                    <div className="text-xs text-[var(--text-secondary)]">{child.chargeCodeName}</div>
-                    <div className="text-[10px] text-[var(--text-muted)] font-[family-name:var(--font-mono)]">{child.chargeCodeId}</div>
-                  </td>
-                  <td className="px-4 py-2 text-right font-[family-name:var(--font-mono)] text-xs text-[var(--text-secondary)]">
-                    {formatCurrency(child.budgetAmount)}
-                  </td>
-                  <td className="px-4 py-2 text-right font-[family-name:var(--font-mono)] text-xs text-[var(--text-secondary)]">
-                    {formatCurrency(child.actualSpent)}
-                  </td>
-                  <td className="px-4 py-2">
-                    <ProgressBar percent={childPercent} severity={childPercent >= 90 ? 'red' : childPercent >= 75 ? 'orange' : 'green'} small />
-                  </td>
-                  <td className="px-4 py-2 text-right text-xs text-[var(--text-muted)]">-</td>
-                  <td className="px-4 py-2" />
-                </tr>
+                <Fragment key={child.chargeCodeId}>
+                  <tr
+                    className={`border-b border-[var(--border-default)] bg-stone-50 dark:bg-stone-900/30 ${isRootCause ? 'ring-1 ring-inset ring-[var(--accent-red)]/20' : ''}`}
+                    style={{ animation: 'fade-in 200ms ease-out' }}
+                  >
+                    <td className="pl-5 py-2" />
+                    <td className="px-2 py-2 pl-8">
+                      <div className="flex items-center gap-1.5">
+                        <div className="text-xs text-[var(--text-secondary)]">{child.chargeCodeName}</div>
+                        {isRootCause && (
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--accent-red-light)] text-[var(--accent-red)] font-medium">
+                            overrun
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-[var(--text-muted)] font-[family-name:var(--font-mono)]">{child.chargeCodeId}</div>
+                    </td>
+                    <td className="px-4 py-2 text-right text-xs text-[var(--text-secondary)]">
+                      {formatCurrency(child.budgetAmount)}
+                    </td>
+                    <td className="px-4 py-2 text-right text-xs text-[var(--text-secondary)]">
+                      {formatCurrency(child.actualSpent)}
+                    </td>
+                    <td className="px-4 py-2">
+                      <ProgressBar percent={childPercent} severity={childPercent >= 90 ? 'red' : childPercent >= 75 ? 'orange' : 'green'} small />
+                    </td>
+                    <td className={`px-4 py-2 text-right text-xs ${child.variance < 0 ? 'text-[var(--accent-red)] font-medium' : 'text-[var(--text-muted)]'}`}>
+                      {child.variance < 0 ? `-${formatCurrency(Math.abs(child.variance))}` : formatCurrency(child.variance)}
+                    </td>
+                    <td className="px-4 py-2" />
+                  </tr>
+                  {/* Grandchildren */}
+                  {child.children && child.children.length > 0 && child.children.map((gc) => {
+                    const gcPercent = gc.budgetAmount > 0 ? Math.round((gc.actualSpent / gc.budgetAmount) * 100) : 0;
+                    return (
+                      <tr
+                        key={gc.chargeCodeId}
+                        className="border-b border-[var(--border-default)] bg-stone-100/50 dark:bg-stone-900/20"
+                        style={{ animation: 'fade-in 200ms ease-out' }}
+                      >
+                        <td className="pl-5 py-1.5" />
+                        <td className="px-2 py-1.5 pl-14">
+                          <div className="text-[11px] text-[var(--text-muted)]">{gc.chargeCodeName}</div>
+                          <div className="text-[9px] text-[var(--text-muted)] font-[family-name:var(--font-mono)]">{gc.chargeCodeId}</div>
+                        </td>
+                        <td className="px-4 py-1.5 text-right text-[11px] text-[var(--text-muted)]">
+                          {formatCurrency(gc.budgetAmount)}
+                        </td>
+                        <td className="px-4 py-1.5 text-right text-[11px] text-[var(--text-muted)]">
+                          {formatCurrency(gc.actualSpent)}
+                        </td>
+                        <td className="px-4 py-1.5">
+                          <ProgressBar percent={gcPercent} severity={gcPercent >= 90 ? 'red' : gcPercent >= 75 ? 'orange' : 'green'} small />
+                        </td>
+                        <td className={`px-4 py-1.5 text-right text-[11px] ${gc.variance < 0 ? 'text-[var(--accent-red)]' : 'text-[var(--text-muted)]'}`}>
+                          {gc.variance < 0 ? `-${formatCurrency(Math.abs(gc.variance))}` : formatCurrency(gc.variance)}
+                        </td>
+                        <td className="px-4 py-1.5" />
+                      </tr>
+                    );
+                  })}
+                </Fragment>
               );
             })
           )}
@@ -363,7 +406,7 @@ function ProgressBar({
           style={{ width: `${Math.min(percent, 100)}%` }}
         />
       </div>
-      <span className={`font-[family-name:var(--font-mono)] ${small ? 'text-[10px]' : 'text-xs'} ${
+      <span className={`${small ? 'text-[10px]' : 'text-xs'} ${
         percent >= 100 ? 'text-[var(--accent-red)] font-medium' :
         percent >= 80 ? 'text-[var(--accent-amber)]' :
         'text-[var(--text-muted)]'
@@ -374,32 +417,3 @@ function ProgressBar({
   );
 }
 
-function OverviewCard({
-  icon,
-  label,
-  value,
-  subtitle,
-  accentColor,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  subtitle: string;
-  accentColor: string;
-}) {
-  return (
-    <div
-      className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-150 hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
-      style={{ borderTopWidth: '3px', borderTopColor: accentColor }}
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <div className="p-1.5 rounded-md bg-stone-100 dark:bg-stone-800 text-[var(--text-secondary)]">
-          {icon}
-        </div>
-        <p className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">{label}</p>
-      </div>
-      <p className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-mono)]">{value}</p>
-      <p className="text-xs text-[var(--text-muted)] mt-1">{subtitle}</p>
-    </div>
-  );
-}

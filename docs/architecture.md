@@ -139,6 +139,8 @@ draft ──submit──▶ submitted ──manager approve──▶ manager_app
                    rejected (employee can revise and resubmit)
 ```
 
+**Submit validation (min 8 hours):** Before transitioning from `draft` to `submitted`, the backend checks that every weekday (excluding holidays from the `calendar_days` table) in the period has at least 8 hours logged across all charge codes for that day. If any day falls short, the submit returns `400` with a `details` array listing each short day.
+
 ---
 
 ## Charge Code Hierarchy
@@ -219,3 +221,19 @@ Three cron jobs run on the backend:
 ### Cost Calculation
 
 `calculated_cost` per entry = `hours × hourly_rate` where the hourly rate is looked up from `cost_rates` by the user's `job_grade`. This is computed at entry save time and stored on `timesheet_entries.calculated_cost`.
+
+### Financial P/L Report
+
+`GET /reports/financial-impact` aggregates approved timesheet entries to compute:
+
+1. **Over-budget cost** — sum of `(actual − budget)` for every charge code where `actual > budget`.
+2. **Low chargeability cost** — estimated revenue gap from chargeability falling below target (80%). Computed as `(target_rate − actual_rate) × total_hours × avg_hourly_rate`.
+3. **Net P/L impact** — sum of the two costs above.
+4. **`byTeam`** — per-department breakdown: total cost, billable revenue, margin, margin %, and chargeability rate.
+5. **`byChargeCode`** — per charge code: budget, actual, variance, and forecast overrun.
+
+The `period` query param filters entries to a specific month. The `team` query param restricts the `byTeam` array.
+
+### Chargeability Alerts
+
+`GET /budgets/chargeability-alerts` computes each employee's chargeability rate from approved timesheet entries and flags those below 80% (the default target). Each alert includes a `costImpact` estimate: hours × average hourly rate × chargeability gap.

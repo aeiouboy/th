@@ -36,40 +36,26 @@ interface TimesheetDetail {
   };
 }
 
-// Mock data for when API is unavailable
-const mockDetail: TimesheetDetail = {
-  id: 'mock',
-  periodStart: '2026-03-01',
-  periodEnd: '2026-03-15',
-  entries: [
-    { id: 'e1', chargeCodeId: 'PRJ-042', date: '2026-03-03', hours: '4.0', description: null, chargeCode: { id: 'PRJ-042', name: 'Web Portal' } },
-    { id: 'e2', chargeCodeId: 'PRJ-042', date: '2026-03-04', hours: '4.0', description: null, chargeCode: { id: 'PRJ-042', name: 'Web Portal' } },
-    { id: 'e3', chargeCodeId: 'PRJ-042', date: '2026-03-05', hours: '4.0', description: null, chargeCode: { id: 'PRJ-042', name: 'Web Portal' } },
-    { id: 'e4', chargeCodeId: 'PRJ-042', date: '2026-03-06', hours: '4.0', description: null, chargeCode: { id: 'PRJ-042', name: 'Web Portal' } },
-    { id: 'e5', chargeCodeId: 'PRJ-042', date: '2026-03-07', hours: '4.0', description: null, chargeCode: { id: 'PRJ-042', name: 'Web Portal' } },
-    { id: 'e6', chargeCodeId: 'ACT-010', date: '2026-03-03', hours: '2.0', description: null, chargeCode: { id: 'ACT-010', name: 'Code Review' } },
-    { id: 'e7', chargeCodeId: 'ACT-010', date: '2026-03-04', hours: '2.0', description: null, chargeCode: { id: 'ACT-010', name: 'Code Review' } },
-    { id: 'e8', chargeCodeId: 'ACT-010', date: '2026-03-05', hours: '2.0', description: null, chargeCode: { id: 'ACT-010', name: 'Code Review' } },
-    { id: 'e9', chargeCodeId: 'TSK-005', date: '2026-03-03', hours: '2.0', description: null, chargeCode: { id: 'TSK-005', name: 'Meetings' } },
-    { id: 'e10', chargeCodeId: 'TSK-005', date: '2026-03-04', hours: '2.0', description: null, chargeCode: { id: 'TSK-005', name: 'Meetings' } },
-    { id: 'e11', chargeCodeId: 'TSK-005', date: '2026-03-05', hours: '2.0', description: null, chargeCode: { id: 'TSK-005', name: 'Meetings' } },
-  ],
-  employee: { id: 'u-001', fullName: 'John Doe', email: 'john@company.com', department: 'Engineering' },
-};
-
 export function TimesheetReview({ timesheetId }: { timesheetId: string }) {
   const [detail, setDetail] = useState<TimesheetDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
+  const fetchDetail = () => {
+    setLoading(true);
+    setError(false);
     api
       .get<TimesheetDetail>(`/approvals/${timesheetId}/detail`)
       .then(setDetail)
       .catch(() => {
-        // Use mock data on failure
-        setDetail({ ...mockDetail, id: timesheetId });
+        setDetail(null);
+        setError(true);
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchDetail();
   }, [timesheetId]);
 
   if (loading) {
@@ -81,7 +67,21 @@ export function TimesheetReview({ timesheetId }: { timesheetId: string }) {
     );
   }
 
-  if (!detail || detail.entries.length === 0) {
+  if (error || !detail) {
+    return (
+      <div className="py-4 text-center space-y-2">
+        <p className="text-sm text-[var(--text-muted)]">Failed to load timesheet details. Please try again.</p>
+        <button
+          onClick={fetchDetail}
+          className="text-sm text-[var(--accent-teal)] hover:underline"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (detail.entries.length === 0) {
     return (
       <div className="py-4 text-center text-sm text-[var(--text-muted)]">
         No entries found

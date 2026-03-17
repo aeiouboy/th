@@ -54,6 +54,12 @@ vi.mock('@/components/reports/AlertList', () => ({
 vi.mock('lucide-react', () => ({
   FileDown: () => <span data-testid="file-down-icon" />,
   FileText: () => <span data-testid="file-text-icon" />,
+  DollarSign: () => <span data-testid="dollar-sign-icon" />,
+  TrendingUp: () => <span data-testid="trending-up-icon" />,
+  Users: () => <span data-testid="users-icon" />,
+  AlertTriangle: () => <span data-testid="alert-triangle-icon" />,
+  ArrowUp: () => <span data-testid="arrow-up-icon" />,
+  ArrowDown: () => <span data-testid="arrow-down-icon" />,
 }));
 
 // Mock UI components

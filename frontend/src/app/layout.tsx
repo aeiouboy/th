@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, DM_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter, IBM_Plex_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/lib/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-heading",
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: ["600", "700", "800"],
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -40,7 +41,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${plusJakartaSans.variable} ${dmSans.variable} ${ibmPlexMono.variable}`}
+      className={`${plusJakartaSans.variable} ${inter.variable} ${ibmPlexMono.variable}`}
     >
       <body className="font-[family-name:var(--font-body)] antialiased">
         <ThemeProvider
@@ -52,6 +53,7 @@ export default function RootLayout({
           <QueryProvider>
             <TooltipProvider>{children}</TooltipProvider>
           </QueryProvider>
+          <Toaster richColors />
         </ThemeProvider>
       </body>
     </html>

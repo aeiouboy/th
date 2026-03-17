@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TimesheetsController } from './timesheets.controller';
 import { TimesheetsService } from './timesheets.service';
+import { CalendarModule } from '../calendar/calendar.module';
 
 @Module({
+  imports: [CalendarModule],
   controllers: [TimesheetsController],
   providers: [TimesheetsService],
   exports: [TimesheetsService],

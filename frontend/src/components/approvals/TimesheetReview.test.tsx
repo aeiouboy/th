@@ -113,12 +113,19 @@ describe('TimesheetReview', () => {
   });
 
   describe('error/fallback state', () => {
-    it('should render mock data when API fails', async () => {
+    it('should render error message when API fails', async () => {
       vi.mocked(apiModule.api.get).mockRejectedValue(new Error('Network error'));
       render(<TimesheetReview timesheetId="ts-1" />);
       await waitFor(() => {
-        // Mock data includes "Web Portal" charge code
-        expect(screen.getByText('Web Portal')).toBeInTheDocument();
+        expect(screen.getByText(/failed to load timesheet details/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should render retry button when API fails', async () => {
+      vi.mocked(apiModule.api.get).mockRejectedValue(new Error('Network error'));
+      render(<TimesheetReview timesheetId="ts-1" />);
+      await waitFor(() => {
+        expect(screen.getByText(/retry/i)).toBeInTheDocument();
       });
     });
   });

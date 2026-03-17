@@ -27,8 +27,13 @@ export class ReportsController {
   }
 
   @Get('financial-impact')
-  getFinancialImpact() {
-    return this.reportsService.getFinancialImpact();
+  @ApiQuery({ name: 'period', required: false, example: '2026-03' })
+  @ApiQuery({ name: 'team', required: false })
+  getFinancialImpact(
+    @Query('period') period?: string,
+    @Query('team') team?: string,
+  ) {
+    return this.reportsService.getFinancialImpact(period, team);
   }
 
   @Get('activity-distribution')

@@ -38,6 +38,7 @@ vi.mock('lucide-react', () => ({
   CheckIcon: () => <span data-testid="check-icon" />,
   XIcon: () => <span data-testid="x-icon" />,
   Loader2Icon: () => <span data-testid="loader-icon" />,
+  CalendarDays: () => <span data-testid="calendar-days-icon" />,
 }));
 
 // Mock UI components

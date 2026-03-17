@@ -19,6 +19,11 @@ async function getAuthHeaders(): Promise<HeadersInit> {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  // Let TanStack Query handle cancellation — re-throw AbortError without toast
+  if (options.signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError');
+  }
+
   const url = `${API_URL}/api/v1${path}`;
   const headers = await getAuthHeaders();
 
@@ -26,13 +31,21 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     console.debug(`[API] ${options.method || 'GET'} ${url}`);
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...headers,
-      ...options.headers,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers: {
+        ...headers,
+        ...options.headers,
+      },
+      signal: options.signal,
+    });
+  } catch (err) {
+    // Re-throw AbortError directly — TanStack Query handles this gracefully
+    if (err instanceof Error && err.name === 'AbortError') throw err;
+    throw err;
+  }
 
   if (process.env.NODE_ENV === 'development') {
     console.debug(`[API] ${response.status} ${url}`);
@@ -52,11 +65,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new Error(message);
   }
 
-  return response.json();
+  const text = await response.text();
+  if (!text) return null as T;
+  return JSON.parse(text);
 }
 
 export const api = {
-  get: <T>(path: string) => request<T>(path),
+  get: <T>(path: string, signal?: AbortSignal) => request<T>(path, { signal }),
   post: <T>(path: string, body: unknown) =>
     request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
   put: <T>(path: string, body: unknown) =>

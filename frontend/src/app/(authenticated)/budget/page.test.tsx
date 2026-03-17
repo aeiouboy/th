@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '../../../test-utils';
 import BudgetPage from './page';
@@ -25,6 +26,17 @@ vi.mock('@/lib/supabase/client', () => ({
   }),
 }));
 
+// Mock currency provider
+vi.mock('@/lib/currency', () => ({
+  CurrencyProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useCurrency: () => ({
+    formatCurrency: (v: number) => `฿${v.toLocaleString()}`,
+    symbol: '฿',
+    currency: 'THB',
+  }),
+  formatCurrencyStatic: (v: number) => `฿${v.toLocaleString()}`,
+}));
+
 // Mock lucide-react
 vi.mock('lucide-react', () => ({
   ChevronDown: () => <span data-testid="chevron-down" />,
@@ -33,6 +45,9 @@ vi.mock('lucide-react', () => ({
   TrendingUp: () => <span data-testid="trending-up" />,
   TrendingDown: () => <span data-testid="trending-down" />,
   DollarSign: () => <span data-testid="dollar-sign" />,
+  BarChart3: () => <span data-testid="bar-chart" />,
+  ArrowUp: () => <span data-testid="arrow-up" />,
+  ArrowDown: () => <span data-testid="arrow-down" />,
 }));
 
 // Mock UI components
@@ -94,9 +109,9 @@ describe('BudgetPage', () => {
   it('should render budget metrics', async () => {
     render(<BudgetPage />);
     await waitFor(() => {
-      // After loading resolves, mock data is shown with dollar amounts
-      const dollarSign = screen.queryByTestId('dollar-sign') || screen.queryByText(/\$\d/) || screen.queryByText(/\$[0-9,.MK]+/);
-      expect(dollarSign).toBeTruthy();
+      // After loading resolves, mock data is shown with currency amounts (THB default uses ฿)
+      const currencyEl = screen.queryByTestId('dollar-sign') || screen.queryByText(/[\$฿€¥]\d/) || screen.queryByText(/[\$฿€¥][0-9,.MK]+/);
+      expect(currencyEl).toBeTruthy();
     });
   });
 

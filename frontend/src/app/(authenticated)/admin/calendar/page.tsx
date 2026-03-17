@@ -37,7 +37,9 @@ import {
   CheckIcon,
   XIcon,
   Loader2Icon,
+  CalendarDays,
 } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 interface CalendarEntry {
   id: number;
@@ -354,9 +356,11 @@ export default function CalendarManagementPage() {
         </CardHeader>
         <CardContent>
           {holidays.length === 0 ? (
-            <p className="text-sm text-[var(--text-muted)] py-8 text-center">
-              No holidays configured for {year}. Add holidays or populate weekends to get started.
-            </p>
+            <EmptyState
+              icon={CalendarDays}
+              title={`No holidays configured for ${year}`}
+              description="Add holidays or populate weekends to get started"
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -370,7 +374,7 @@ export default function CalendarManagementPage() {
               <TableBody>
                 {holidays.map((h) => (
                   <TableRow key={h.id}>
-                    <TableCell className="font-[family-name:var(--font-mono)]">
+                    <TableCell>
                       {formatDate(h.date)}
                     </TableCell>
                     <TableCell className="font-medium text-[var(--text-primary)]">
@@ -427,13 +431,13 @@ export default function CalendarManagementPage() {
                     <TableCell className="font-medium text-[var(--text-primary)]">
                       {v.user.fullName || v.user.email}
                     </TableCell>
-                    <TableCell className="font-[family-name:var(--font-mono)]">
+                    <TableCell>
                       {formatDate(v.vacation.startDate)}
                     </TableCell>
-                    <TableCell className="font-[family-name:var(--font-mono)]">
+                    <TableCell>
                       {formatDate(v.vacation.endDate)}
                     </TableCell>
-                    <TableCell className="font-[family-name:var(--font-mono)] text-[var(--text-secondary)]">
+                    <TableCell className="text-[var(--text-secondary)]">
                       {formatDate(v.vacation.createdAt.split('T')[0])}
                     </TableCell>
                     <TableCell className="text-right">
@@ -489,7 +493,7 @@ function MiniMonth({
   return (
     <Card size="sm" className="hover:translate-y-0 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <CardHeader className="pb-1">
-        <CardTitle className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+        <CardTitle className="text-xs font-semibold text-[var(--text-secondary)] tracking-wider">
           {MONTH_NAMES[month]}
         </CardTitle>
       </CardHeader>

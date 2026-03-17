@@ -16,6 +16,9 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 @Injectable()
 export class SupabaseAuthGuard implements CanActivate {
   private jwksClient: jwksRsa.JwksClient;
+  // In-memory profile cache — avoids a DB query per request for the same user
+  // TTL: 60 seconds. Entries: { profile, expiresAt }
+  private profileCache = new Map<string, { profile: Record<string, unknown>; expiresAt: number }>();
 
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDB,
@@ -50,11 +53,24 @@ export class SupabaseAuthGuard implements CanActivate {
       const decoded = await this.verifyToken(token);
       const userId = decoded.sub as string;
 
-      const [profile] = await this.db
-        .select()
-        .from(profiles)
-        .where(eq(profiles.id, userId))
-        .limit(1);
+      // Check profile cache first to avoid DB round-trip on every request
+      const now = Date.now();
+      const cached = this.profileCache.get(userId);
+      let profile: Record<string, unknown> | undefined;
+
+      if (cached && cached.expiresAt > now) {
+        profile = cached.profile;
+      } else {
+        const [row] = await this.db
+          .select()
+          .from(profiles)
+          .where(eq(profiles.id, userId))
+          .limit(1);
+        profile = row as Record<string, unknown> | undefined;
+        if (profile) {
+          this.profileCache.set(userId, { profile, expiresAt: now + 60_000 });
+        }
+      }
 
       if (!profile) {
         throw new UnauthorizedException('User profile not found');

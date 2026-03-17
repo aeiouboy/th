@@ -22,8 +22,9 @@ import {
 } from '@/components/ui/dialog';
 import { TimesheetReview } from './TimesheetReview';
 import { BulkApprovalBar } from './BulkApprovalBar';
-import { Eye, Check, X, AlertTriangle } from 'lucide-react';
+import { Eye, Check, X, AlertTriangle, CheckCircle } from 'lucide-react';
 import { formatShortDate } from '@/lib/utils';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 interface PendingTimesheet {
   id: string;
@@ -145,8 +146,12 @@ export function ApprovalQueue({ items, onRefresh }: ApprovalQueueProps) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] py-12 text-center text-[var(--text-muted)] text-sm shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        No pending approvals
+      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <EmptyState
+          icon={CheckCircle}
+          title="No pending approvals"
+          description="Timesheets submitted by your team will appear here"
+        />
       </div>
     );
   }
@@ -165,11 +170,11 @@ export function ApprovalQueue({ items, onRefresh }: ApprovalQueueProps) {
                   className="rounded border-stone-300 accent-[var(--accent-teal)]"
                 />
               </TableHead>
-              <TableHead className="text-xs uppercase tracking-wider font-medium text-[var(--text-secondary)]">Employee</TableHead>
-              <TableHead className="text-xs uppercase tracking-wider font-medium text-[var(--text-secondary)]">Period</TableHead>
-              <TableHead className="text-right text-xs uppercase tracking-wider font-medium text-[var(--text-secondary)]">Hours</TableHead>
-              <TableHead className="text-xs uppercase tracking-wider font-medium text-[var(--text-secondary)]">Status</TableHead>
-              <TableHead className="text-right text-xs uppercase tracking-wider font-medium text-[var(--text-secondary)]">Actions</TableHead>
+              <TableHead className="text-xs tracking-wider font-medium text-[var(--text-secondary)]">Employee</TableHead>
+              <TableHead className="text-xs tracking-wider font-medium text-[var(--text-secondary)]">Period</TableHead>
+              <TableHead className="text-right text-xs tracking-wider font-medium text-[var(--text-secondary)]">Hours</TableHead>
+              <TableHead className="text-xs tracking-wider font-medium text-[var(--text-secondary)]">Status</TableHead>
+              <TableHead className="text-right text-xs tracking-wider font-medium text-[var(--text-secondary)]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -196,12 +201,12 @@ export function ApprovalQueue({ items, onRefresh }: ApprovalQueueProps) {
                       <div className="text-xs text-[var(--text-muted)]">{ts.employee.department}</div>
                     )}
                   </TableCell>
-                  <TableCell className="font-[family-name:var(--font-mono)] text-xs text-[var(--text-secondary)]">
+                  <TableCell className="text-xs text-[var(--text-secondary)]">
                     {formatShortDate(ts.periodStart)} - {formatShortDate(ts.periodEnd)}
                   </TableCell>
                   <TableCell className="text-right">
                     <span
-                      className={`font-[family-name:var(--font-mono)] text-sm ${
+                      className={`text-sm ${
                         ts.totalHours < 40
                           ? 'text-[var(--accent-amber)] font-medium'
                           : 'text-[var(--text-primary)]'

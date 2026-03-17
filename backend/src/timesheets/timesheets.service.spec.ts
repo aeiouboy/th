@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { TimesheetsService } from './timesheets.service';
+import { CalendarService } from '../calendar/calendar.service';
 import { DRIZZLE } from '../database/drizzle.provider';
 
 const mockDb = {
@@ -8,6 +9,11 @@ const mockDb = {
   insert: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
+};
+
+const mockCalendarService = {
+  getWorkingDays: jest.fn(),
+  getCalendarByYear: jest.fn(),
 };
 
 // Helper to build a chainable mock
@@ -39,6 +45,7 @@ describe('TimesheetsService', () => {
       providers: [
         TimesheetsService,
         { provide: DRIZZLE, useValue: db },
+        { provide: CalendarService, useValue: mockCalendarService },
       ],
     }).compile();
 
@@ -47,6 +54,33 @@ describe('TimesheetsService', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('getAvailablePeriods', () => {
+    it('should return an empty array when user has no timesheets', async () => {
+      db.selectDistinct = jest.fn().mockReturnValue(buildSelectDistinctChain([]));
+      const result = await service.getAvailablePeriods('user-1');
+      expect(result).toEqual([]);
+    });
+
+    it('should return periodStart values in descending order', async () => {
+      const rows = [
+        { periodStart: '2026-03-09' },
+        { periodStart: '2026-02-23' },
+        { periodStart: '2026-02-16' },
+      ];
+      db.selectDistinct = jest.fn().mockReturnValue(buildSelectDistinctChain(rows));
+      const result = await service.getAvailablePeriods('user-1');
+      expect(result).toEqual(['2026-03-09', '2026-02-23', '2026-02-16']);
+    });
+
+    it('should return a single period when user has one timesheet', async () => {
+      const rows = [{ periodStart: '2026-03-09' }];
+      db.selectDistinct = jest.fn().mockReturnValue(buildSelectDistinctChain(rows));
+      const result = await service.getAvailablePeriods('user-1');
+      expect(result).toHaveLength(1);
+      expect(result[0]).toBe('2026-03-09');
+    });
   });
 
   describe('getWeekBounds (via create)', () => {
@@ -231,9 +265,12 @@ describe('TimesheetsService', () => {
       await expect(service.submit('user-1', 'ts-1')).rejects.toThrow(BadRequestException);
     });
 
-    it('should transition draft timesheet to submitted', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft' };
+    it('should transition draft timesheet to submitted when min hours met', async () => {
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
       const updated = { ...sheet, status: 'submitted' };
+
+      // Mock validateMinimumHours to pass (spy and resolve)
+      jest.spyOn(service, 'validateMinimumHours').mockResolvedValueOnce(undefined);
 
       db.select.mockReturnValueOnce(buildSelectChain([sheet]));
       db.update.mockReturnValueOnce(buildUpdateChain([updated]));
@@ -243,14 +280,191 @@ describe('TimesheetsService', () => {
     });
 
     it('should allow resubmitting a rejected timesheet', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'rejected' };
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'rejected', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
       const updated = { ...sheet, status: 'submitted' };
+
+      jest.spyOn(service, 'validateMinimumHours').mockResolvedValueOnce(undefined);
 
       db.select.mockReturnValueOnce(buildSelectChain([sheet]));
       db.update.mockReturnValueOnce(buildUpdateChain([updated]));
 
       const result = await service.submit('user-1', 'ts-1');
       expect(result.status).toBe('submitted');
+    });
+
+    it('should throw BadRequestException when weekday has less than 8 hours', async () => {
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
+
+      jest.spyOn(service, 'validateMinimumHours').mockRejectedValueOnce(
+        new BadRequestException({
+          message: 'Minimum 8 hours required on weekdays',
+          details: [{ date: '2026-03-09', logged: 4, required: 8 }],
+        }),
+      );
+
+      db.select.mockReturnValueOnce(buildSelectChain([sheet]));
+
+      await expect(service.submit('user-1', 'ts-1')).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('validateMinimumHours', () => {
+    // Week of 2026-03-09 (Mon) to 2026-03-15 (Sun)
+    // Weekdays: Mon 09, Tue 10, Wed 11, Thu 12, Fri 13
+    // Weekend: Sat 14, Sun 15
+
+    it('should pass when all weekdays have 8+ hours', async () => {
+      // Entries: 8 hours each weekday
+      const entries = [
+        { date: '2026-03-09', hours: '8' },
+        { date: '2026-03-10', hours: '8' },
+        { date: '2026-03-11', hours: '8' },
+        { date: '2026-03-12', hours: '8' },
+        { date: '2026-03-13', hours: '8' },
+      ];
+
+      // First select call: entries for this timesheet
+      db.select.mockReturnValueOnce(buildEntriesSelectChain(entries));
+      // Second select call: non-working days from calendar (none - pure weekdays)
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+
+      await expect(
+        service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1'),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should throw when a weekday has less than 8 hours', async () => {
+      const entries = [
+        { date: '2026-03-09', hours: '8' },
+        { date: '2026-03-10', hours: '4' }, // Short day!
+        { date: '2026-03-11', hours: '8' },
+        { date: '2026-03-12', hours: '8' },
+        { date: '2026-03-13', hours: '8' },
+      ];
+
+      db.select.mockReturnValueOnce(buildEntriesSelectChain(entries));
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+
+      await expect(
+        service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1'),
+      ).rejects.toThrow(BadRequestException);
+
+      try {
+        db.select.mockReturnValueOnce(buildEntriesSelectChain(entries));
+        db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+        await service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1');
+      } catch (e: any) {
+        const response = e.getResponse();
+        expect(response.details).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ date: '2026-03-10', logged: 4, required: 8 }),
+          ]),
+        );
+      }
+    });
+
+    it('should exclude holidays from validation', async () => {
+      // Only log hours on 4 days (Wed 11 is holiday)
+      const entries = [
+        { date: '2026-03-09', hours: '8' },
+        { date: '2026-03-10', hours: '8' },
+        // No entry for 2026-03-11 (holiday)
+        { date: '2026-03-12', hours: '8' },
+        { date: '2026-03-13', hours: '8' },
+      ];
+
+      db.select.mockReturnValueOnce(buildEntriesSelectChain(entries));
+      // Calendar returns Wed as a holiday
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([
+        { date: '2026-03-11' },
+        { date: '2026-03-14' }, // Saturday
+        { date: '2026-03-15' }, // Sunday
+      ]));
+
+      await expect(
+        service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1'),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should exclude weekends from validation even without calendar entries', async () => {
+      // Only log hours on weekdays
+      const entries = [
+        { date: '2026-03-09', hours: '8' },
+        { date: '2026-03-10', hours: '8' },
+        { date: '2026-03-11', hours: '8' },
+        { date: '2026-03-12', hours: '8' },
+        { date: '2026-03-13', hours: '8' },
+        // No entries for Sat/Sun - should still pass
+      ];
+
+      db.select.mockReturnValueOnce(buildEntriesSelectChain(entries));
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([])); // No calendar entries
+
+      await expect(
+        service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1'),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should pass when exactly 8 hours logged on weekday', async () => {
+      const entries = [
+        { date: '2026-03-09', hours: '4' },
+        { date: '2026-03-09', hours: '4' }, // Two entries summing to exactly 8
+        { date: '2026-03-10', hours: '8' },
+        { date: '2026-03-11', hours: '8' },
+        { date: '2026-03-12', hours: '8' },
+        { date: '2026-03-13', hours: '8' },
+      ];
+
+      db.select.mockReturnValueOnce(buildEntriesSelectChain(entries));
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+
+      await expect(
+        service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1'),
+      ).resolves.toBeUndefined();
+    });
+
+    it('should report all short days not just the first one', async () => {
+      const entries = [
+        { date: '2026-03-09', hours: '4' },
+        { date: '2026-03-10', hours: '6' },
+        { date: '2026-03-11', hours: '8' },
+        { date: '2026-03-12', hours: '3' },
+        { date: '2026-03-13', hours: '8' },
+      ];
+
+      db.select.mockReturnValueOnce(buildEntriesSelectChain(entries));
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+
+      try {
+        await service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1');
+        fail('Should have thrown');
+      } catch (e: any) {
+        const response = e.getResponse();
+        expect(response.details).toHaveLength(3); // Mon, Tue, Thu
+        expect(response.details.map((d: any) => d.date)).toEqual([
+          '2026-03-09', '2026-03-10', '2026-03-12',
+        ]);
+      }
+    });
+
+    it('should throw when no entries at all for weekdays', async () => {
+      // No entries at all
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+
+      await expect(
+        service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1'),
+      ).rejects.toThrow(BadRequestException);
+
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
+
+      try {
+        await service.validateMinimumHours('ts-1', '2026-03-09', '2026-03-15', 'user-1');
+      } catch (e: any) {
+        const response = e.getResponse();
+        expect(response.details).toHaveLength(5); // All 5 weekdays
+      }
     });
   });
 });
@@ -311,6 +525,16 @@ function buildUpdateChain(resolveValue: any[]) {
     set: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     returning: jest.fn().mockResolvedValue(resolveValue),
+  };
+  chain.where.mockReturnValue(chain);
+  return chain;
+}
+
+function buildSelectDistinctChain(resolveValue: any[]) {
+  const chain: any = {
+    from: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockResolvedValue(resolveValue),
   };
   chain.where.mockReturnValue(chain);
   return chain;

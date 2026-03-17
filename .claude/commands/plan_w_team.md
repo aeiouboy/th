@@ -436,14 +436,15 @@ Use these files to complete the task:
   │   ├── e2e-results.json                # Playwright JSON report
   │   └── e2e-results.md                  # Human-readable e2e test report
   ├── screenshots/                        # Visual captures (if project has UI)
-  │   ├── <page-name>--desktop.png        # Desktop viewport screenshot
-  │   ├── <page-name>--mobile.png         # Mobile viewport screenshot (if responsive)
-  │   └── ...
+  │   ├── <page-name>--desktop.png        # Static page captures (one per page)
+  │   ├── <page-name>--mobile.png         # Mobile viewport (if responsive)
+  │   └── <test-id>-<step>--desktop.png   # Workflow step evidence (see below)
   └── healing-log.md                      # Auto-heal iterations (created by cook if healing occurs)
   ```
 - **File naming rules** (engineers must follow these exactly):
   - Use **kebab-case** for all file and folder names (e.g. `order-list--desktop.png`, not `OrderList_desktop.png`)
-  - Screenshots: `<page-or-component>--<viewport>.png` (double dash separates name from variant)
+  - Static page screenshots: `<page-name>--<viewport>.png` (double dash separates name from variant)
+  - **Workflow step screenshots**: `<test-id>-<step-description>--<viewport>.png` — every E2E test that performs a multi-step workflow MUST capture a screenshot at each significant state change. This is evidence that the action actually happened.
   - Test results: `<type>-results.<ext>` where type is `unit`, `e2e`, `integration`, etc.
   - Always include both `.json` (machine-readable) and `.md` (human-readable) for each test type
 - Configure the test runner to output JSON results (e.g. `vitest run --reporter=json --outputFile=docs/test-results/unit/unit-results.json`)
@@ -564,19 +565,35 @@ Every E2E test case MUST be written in Given-When-Then format with:
 2. **Actions** (When) — exact user steps (click, fill, select, submit)
 3. **Assertions** (Then) — what the test verifies (UI state AND backend state)
 4. **Negative case** — at least 1 negative scenario per feature (invalid input, missing required field, unauthorized access)
+5. **Evidence snapshots** (Snap) — screenshots at key state changes to prove the action happened
 
 Format:
 ```
 E2E-<MODULE>-<NUM>: <test name>
   Given: <preconditions — logged-in user, existing data, role>
   When: <step 1 — e.g., Click "Create New" button>
-  When: <step 2 — e.g., Select level "project" from dropdown>
-  When: <step 3 — e.g., Select parent "Digital Transformation" from parent dropdown>
-  When: <step 4 — e.g., Fill name="New OMS", budget=2000000, click Create>
-  Then: <UI assertion — e.g., Tree shows "New OMS" nested under "Digital Transformation">
-  Then: <API assertion — e.g., GET /charge-codes/tree returns node with parentId matching program ID>
-  Negative: <what happens when input is invalid — e.g., Submit without parent → error "A project must have a parent">
+  Snap: <what to capture — e.g., "dialog-open" — dialog visible with empty form>
+  When: <step 2 — e.g., Fill name="New OMS", budget=2000000, click Create>
+  Snap: <what to capture — e.g., "after-create" — tree shows new item>
+  Then: <UI assertion — e.g., Tree shows "New OMS" nested under parent>
+  Then: <API assertion — e.g., GET /charge-codes/tree returns node with parentId>
+  Negative: <what happens when input is invalid — e.g., Submit without parent → error>
+  Snap: <what to capture — e.g., "error-shown" — error message visible in dialog>
 ```
+
+**Snap rules:**
+- Every `Snap:` line in the spec MUST produce a screenshot in the test implementation
+- Screenshot filename: `<test-id>-<snap-description>--<viewport>.png` (all kebab-case)
+  - Example: `e2e-cc-01-dialog-open--desktop.png`, `e2e-wf-04-after-approve--desktop.png`
+- The test-writer MUST implement a `snap(page, testId, stepName)` helper that:
+  1. Takes the screenshot with the correct naming convention
+  2. Saves to `docs/test-results/screenshots/`
+  3. Is reusable across all tests (no hardcoded paths)
+- Minimum snaps per test type:
+  - **CRUD tests**: at least 1 snap before action + 1 snap after action (proves state changed)
+  - **Workflow tests**: 1 snap per user role transition (proves each persona saw correct data)
+  - **Negative tests**: 1 snap showing the error/validation message
+- The validator MUST verify: for each `Snap:` line in the spec, a corresponding screenshot file exists in `docs/test-results/screenshots/`
 
 <list E2E test specs here using the format above. Minimum coverage:>
 - At least 1 CRUD flow per core module (create → read → update → verify)

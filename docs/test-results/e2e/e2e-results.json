@@ -29,7 +29,7 @@
         "testMatch": [
           "/auth\\.setup\\.ts/"
         ],
-        "timeout": 30000
+        "timeout": 120000
       },
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
@@ -45,7 +45,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 120000
       },
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
@@ -61,13 +61,20 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 120000
       }
     ],
     "quiet": false,
     "reporter": [
       [
-        "json"
+        "json",
+        {
+          "outputFile": "../docs/test-results/e2e/e2e-results.json"
+        }
+      ],
+      [
+        "list",
+        null
       ]
     ],
     "reportSlowTests": {
@@ -96,12 +103,12 @@
       "line": 0,
       "specs": [
         {
-          "title": "authenticate",
+          "title": "authenticate all users",
           "ok": true,
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "setup",
@@ -111,12 +118,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2895,
+                  "duration": 15911,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-17T10:03:44.577Z",
+                  "startTime": "2026-03-17T21:50:47.513Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -124,7 +131,7 @@
               "status": "expected"
             }
           ],
-          "id": "17e3fe6f4d9d8bd79c6b-60f085b113a677673906",
+          "id": "17e3fe6f4d9d8bd79c6b-3453aab771e18646c9cc",
           "file": "auth.setup.ts",
           "line": 12,
           "column": 6
@@ -132,1286 +139,111 @@
       ]
     },
     {
-      "title": "admin-calendar.spec.ts",
-      "file": "admin-calendar.spec.ts",
+      "title": "workflow-approval.spec.ts",
+      "file": "workflow-approval.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Admin Calendar Module",
-          "file": "admin-calendar.spec.ts",
-          "line": 4,
+          "title": "Workflow Approval Tests",
+          "file": "workflow-approval.spec.ts",
+          "line": 133,
           "column": 15,
-          "specs": [
+          "specs": [],
+          "suites": [
             {
-              "title": "E2E-CAL-01: Create a holiday",
-              "ok": true,
-              "tags": [],
-              "tests": [
+              "title": "E2E-WF-07: Rejection flow",
+              "file": "workflow-approval.spec.ts",
+              "line": 395,
+              "column": 8,
+              "specs": [],
+              "suites": [
                 {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
+                  "title": "Wichai submits timesheet for next week",
+                  "file": "workflow-approval.spec.ts",
+                  "line": 397,
+                  "column": 10,
+                  "specs": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4339,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:03:48.374Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3c3185538ec1b819c8bd-29682ff706f4862d5606",
-              "file": "admin-calendar.spec.ts",
-              "line": 7,
-              "column": 7
-            },
-            {
-              "title": "E2E-CAL-02: Delete a holiday",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 6340,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:03:53.139Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3c3185538ec1b819c8bd-2afe90ba98c54df27beb",
-              "file": "admin-calendar.spec.ts",
-              "line": 52,
-              "column": 7
-            },
-            {
-              "title": "E2E-CAL-03: Calendar displays year and navigation",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2881,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:03:59.485Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3c3185538ec1b819c8bd-8d228711e5a2a1734748",
-              "file": "admin-calendar.spec.ts",
-              "line": 80,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "admin-rates.spec.ts",
-      "file": "admin-rates.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Admin Rates Module",
-          "file": "admin-rates.spec.ts",
-          "line": 4,
-          "column": 15,
-          "specs": [
-            {
-              "title": "E2E-RATE-01: Rates table loads with real data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1323,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:02.374Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8f925593326d96746e43-accb10d46c7d1f25efab",
-              "file": "admin-rates.spec.ts",
-              "line": 7,
-              "column": 7
-            },
-            {
-              "title": "E2E-RATE-02: Add a new cost rate",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3481,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:03.702Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8f925593326d96746e43-49a034f664d2c021b20a",
-              "file": "admin-rates.spec.ts",
-              "line": 25,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "admin-users.spec.ts",
-      "file": "admin-users.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Admin Users Module",
-          "file": "admin-users.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-USR-01: Users list loads with real data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1676,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:07.190Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-2a46eec3f13d08fcd958",
-              "file": "admin-users.spec.ts",
-              "line": 5,
-              "column": 7
-            },
-            {
-              "title": "E2E-USR-02: Update user role (verify role display)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2308,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:08.871Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-4cf638c03454a97d2e0c",
-              "file": "admin-users.spec.ts",
-              "line": 32,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "approvals.spec.ts",
-      "file": "approvals.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Approvals Module",
-          "file": "approvals.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-AP-01: Pending approvals list shows submitted timesheets",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2372,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:11.188Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "972180bc72c2792ab3fa-cb5ef40af520af50899f",
-              "file": "approvals.spec.ts",
-              "line": 5,
-              "column": 7
-            },
-            {
-              "title": "E2E-AP-02: Approve a timesheet",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2383,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:13.565Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "972180bc72c2792ab3fa-83a09c2a9037f718e791",
-              "file": "approvals.spec.ts",
-              "line": 43,
-              "column": 7
-            },
-            {
-              "title": "E2E-AP-03: Reject a timesheet with comment (NEGATIVE flow)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2320,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:15.953Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "972180bc72c2792ab3fa-78c7eb766599653ecf38",
-              "file": "approvals.spec.ts",
-              "line": 79,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "budget.spec.ts",
-      "file": "budget.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Budget Module",
-          "file": "budget.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-BUD-01: Budget summary loads with real data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2930,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:18.281Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "bfff7a1deaa6eae76f63-dbaec6a69d3af869edbf",
-              "file": "budget.spec.ts",
-              "line": 5,
-              "column": 7
-            },
-            {
-              "title": "E2E-BUD-02: Budget alerts section is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3741,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:21.216Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "bfff7a1deaa6eae76f63-9ad8277557406fe9c19f",
-              "file": "budget.spec.ts",
-              "line": 31,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "charge-codes.spec.ts",
-      "file": "charge-codes.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Charge Codes Module",
-          "file": "charge-codes.spec.ts",
-          "line": 4,
-          "column": 15,
-          "specs": [
-            {
-              "title": "E2E-CC-01: Create a new program (top-level charge code)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3923,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:24.964Z",
-                      "annotations": [],
-                      "attachments": []
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4094,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-03-17T10:04:48.699Z",
-                      "annotations": [],
-                      "attachments": [
+                      "title": "submit timesheet for next week",
+                      "ok": true,
+                      "tags": [],
+                      "tests": [
                         {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--8f4ea-gram-top-level-charge-code--desktop-retry1/trace.zip"
-                        }
-                      ]
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "25337b92e5bcfe983c4c-d2836c828efbed41fa48",
-              "file": "charge-codes.spec.ts",
-              "line": 8,
-              "column": 7
-            },
-            {
-              "title": "E2E-CC-02: Create a project under a program (hierarchy + parent selector)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5596,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:28.891Z",
-                      "annotations": [],
-                      "attachments": []
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5684,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-03-17T10:04:53.305Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--a1f75--hierarchy-parent-selector--desktop-retry1/trace.zip"
-                        }
-                      ]
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "25337b92e5bcfe983c4c-ded195363d748ddd0260",
-              "file": "charge-codes.spec.ts",
-              "line": 55,
-              "column": 7
-            },
-            {
-              "title": "E2E-CC-03: Project without parent fails (NEGATIVE)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2151,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:34.491Z",
-                      "annotations": [],
-                      "attachments": []
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2224,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-03-17T10:04:59.033Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--063b1-hout-parent-fails-NEGATIVE--desktop-retry1/trace.zip"
-                        }
-                      ]
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "25337b92e5bcfe983c4c-9497f14c4df809076d2c",
-              "file": "charge-codes.spec.ts",
-              "line": 105,
-              "column": 7
-            },
-            {
-              "title": "E2E-CC-04: Edit an existing charge code",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4574,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:36.646Z",
-                      "annotations": [],
-                      "attachments": []
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4501,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-03-17T10:05:01.288Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--5bc4b-dit-an-existing-charge-code-desktop-retry1/trace.zip"
-                        }
-                      ]
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "25337b92e5bcfe983c4c-d32aae8efdda349890c4",
-              "file": "charge-codes.spec.ts",
-              "line": 134,
-              "column": 7
-            },
-            {
-              "title": "E2E-CC-05: Search filters the charge code tree",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 6868,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:178:29",
-                        "location": {
-                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
-                          "column": 29,
-                          "line": 178
-                        },
-                        "snippet": "  176 |     // Only charge codes matching \"Digital\" should be visible\n  177 |     const treePanel = page.locator('[class*=\"overflow-y-auto\"]').last();\n> 178 |     await expect(treePanel).toContainText('Digital', { timeout: 5000 });\n      |                             ^\n  179 |\n  180 |     // Clear the search input\n  181 |     await searchInput.clear();"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
-                            "column": 29,
-                            "line": 178
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n\n\n  176 |     // Only charge codes matching \"Digital\" should be visible\n  177 |     const treePanel = page.locator('[class*=\"overflow-y-auto\"]').last();\n> 178 |     await expect(treePanel).toContainText('Digital', { timeout: 5000 });\n      |                             ^\n  179 |\n  180 |     // Clear the search input\n  181 |     await searchInput.clear();\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:178:29"
+                          "timeout": 60000,
+                          "annotations": [],
+                          "expectedStatus": "passed",
+                          "projectId": "desktop",
+                          "projectName": "desktop",
+                          "results": [
+                            {
+                              "workerIndex": 1,
+                              "parallelIndex": 0,
+                              "status": "passed",
+                              "duration": 15477,
+                              "errors": [],
+                              "stdout": [],
+                              "stderr": [],
+                              "retry": 0,
+                              "startTime": "2026-03-17T21:51:04.475Z",
+                              "annotations": [],
+                              "attachments": []
+                            }
+                          ],
+                          "status": "expected"
                         }
                       ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:04:41.227Z",
-                      "annotations": [],
-                      "attachments": [
+                      "id": "f3fbbcfd8414fe713405-e3e034ee2b93a24e5475",
+                      "file": "workflow-approval.spec.ts",
+                      "line": 400,
+                      "column": 11
+                    }
+                  ]
+                },
+                {
+                  "title": "Nattaya rejects with comment",
+                  "file": "workflow-approval.spec.ts",
+                  "line": 436,
+                  "column": 10,
+                  "specs": [
+                    {
+                      "title": "reject timesheet with comment",
+                      "ok": true,
+                      "tags": [],
+                      "tests": [
                         {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop/error-context.md"
+                          "timeout": 60000,
+                          "annotations": [],
+                          "expectedStatus": "passed",
+                          "projectId": "desktop",
+                          "projectName": "desktop",
+                          "results": [
+                            {
+                              "workerIndex": 1,
+                              "parallelIndex": 0,
+                              "status": "passed",
+                              "duration": 6294,
+                              "errors": [],
+                              "stdout": [],
+                              "stderr": [],
+                              "retry": 0,
+                              "startTime": "2026-03-17T21:51:20.447Z",
+                              "annotations": [],
+                              "attachments": []
+                            }
+                          ],
+                          "status": "expected"
                         }
                       ],
-                      "errorLocation": {
-                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
-                        "column": 29,
-                        "line": 178
-                      }
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 7068,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:178:29",
-                        "location": {
-                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
-                          "column": 29,
-                          "line": 178
-                        },
-                        "snippet": "  176 |     // Only charge codes matching \"Digital\" should be visible\n  177 |     const treePanel = page.locator('[class*=\"overflow-y-auto\"]').last();\n> 178 |     await expect(treePanel).toContainText('Digital', { timeout: 5000 });\n      |                             ^\n  179 |\n  180 |     // Clear the search input\n  181 |     await searchInput.clear();"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
-                            "column": 29,
-                            "line": 178
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n\n\n  176 |     // Only charge codes matching \"Digital\" should be visible\n  177 |     const treePanel = page.locator('[class*=\"overflow-y-auto\"]').last();\n> 178 |     await expect(treePanel).toContainText('Digital', { timeout: 5000 });\n      |                             ^\n  179 |\n  180 |     // Clear the search input\n  181 |     await searchInput.clear();\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:178:29"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-03-17T10:05:05.836Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
-                        "column": 29,
-                        "line": 178
-                      }
+                      "id": "f3fbbcfd8414fe713405-4aa6200af7a30b75fd9b",
+                      "file": "workflow-approval.spec.ts",
+                      "line": 439,
+                      "column": 11
                     }
-                  ],
-                  "status": "unexpected"
+                  ]
                 }
-              ],
-              "id": "25337b92e5bcfe983c4c-e2fe48943e3998be4e8a",
-              "file": "charge-codes.spec.ts",
-              "line": 167,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "dashboard.spec.ts",
-      "file": "dashboard.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Dashboard Module",
-          "file": "dashboard.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-DASH-01: Dashboard shows real KPI metrics",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3397,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:13.515Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "90cda532ab82d274b30b-343db96089b6410d7fdd",
-              "file": "dashboard.spec.ts",
-              "line": 5,
-              "column": 7
-            },
-            {
-              "title": "E2E-DASH-02: Dashboard navigation works",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3027,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:17.403Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "90cda532ab82d274b30b-5a93b816892ba327d4d5",
-              "file": "dashboard.spec.ts",
-              "line": 30,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "login.spec.ts",
-      "file": "login.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Login Module",
-          "file": "login.spec.ts",
-          "line": 6,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-LOGIN-01: Successful login redirects to dashboard",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2661,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:20.436Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "41d3fd2474a19feb00a1-5936c43826b6de661bb9",
-              "file": "login.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "E2E-LOGIN-02: Invalid credentials show error (NEGATIVE)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1265,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:23.104Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "41d3fd2474a19feb00a1-ec4a27c28112475bb8f9",
-              "file": "login.spec.ts",
-              "line": 25,
-              "column": 7
-            },
-            {
-              "title": "E2E-LOGIN-03: Empty form shows validation",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 847,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:24.382Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "41d3fd2474a19feb00a1-0f8ecca0e1484a21f41e",
-              "file": "login.spec.ts",
-              "line": 37,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "reports.spec.ts",
-      "file": "reports.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Reports Module",
-          "file": "reports.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-RPT-01: Utilization report loads with real data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3630,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:25.236Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d2ea609703bae19dcdce-6dcace2cc9932aaad4c1",
-              "file": "reports.spec.ts",
-              "line": 5,
-              "column": 7
-            },
-            {
-              "title": "E2E-RPT-02: Export CSV button works",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2614,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:28.872Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d2ea609703bae19dcdce-67f72529a73be5ee2028",
-              "file": "reports.spec.ts",
-              "line": 29,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "time-entry.spec.ts",
-      "file": "time-entry.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Time Entry Module",
-          "file": "time-entry.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-TS-01: Create timesheet and add entries",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2772,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:31.496Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d0f6b1bd39217fcf56d-5fbea8c64d7575c76d80",
-              "file": "time-entry.spec.ts",
-              "line": 5,
-              "column": 7
-            },
-            {
-              "title": "E2E-TS-02: Submit timesheet for approval",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2312,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:34.273Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d0f6b1bd39217fcf56d-eddc2d4e013cd84c0c76",
-              "file": "time-entry.spec.ts",
-              "line": 36,
-              "column": 7
-            },
-            {
-              "title": "E2E-TS-03: Submit empty timesheet shows warning (NEGATIVE)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3259,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:36.591Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d0f6b1bd39217fcf56d-27d763001947b8c08ec9",
-              "file": "time-entry.spec.ts",
-              "line": 61,
-              "column": 7
-            },
-            {
-              "title": "E2E-TS-04: Week navigation changes the displayed period",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5251,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T10:05:39.856Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d0f6b1bd39217fcf56d-f2d4612b5281e6960be2",
-              "file": "time-entry.spec.ts",
-              "line": 105,
-              "column": 7
+              ]
             }
           ]
         }
@@ -1420,11 +252,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-17T10:03:44.053Z",
-    "duration": 121091.74699999999,
-    "expected": 28,
+    "startTime": "2026-03-17T21:50:46.802Z",
+    "duration": 39975.357,
+    "expected": 3,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }

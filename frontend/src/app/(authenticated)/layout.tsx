@@ -4,7 +4,9 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { api } from '@/lib/api';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { CurrencyProvider } from '@/lib/currency';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,16 +29,18 @@ import {
   Settings,
   Menu,
   Bell,
-  HelpCircle,
   ChevronRight,
 } from 'lucide-react';
 
-const mainNavItems = [
+const baseNavItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/time-entry', label: 'Time Entry', icon: Clock },
   { href: '/charge-codes', label: 'Charge Codes', icon: Tag },
-  { href: '/approvals', label: 'Approvals', icon: CheckCircle },
 ];
+
+const approvalsNavItem = { href: '/approvals', label: 'Approvals', icon: CheckCircle };
+
+const APPROVALS_ROLES = ['admin', 'charge_manager', 'pmo'];
 
 const insightNavItems = [
   { href: '/reports', label: 'Reports', icon: BarChart3 },
@@ -49,28 +53,58 @@ const adminNavItems = [
   { href: '/admin/rates', label: 'Rates', icon: Settings },
 ];
 
-const mobileNavItems = [
+const baseMobileNavItems = [
   { href: '/', label: 'Home', icon: LayoutDashboard },
   { href: '/time-entry', label: 'Time', icon: Clock },
   { href: '/charge-codes', label: 'Codes', icon: Tag },
-  { href: '/approvals', label: 'Approve', icon: CheckCircle },
-  { href: '/reports', label: 'Reports', icon: BarChart3 },
 ];
+
+const approvalsMobileNavItem = { href: '/approvals', label: 'Approve', icon: CheckCircle };
+
+const reportsMobileNavItem = { href: '/reports', label: 'Reports', icon: BarChart3 };
 
 export default function AuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const supabaseRef = useRef<SupabaseClient | null>(null);
   if (typeof window !== 'undefined' && !supabaseRef.current) {
     supabaseRef.current = createClient();
   }
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const profile = await api.get<{ role: string; fullName: string | null }>('/users/me');
+        setUserRole(profile.role);
+        setUserName(profile.fullName ?? null);
+      } catch {
+        // If fetch fails, role stays null — nav items hidden until loaded
+      }
+    };
+    fetchUserProfile();
+  }, []);
+
+  const mainNavItems = [
+    ...baseNavItems,
+    ...(userRole && APPROVALS_ROLES.includes(userRole) ? [approvalsNavItem] : []),
+  ];
+
+  const showAdminNav = userRole === 'admin';
+
+  const mobileNavItems = [
+    ...baseMobileNavItems,
+    ...(userRole && APPROVALS_ROLES.includes(userRole) ? [approvalsMobileNavItem] : []),
+    reportsMobileNavItem,
+  ];
 
   useEffect(() => {
     const checkViewport = () => {
@@ -85,7 +119,6 @@ export default function AuthenticatedLayout({
 
   useEffect(() => {
     if (isTablet) setSidebarCollapsed(true);
-    if (!isTablet && !isMobile) setSidebarCollapsed(false);
   }, [isTablet, isMobile]);
 
   const handleLogout = async () => {
@@ -111,6 +144,16 @@ export default function AuthenticatedLayout({
     return segments.map((seg) => seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' '));
   };
 
+  const getInitials = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return 'U';
+    const parts = trimmed.split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return parts[0][0].toUpperCase();
+  };
+
+  const avatarInitials = userName ? getInitials(userName) : 'U';
+
   const collapsed = sidebarCollapsed || isTablet;
 
   return (
@@ -120,7 +163,7 @@ export default function AuthenticatedLayout({
         <aside
           className={`${
             collapsed ? 'w-16' : 'w-60'
-          } bg-[#0F172A] text-white flex flex-col transition-all duration-200 ease-in-out shrink-0`}
+          } bg-[var(--sidebar)] text-white flex flex-col transition-all duration-200 ease-in-out shrink-0`}
         >
           {/* Logo */}
           <div className="h-14 flex items-center gap-3 px-4 border-b border-slate-700/50">
@@ -137,7 +180,7 @@ export default function AuthenticatedLayout({
           {/* Navigation */}
           <nav className="flex-1 py-4 overflow-y-auto">
             {!collapsed && (
-              <p className="px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              <p className="px-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">
                 Main
               </p>
             )}
@@ -153,7 +196,7 @@ export default function AuthenticatedLayout({
             <Separator className="my-3 bg-slate-700/50" />
 
             {!collapsed && (
-              <p className="px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              <p className="px-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">
                 Insight
               </p>
             )}
@@ -166,46 +209,37 @@ export default function AuthenticatedLayout({
               />
             ))}
 
-            <Separator className="my-3 bg-slate-700/50" />
+            {showAdminNav && (
+              <>
+                <Separator className="my-3 bg-slate-700/50" />
 
-            {!collapsed && (
-              <p className="px-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                Admin
-              </p>
+                {!collapsed && (
+                  <p className="px-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">
+                    Admin
+                  </p>
+                )}
+                {adminNavItems.map((item) => (
+                  <NavItem
+                    key={item.href}
+                    {...item}
+                    active={isActive(item.href)}
+                    collapsed={collapsed}
+                  />
+                ))}
+              </>
             )}
-            {adminNavItems.map((item) => (
-              <NavItem
-                key={item.href}
-                {...item}
-                active={isActive(item.href)}
-                collapsed={collapsed}
-              />
-            ))}
           </nav>
 
           {/* Footer */}
           <div className="p-4 border-t border-slate-700/50 space-y-2">
             {!collapsed ? (
-              <>
-                <a
-                  href="#"
-                  className="flex items-center gap-2 text-xs text-slate-400 hover:text-white transition-colors"
-                >
-                  <HelpCircle className="w-3.5 h-3.5" />
-                  Help & Support
-                </a>
-                <Badge
-                  variant="secondary"
-                  className="bg-slate-800 text-slate-400 text-[10px]"
-                >
-                  v1.0.0
-                </Badge>
-              </>
-            ) : (
-              <div className="flex justify-center">
-                <HelpCircle className="w-4 h-4 text-slate-500 hover:text-white cursor-pointer transition-colors" />
-              </div>
-            )}
+              <Badge
+                variant="secondary"
+                className="bg-slate-800 text-slate-400 text-[10px]"
+              >
+                v1.0.0
+              </Badge>
+            ) : null}
           </div>
         </aside>
       )}
@@ -213,7 +247,7 @@ export default function AuthenticatedLayout({
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
-        <header className="h-14 bg-white dark:bg-[#1C1917] border-b border-[var(--border-default)] flex items-center justify-between px-4 shrink-0 sticky top-0 z-30">
+        <header className="h-14 bg-[var(--bg-card)] border-b border-[var(--border-default)] shadow-[var(--shadow-xs)] flex items-center justify-between px-4 shrink-0 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             {!isMobile && (
               <button
@@ -228,30 +262,30 @@ export default function AuthenticatedLayout({
               <h1 className="text-lg font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">
                 {pageTitle()}
               </h1>
-              {breadcrumb() && breadcrumb()!.length > 1 && (
+              {(() => {
+                const crumbs = breadcrumb();
+                return crumbs && crumbs.length > 1 && (
                 <div className="hidden sm:flex items-center gap-1 text-xs text-[var(--text-muted)]">
-                  {breadcrumb()!.map((seg, i) => (
+                  {crumbs.map((seg, i) => (
                     <span key={i} className="flex items-center gap-1">
                       {i > 0 && <ChevronRight className="w-3 h-3" />}
                       <span>{seg}</span>
                     </span>
                   ))}
                 </div>
-              )}
+              );
+              })()}
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="p-1.5 rounded-md hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 relative transition-colors" aria-label="Notifications (3 unread)">
+            <button className="p-1.5 rounded-md hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 relative transition-colors" aria-label="Notifications">
               <Bell className="w-5 h-5" />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[var(--accent-red)] text-white text-[10px] font-medium rounded-full flex items-center justify-center">
-                3
-              </span>
             </button>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer" suppressHydrationWarning>
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-teal-600 text-white text-xs font-medium">
-                    U
+                    {avatarInitials}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
@@ -273,13 +307,13 @@ export default function AuthenticatedLayout({
 
         {/* Content with fade-in animation */}
         <main className="flex-1 overflow-y-auto p-6 animate-fade-in" key={pathname}>
-          {children}
+          <CurrencyProvider>{children}</CurrencyProvider>
         </main>
       </div>
 
       {/* Mobile bottom tab navigation */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white dark:bg-[#1C1917] border-t border-[var(--border-default)] flex items-center justify-around z-40">
+        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-[var(--bg-card)] border-t border-[var(--border-default)] flex items-center justify-around z-40">
           {mobileNavItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -320,16 +354,13 @@ function NavItem({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors relative ${
+      className={`flex items-center gap-3 mx-2 px-3 py-2 text-sm transition-colors relative rounded-lg ${
         active
-          ? 'text-white bg-slate-800/60 font-semibold'
-          : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
+          ? 'text-white bg-slate-800/80 font-medium border-l-4 border-teal-500'
+          : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
       }`}
       title={collapsed ? label : undefined}
     >
-      {active && (
-        <div className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r bg-teal-500" />
-      )}
       <Icon className="w-4 h-4 shrink-0" />
       {!collapsed && <span>{label}</span>}
     </Link>

@@ -79,6 +79,86 @@ ts/
 - [Troubleshooting](troubleshooting.md) -- Common issues and fixes
 - [Test Results](test-results/summary.md) -- Test execution summary
 
+## User Roles & Test Accounts
+
+### Roles
+
+| Role | Permissions | Sidebar Access |
+|------|-----------|----------------|
+| **employee** | Log time, submit timesheets, view own charge codes | Main + Insight |
+| **charge_manager** | All employee permissions + approve as manager, create/manage charge codes | Main + Insight |
+| **pmo** | All employee permissions + view all reports, monitor budgets | Main + Insight |
+| **finance** | All employee permissions + view financial reports, cost rates | Main + Insight |
+| **admin** | Full access — all of the above + manage users, calendar, rates | Main + Insight + Admin |
+
+### Approval Workflow
+
+```
+Employee submits → Manager approves → Charge Code Owner approves → Locked
+   (draft→submitted)  (submitted→manager_approved)  (manager_approved→cc_approved→locked)
+```
+
+- **Manager**: determined by `profiles.manager_id` — approves timesheets of direct reports
+- **CC Owner**: determined by `charge_codes.owner_id` / `approver_id` — approves timesheets with entries on their charge codes
+
+### Test Accounts (password: `password1234` for all)
+
+| Email | Name | Role | Manager | Assigned Charge Codes | Test Purpose |
+|-------|------|------|---------|----------------------|-------------|
+| tachongrak@central.co.th | Tachongrak | admin | — | PRG-001 (program owner/approver) | CC Owner approve, admin pages |
+| nattaya.k@central.co.th | Nattaya Kaewkla | charge_manager | Tachongrak | PRJ-001, PRJ-002 | Manager approve (Wichai, Ploy) |
+| somchai.p@central.co.th | Somchai Prasert | pmo | Tachongrak | PRJ-003, PRJ-004, ACT-008~011 | View reports, monitor budgets |
+| wichai.s@central.co.th | Wichai Srisuk | employee | Nattaya | ACT-001~004, TSK-001~003 | Submit timesheet (Backend) |
+| ploy.r@central.co.th | Ploy Rattanaporn | employee | Nattaya | ACT-005~007, TSK-004~005 | Submit timesheet (Frontend) |
+
+### Org Chart
+
+```
+Tachongrak (admin)
+├── Nattaya (charge_manager) — manager of Wichai & Ploy
+│   ├── Wichai (employee) — Backend API team
+│   └── Ploy (employee) — Frontend App team
+└── Somchai (pmo) — Infrastructure & QA oversight
+```
+
+### New OMS Project Structure
+
+```
+PRG-001 New OMS (budget: ฿5M)
+├── PRJ-001 Backend API (฿2M, owner: Nattaya, approver: Tachongrak)
+│   ├── ACT-001 Order Service → TSK-001 API Design, TSK-002 CRUD
+│   ├── ACT-002 Payment Service → TSK-003 Payment Gateway
+│   ├── ACT-003 Inventory Service
+│   └── ACT-004 Shipping Integration
+├── PRJ-002 Frontend App (฿1.5M, owner: Nattaya)
+│   ├── ACT-005 Customer Portal → TSK-004 Wireframes, TSK-005 React Components
+│   ├── ACT-006 Admin Dashboard
+│   └── ACT-007 Mobile Responsive
+├── PRJ-003 Infrastructure & DevOps (฿800K, owner: Somchai)
+│   ├── ACT-008 CI/CD Pipeline
+│   └── ACT-009 Cloud Infrastructure
+└── PRJ-004 QA & Testing (฿700K, non-billable, owner: Somchai)
+    ├── ACT-010 Integration Testing
+    └── ACT-011 UAT
+```
+
+## Features
+
+### Time Entry
+- Weekly timesheet grid with daily hour input per charge code
+- **Entry description field** — click the note icon on any cell to add a description for that entry
+- **Minimum 8-hour weekday validation** — timesheets cannot be submitted until every non-holiday weekday has at least 8 hours logged across all charge codes; short days are listed in the error message
+
+### Budget Tracking
+- Budget vs actual progress bars per charge code
+- **Forecast drill-down** — click any charge code row to expand child-level and grandchild-level budget breakdown inline
+- Root-cause activity badge highlights the specific activity driving an overrun
+
+### Reports & Analytics
+- Utilization, chargeability, activity distribution, and budget charts
+- **Financial P/L report** — dedicated section showing over-budget cost, low-chargeability gap, and net P/L impact; includes a team-by-team breakdown table with cost, billable revenue, margin, and chargeability
+- **Chargeability alerts** — employees below the chargeability target surface as alerts alongside budget overrun alerts; includes cost impact estimate
+
 ## Tech Stack
 
 | Layer | Technology |

@@ -120,6 +120,52 @@ export class ChargeabilityReportDto {
   members: TeamChargeabilityDto[];
 }
 
+export class TeamFinancialDto {
+  @ApiProperty()
+  department: string;
+
+  @ApiProperty()
+  totalHours: number;
+
+  @ApiProperty()
+  billableHours: number;
+
+  @ApiProperty()
+  chargeability: number;
+
+  @ApiProperty()
+  totalCost: number;
+
+  @ApiProperty()
+  billableRevenue: number;
+
+  @ApiProperty()
+  margin: number;
+
+  @ApiProperty()
+  marginPercent: number;
+}
+
+export class ChargeCodeFinancialDto {
+  @ApiProperty()
+  chargeCodeId: string;
+
+  @ApiProperty()
+  chargeCodeName: string;
+
+  @ApiProperty()
+  budget: number;
+
+  @ApiProperty()
+  actual: number;
+
+  @ApiProperty()
+  variance: number;
+
+  @ApiProperty()
+  forecastOverrun: number;
+}
+
 export class FinancialImpactDto {
   @ApiProperty()
   overBudgetCost: number;
@@ -141,6 +187,12 @@ export class FinancialImpactDto {
 
   @ApiProperty()
   actualChargeability: number;
+
+  @ApiProperty({ type: [TeamFinancialDto] })
+  byTeam: TeamFinancialDto[];
+
+  @ApiProperty({ type: [ChargeCodeFinancialDto] })
+  byChargeCode: ChargeCodeFinancialDto[];
 }
 
 export class ActivityDistributionItemDto {

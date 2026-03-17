@@ -13,6 +13,7 @@ import { SchedulersModule } from './schedulers/schedulers.module';
 import { ReportsModule } from './reports/reports.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { CostRatesModule } from './cost-rates/cost-rates.module';
+import { SettingsModule } from './settings/settings.module';
 import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -31,6 +32,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     ReportsModule,
     IntegrationsModule,
     CostRatesModule,
+    SettingsModule,
   ],
   providers: [
     {

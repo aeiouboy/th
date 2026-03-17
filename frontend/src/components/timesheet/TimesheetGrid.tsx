@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { EntryCell } from './EntryCell';
+import { EntryNoteDialog } from './EntryNoteDialog';
 import { format, addDays, parseISO } from 'date-fns';
 
 interface ChargeCodeRow {
@@ -17,11 +18,19 @@ export interface GridData {
   };
 }
 
+export interface DescriptionData {
+  [chargeCodeId: string]: {
+    [date: string]: string;
+  };
+}
+
 interface TimesheetGridProps {
   weekStart: Date;
   rows: ChargeCodeRow[];
   data: GridData;
+  descriptions?: DescriptionData;
   onCellChange: (chargeCodeId: string, date: string, hours: number) => void;
+  onDescriptionChange?: (chargeCodeId: string, date: string, description: string) => void;
   disabled?: boolean;
   onRemoveRow?: (chargeCodeId: string) => void;
 }
@@ -33,10 +42,14 @@ export function TimesheetGrid({
   weekStart,
   rows,
   data,
+  descriptions,
   onCellChange,
+  onDescriptionChange,
   disabled,
   onRemoveRow,
 }: TimesheetGridProps) {
+  const [activeNote, setActiveNote] = useState<{ chargeCodeId: string; date: string } | null>(null);
+
   const dates = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => {
       const d = addDays(weekStart, i);
@@ -76,8 +89,24 @@ export function TimesheetGrid({
     [dailyTotals, isWeekend],
   );
 
+  const activeNoteRow = activeNote
+    ? rows.find((r) => r.chargeCodeId === activeNote.chargeCodeId)
+    : null;
+
   return (
     <div className="overflow-x-auto">
+      <EntryNoteDialog
+        open={activeNote !== null}
+        onOpenChange={(open) => { if (!open) setActiveNote(null); }}
+        chargeCodeName={activeNoteRow?.name ?? ''}
+        date={activeNote?.date ?? ''}
+        description={activeNote ? (descriptions?.[activeNote.chargeCodeId]?.[activeNote.date] ?? '') : ''}
+        onSave={(desc) => {
+          if (activeNote && onDescriptionChange) {
+            onDescriptionChange(activeNote.chargeCodeId, activeNote.date, desc);
+          }
+        }}
+      />
       <table className="w-full border-collapse min-w-[800px]">
         <thead>
           <tr className="border-b border-[var(--border-default)]">
@@ -149,6 +178,8 @@ export function TimesheetGrid({
                     onChange={(v) => onCellChange(row.chargeCodeId, date, v)}
                     disabled={disabled || isWeekend(colIdx)}
                     isBillable={row.isBillable ?? false}
+                    description={descriptions?.[row.chargeCodeId]?.[date]}
+                    onNoteClick={() => setActiveNote({ chargeCodeId: row.chargeCodeId, date })}
                   />
                 </td>
               ))}

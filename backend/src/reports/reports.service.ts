@@ -229,7 +229,7 @@ export class ReportsService {
     const target = 80; // 80% target
 
     // Build the query - get hours per employee, split by billable
-    let query = this.db
+    const query = this.db
       .select({
         userId: timesheets.userId,
         isBillable: chargeCodes.isBillable,
@@ -286,17 +286,22 @@ export class ReportsService {
     };
   }
 
-  async getFinancialImpact(): Promise<FinancialImpactDto> {
+  async getFinancialImpact(period?: string, team?: string): Promise<FinancialImpactDto> {
     const targetChargeability = 0.8;
 
-    // Over-budget cost
-    const budgetRows = await this.db
+    // Over-budget cost - optionally filtered by charge codes with matching period
+    const budgetQuery = this.db
       .select({
+        chargeCodeId: budgets.chargeCodeId,
+        chargeCodeName: chargeCodes.name,
         budgetAmount: budgets.budgetAmount,
         actualSpent: budgets.actualSpent,
+        forecastAtCompletion: budgets.forecastAtCompletion,
       })
       .from(budgets)
       .innerJoin(chargeCodes, eq(budgets.chargeCodeId, chargeCodes.id));
+
+    const budgetRows = await budgetQuery;
 
     let overBudgetCost = 0;
     let overBudgetCount = 0;
@@ -309,9 +314,26 @@ export class ReportsService {
       }
     }
 
-    // Chargeability data
-    const chargeability = await this.getChargeabilityReport();
+    // Chargeability data (optionally filtered by team)
+    const chargeability = await this.getChargeabilityReport(team);
     const actualRate = chargeability.overallChargeabilityRate / 100;
+
+    // Get all profiles for team grouping
+    const allProfiles = await this.db.select().from(profiles);
+    const profileMap = new Map(allProfiles.map((p) => [p.id, p]));
+
+    // Build date range filter for period
+    let dateConditions: any[] = [];
+    if (period) {
+      const [year, month] = period.split('-').map(Number);
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const lastDay = new Date(year, month, 0).getDate();
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      dateConditions = [
+        gte(timesheetEntries.date, startDate),
+        lte(timesheetEntries.date, endDate),
+      ];
+    }
 
     // Average cost rate
     const rateResult = await this.db
@@ -325,6 +347,95 @@ export class ReportsService {
     const gapRate = Math.max(0, targetChargeability - actualRate);
     const lowChargeabilityCost = gapRate * chargeability.overallTotalHours * avgCostRate;
 
+    // byTeam: group by department
+    const teamEntryConditions = dateConditions.length > 0
+      ? and(...dateConditions)
+      : undefined;
+
+    const teamRows = await this.db
+      .select({
+        userId: timesheets.userId,
+        isBillable: chargeCodes.isBillable,
+        totalHours: sum(timesheetEntries.hours).as('total_hours'),
+        totalCost: sum(timesheetEntries.calculatedCost).as('total_cost'),
+      })
+      .from(timesheetEntries)
+      .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
+      .innerJoin(chargeCodes, eq(timesheetEntries.chargeCodeId, chargeCodes.id))
+      .where(teamEntryConditions)
+      .groupBy(timesheets.userId, chargeCodes.isBillable);
+
+    // Aggregate by department
+    const deptMap = new Map<string, {
+      totalHours: number;
+      billableHours: number;
+      totalCost: number;
+      billableRevenue: number;
+    }>();
+
+    // Build a map of user -> cost rate
+    const userRates = new Map<string, number>();
+    for (const profile of allProfiles) {
+      if (!profile.jobGrade) continue;
+      const [rate] = await this.db
+        .select({ hourlyRate: costRates.hourlyRate })
+        .from(costRates)
+        .where(eq(costRates.jobGrade, profile.jobGrade))
+        .limit(1);
+      if (rate) {
+        userRates.set(profile.id, Number(rate.hourlyRate));
+      }
+    }
+
+    for (const row of teamRows) {
+      const profile = profileMap.get(row.userId);
+      if (team && profile?.department !== team) continue;
+
+      const dept = profile?.department ?? 'Unassigned';
+      if (!deptMap.has(dept)) {
+        deptMap.set(dept, { totalHours: 0, billableHours: 0, totalCost: 0, billableRevenue: 0 });
+      }
+      const d = deptMap.get(dept)!;
+      const hours = Number(row.totalHours ?? 0);
+      const cost = Number(row.totalCost ?? 0);
+      const rate = userRates.get(row.userId) ?? avgCostRate;
+
+      d.totalHours += hours;
+      d.totalCost += cost;
+      if (row.isBillable) {
+        d.billableHours += hours;
+        d.billableRevenue += hours * rate;
+      }
+    }
+
+    const byTeam = Array.from(deptMap.entries()).map(([department, d]) => ({
+      department,
+      totalHours: Math.round(d.totalHours * 100) / 100,
+      billableHours: Math.round(d.billableHours * 100) / 100,
+      chargeability: d.totalHours > 0 ? Math.round((d.billableHours / d.totalHours) * 10000) / 100 : 0,
+      totalCost: Math.round(d.totalCost * 100) / 100,
+      billableRevenue: Math.round(d.billableRevenue * 100) / 100,
+      margin: Math.round((d.billableRevenue - d.totalCost) * 100) / 100,
+      marginPercent: d.billableRevenue > 0
+        ? Math.round(((d.billableRevenue - d.totalCost) / d.billableRevenue) * 10000) / 100
+        : 0,
+    }));
+
+    // byChargeCode: charge codes with budget vs actual vs forecast
+    const byChargeCode = budgetRows.map((row) => {
+      const budgetAmt = Number(row.budgetAmount ?? 0);
+      const actual = Number(row.actualSpent ?? 0);
+      const forecast = row.forecastAtCompletion ? Number(row.forecastAtCompletion) : null;
+      return {
+        chargeCodeId: row.chargeCodeId,
+        chargeCodeName: row.chargeCodeName,
+        budget: budgetAmt,
+        actual,
+        variance: budgetAmt - actual,
+        forecastOverrun: forecast !== null ? Math.max(0, forecast - budgetAmt) : 0,
+      };
+    });
+
     return {
       overBudgetCost: Math.round(overBudgetCost * 100) / 100,
       overBudgetCount,
@@ -333,6 +444,8 @@ export class ReportsService {
       avgCostRate: Math.round(avgCostRate * 100) / 100,
       targetChargeability: targetChargeability * 100,
       actualChargeability: chargeability.overallChargeabilityRate,
+      byTeam,
+      byChargeCode,
     };
   }
 

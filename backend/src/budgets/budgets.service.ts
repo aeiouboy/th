@@ -13,6 +13,7 @@ import {
   BudgetResponseDto,
   BudgetAlertDto,
   BudgetSummaryDto,
+  ChargeabilityAlertDto,
 } from './dto/budget-response.dto';
 
 @Injectable()
@@ -381,6 +382,89 @@ export class BudgetsService {
     }
 
     return { recalculated };
+  }
+
+  async getChargeabilityAlerts(): Promise<ChargeabilityAlertDto[]> {
+    const target = 80;
+
+    // Query hours per employee, split by billable
+    const rows = await this.db
+      .select({
+        userId: timesheets.userId,
+        isBillable: chargeCodes.isBillable,
+        totalHours: sum(timesheetEntries.hours).as('total_hours'),
+      })
+      .from(timesheetEntries)
+      .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
+      .innerJoin(chargeCodes, eq(timesheetEntries.chargeCodeId, chargeCodes.id))
+      .groupBy(timesheets.userId, chargeCodes.isBillable);
+
+    // Aggregate per employee
+    const employeeMap = new Map<string, { billable: number; total: number }>();
+    for (const row of rows) {
+      if (!employeeMap.has(row.userId)) {
+        employeeMap.set(row.userId, { billable: 0, total: 0 });
+      }
+      const emp = employeeMap.get(row.userId)!;
+      const hours = Number(row.totalHours ?? 0);
+      emp.total += hours;
+      if (row.isBillable) {
+        emp.billable += hours;
+      }
+    }
+
+    // Get profiles for names
+    const allProfiles = await this.db.select().from(profiles);
+    const profileMap = new Map(allProfiles.map((p) => [p.id, p]));
+
+    // Average cost rate for cost impact calculation
+    const rateResult = await this.db
+      .select({
+        avgRate: sql<string>`AVG(${costRates.hourlyRate}::numeric)`,
+      })
+      .from(costRates);
+    const avgCostRate = Number(rateResult[0]?.avgRate ?? 0);
+
+    const alerts: ChargeabilityAlertDto[] = [];
+
+    for (const [userId, data] of employeeMap) {
+      if (data.total === 0) continue;
+
+      const chargeability = (data.billable / data.total) * 100;
+      if (chargeability >= target) continue;
+
+      let severity: 'red' | 'orange' | 'yellow';
+      if (chargeability < 60) {
+        severity = 'red';
+      } else if (chargeability < 70) {
+        severity = 'orange';
+      } else {
+        severity = 'yellow';
+      }
+
+      const gapHours = (target / 100) * data.total - data.billable;
+      const costImpact = Math.round(gapHours * avgCostRate * 100) / 100;
+
+      const profile = profileMap.get(userId);
+
+      alerts.push({
+        type: 'chargeability',
+        employeeId: userId,
+        name: profile?.fullName ?? profile?.email ?? 'Unknown',
+        billableHours: Math.round(data.billable * 100) / 100,
+        totalHours: Math.round(data.total * 100) / 100,
+        chargeability: Math.round(chargeability * 100) / 100,
+        target,
+        severity,
+        costImpact,
+      });
+    }
+
+    // Sort: red first, then orange, then yellow
+    const severityOrder = { red: 0, orange: 1, yellow: 2 };
+    alerts.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+
+    return alerts;
   }
 
   private getStatus(

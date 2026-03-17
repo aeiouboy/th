@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { TimesheetGrid, type GridData } from '@/components/timesheet/TimesheetGrid';
+import { TimesheetGrid, type GridData, type DescriptionData } from '@/components/timesheet/TimesheetGrid';
 import { ChargeCodeSelector } from '@/components/timesheet/ChargeCodeSelector';
 import {
   addDays,
@@ -15,6 +15,14 @@ import {
   format,
 } from 'date-fns';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 interface Timesheet {
   id: string;
@@ -72,8 +80,10 @@ export default function TimeEntryPage() {
   const [activeRows, setActiveRows] = useState<
     { chargeCodeId: string; name: string; isBillable: boolean | null }[]
   >([]);
+  const [descriptions, setDescriptions] = useState<DescriptionData>({});
   const [isDirty, setIsDirty] = useState(false);
   const [viewMode, setViewMode] = useState<'week' | 'biweek'>('week');
+  const [minHoursWarning, setMinHoursWarning] = useState<{ day: string; hours: number }[] | null>(null);
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const periodStr = format(weekStart, 'yyyy-MM-dd');
@@ -81,7 +91,7 @@ export default function TimeEntryPage() {
   // Fetch charge codes assigned to user
   const { data: rawChargeCodes = [] } = useQuery<ChargeCode[]>({
     queryKey: ['timesheet-charge-codes'],
-    queryFn: () => api.get('/timesheets/charge-codes'),
+    queryFn: ({ signal }) => api.get('/timesheets/charge-codes', signal),
   });
 
   const chargeCodes = rawChargeCodes;
@@ -89,9 +99,10 @@ export default function TimeEntryPage() {
   // Fetch or create timesheet for the period
   const { data: rawTimesheet, isLoading: timesheetLoading } = useQuery<Timesheet | null>({
     queryKey: ['timesheet', periodStr],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const existing = await api.get<Timesheet | null>(
         `/timesheets?period=${periodStr}`,
+        signal,
       );
       if (existing) return existing;
       return api.post<Timesheet>('/timesheets', {
@@ -106,7 +117,7 @@ export default function TimeEntryPage() {
   // Fetch entries when we have a timesheet
   const { data: entriesData } = useQuery<Entry[]>({
     queryKey: ['timesheet-entries', timesheet?.id],
-    queryFn: () => api.get(`/timesheets/${timesheet!.id}/entries`),
+    queryFn: ({ signal }) => api.get(`/timesheets/${timesheet!.id}/entries`, signal),
     enabled: !!timesheet?.id,
   });
 
@@ -115,6 +126,7 @@ export default function TimeEntryPage() {
     const entries = entriesData ?? [];
 
     const newGrid: GridData = {};
+    const newDescriptions: DescriptionData = {};
     const rowMap = new Map<
       string,
       { chargeCodeId: string; name: string; isBillable: boolean | null }
@@ -126,6 +138,13 @@ export default function TimeEntryPage() {
       }
       newGrid[entry.chargeCodeId][entry.date] = parseFloat(entry.hours);
 
+      if (entry.description) {
+        if (!newDescriptions[entry.chargeCodeId]) {
+          newDescriptions[entry.chargeCodeId] = {};
+        }
+        newDescriptions[entry.chargeCodeId][entry.date] = entry.description;
+      }
+
       if (!rowMap.has(entry.chargeCodeId)) {
         rowMap.set(entry.chargeCodeId, {
           chargeCodeId: entry.chargeCodeId,
@@ -136,6 +155,7 @@ export default function TimeEntryPage() {
     }
 
     setGridData(newGrid);
+    setDescriptions(newDescriptions);
     setActiveRows(Array.from(rowMap.values()));
     setIsDirty(false);
   }, [entriesData, weekStart]);
@@ -155,10 +175,12 @@ export default function TimeEntryPage() {
         const rowData = gridData[row.chargeCodeId] || {};
         for (const [date, hours] of Object.entries(rowData)) {
           if (hours > 0) {
+            const desc = descriptions[row.chargeCodeId]?.[date];
             entries.push({
               charge_code_id: row.chargeCodeId,
               date,
               hours,
+              ...(desc ? { description: desc } : {}),
             });
           }
         }
@@ -199,6 +221,33 @@ export default function TimeEntryPage() {
     },
   });
 
+  // Check min hours before submitting
+  const checkMinHoursAndSubmit = useCallback(() => {
+    const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const incompleteDays: { day: string; hours: number }[] = [];
+
+    for (let i = 0; i < 5; i++) {
+      const date = format(addDays(weekStart, i), 'yyyy-MM-dd');
+      let total = 0;
+      for (const row of activeRows) {
+        total += gridData[row.chargeCodeId]?.[date] || 0;
+      }
+      total = Math.round(total * 100) / 100;
+      if (total < 8) {
+        incompleteDays.push({ day: `${DAYS[i]} (${format(addDays(weekStart, i), 'MMM d')})`, hours: total });
+      }
+    }
+
+    if (incompleteDays.length > 0) {
+      setMinHoursWarning(incompleteDays);
+    } else {
+      submitMutation.mutate();
+    }
+  }, [weekStart, activeRows, gridData, submitMutation]);
+
+  const canEdit =
+    !timesheet?.status || timesheet.status === 'draft' || timesheet.status === 'rejected';
+
   // Auto-save every 30 seconds
   useEffect(() => {
     if (autoSaveTimerRef.current) {
@@ -215,10 +264,7 @@ export default function TimeEntryPage() {
         clearInterval(autoSaveTimerRef.current);
       }
     };
-  }, [isDirty, timesheet?.id]);
-
-  const canEdit =
-    !timesheet?.status || timesheet.status === 'draft' || timesheet.status === 'rejected';
+  }, [isDirty, timesheet?.id, canEdit, saveMutation]);
 
   const handleCellChange = useCallback(
     (chargeCodeId: string, date: string, hours: number) => {
@@ -227,6 +273,20 @@ export default function TimeEntryPage() {
         [chargeCodeId]: {
           ...prev[chargeCodeId],
           [date]: hours,
+        },
+      }));
+      setIsDirty(true);
+    },
+    [],
+  );
+
+  const handleDescriptionChange = useCallback(
+    (chargeCodeId: string, date: string, description: string) => {
+      setDescriptions((prev) => ({
+        ...prev,
+        [chargeCodeId]: {
+          ...prev[chargeCodeId],
+          [date]: description,
         },
       }));
       setIsDirty(true);
@@ -281,7 +341,7 @@ export default function TimeEntryPage() {
                 {format(weekEnd, 'd, yyyy')}
               </h2>
               <p className="text-xs text-[var(--text-muted)]">
-                Semi-monthly period 2 of 2
+                {format(weekStart, 'MMMM yyyy')}
               </p>
             </div>
             <Button
@@ -300,7 +360,7 @@ export default function TimeEntryPage() {
               </Badge>
             )}
             {isDirty && (
-              <span className="text-xs text-[var(--accent-amber)] font-medium font-[family-name:var(--font-mono)]">
+              <span className="text-xs text-[var(--accent-amber)] font-medium">
                 Unsaved
               </span>
             )}
@@ -345,7 +405,9 @@ export default function TimeEntryPage() {
             weekStart={weekStart}
             rows={activeRows}
             data={gridData}
+            descriptions={descriptions}
             onCellChange={handleCellChange}
+            onDescriptionChange={handleDescriptionChange}
             disabled={!canEdit}
             onRemoveRow={handleRemoveRow}
           />
@@ -362,7 +424,7 @@ export default function TimeEntryPage() {
               onSelect={handleAddCode}
             />
           )}
-          <span className="text-[11px] text-[var(--text-muted)] font-[family-name:var(--font-mono)]">
+          <span className="text-[11px] text-[var(--text-muted)]">
             Auto-saves every 30s
           </span>
         </div>
@@ -378,7 +440,7 @@ export default function TimeEntryPage() {
               </Button>
               <Button
                 className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white"
-                onClick={() => submitMutation.mutate()}
+                onClick={checkMinHoursAndSubmit}
                 disabled={submitMutation.isPending || !timesheet?.id}
               >
                 {submitMutation.isPending ? 'Submitting...' : 'Submit'}
@@ -393,6 +455,36 @@ export default function TimeEntryPage() {
           )}
         </div>
       </div>
+
+      {/* Min hours warning dialog */}
+      <Dialog open={minHoursWarning !== null} onOpenChange={(open) => { if (!open) setMinHoursWarning(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Incomplete Hours</DialogTitle>
+            <DialogDescription>
+              The following days have less than 8 hours logged:
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="space-y-1.5 text-sm">
+            {minHoursWarning?.map(({ day, hours }) => (
+              <li key={day} className="flex items-center justify-between px-3 py-1.5 rounded-md bg-[var(--accent-red-light)]/30">
+                <span className="font-medium text-[var(--text-primary)]">{day}</span>
+                <span className="font-[family-name:var(--font-mono)] text-[var(--accent-red)] font-medium">
+                  {hours.toFixed(1)}h / 8h
+                </span>
+              </li>
+            ))}
+          </ul>
+          <DialogFooter>
+            <Button
+              className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white"
+              onClick={() => setMinHoursWarning(null)}
+            >
+              OK, Got It
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

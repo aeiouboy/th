@@ -91,8 +91,33 @@ When invoked, you must follow these steps:
       - Invalid input → validation error shown
       - Unauthorized role → access denied or element hidden
 
-   e. **Screenshots** — capture each page at desktop (1280×720) and mobile (375×667)
-   - Save screenshots to `docs/test-results/screenshots/<page-name>--<viewport>.png`
+   d2. **Core actions must assert, not guard** — If an action is the PURPOSE of the test (the thing described in the test name), it MUST use an assertion that fails when the precondition is not met. It MUST NOT be wrapped in a conditional that silently skips the action. A test that passes without performing its core action is worse than a failing test — it hides bugs. Conditional guards are only acceptable for optional UI variations (e.g., dismissing an optional dialog), never for the action being tested.
+
+   e. **Evidence screenshots (snap)** — CRITICAL: screenshots are EVIDENCE that actions happened, not just page captures.
+
+   The test helper must include a reusable `snap()` function:
+   ```typescript
+   // Generic, reusable — no hardcoded paths or test IDs
+   async function snap(page: Page, testId: string, stepName: string) {
+     const fileName = `${testId}-${stepName}--desktop.png`.toLowerCase().replace(/\s+/g, '-');
+     await page.screenshot({
+       path: path.join(SCREENSHOTS_DIR, fileName),
+       fullPage: false,
+     });
+   }
+   ```
+
+   **When to call `snap()`:**
+   - Every `Snap:` line in the plan's E2E spec MUST produce a `snap()` call in the test
+   - If the plan has no `Snap:` lines, apply these defaults:
+     - **CRUD tests**: snap before action ("before-create") + snap after action ("after-create")
+     - **Workflow tests**: snap at each user role transition ("employee-submitted", "manager-approved")
+     - **Negative tests**: snap showing the error message ("error-shown")
+   - The snap filename is derived from the test ID + step name — fully dynamic, no hardcoding
+
+   **Two types of screenshots:**
+   - **Static page captures**: `takeScreenshots(page, 'page-name')` — one per page, taken once
+   - **Workflow step evidence**: `snap(page, 'e2e-wf-01', 'after-submit')` — per action, taken at key moments
 
    f. **Tests must NOT mock the backend** — E2E tests run against real running servers. If tests need auth, obtain a real token via Supabase auth API or use storageState from a global setup that logs in once.
 5. **Run the tests.** Execute the test suite to confirm all new tests pass. Fix any failures in the test code (never in the implementation code).
@@ -220,6 +245,20 @@ TC-003,Returns 400 on missing email,unit,Server Actions — Users,tests/users/va
    - [ ] At least 1 E2E test is a negative case (verifies error message appears for invalid input)
    - [ ] Every `E2E-*` spec listed in the plan's `## E2E Test Specifications` section has a corresponding test implemented
    - [ ] No E2E test uses mocked API responses — all tests run against real backend
+
+   ### Silent skip check (CRITICAL — prevents tests that pass without testing)
+   - [ ] Every test's core action (the action described in its name) is executed unconditionally — not wrapped in a conditional guard that could silently skip it
+   - [ ] If a test passes but its snap evidence screenshots are missing, the test is considered FAILED (the action was skipped)
+
+   ### Screenshot evidence checks (CRITICAL — prevents empty evidence)
+   - [ ] A reusable `snap(page, testId, stepName)` helper exists in helpers (not hardcoded per test)
+   - [ ] Every `Snap:` line in the plan's E2E specs has a corresponding `snap()` call in the test code
+   - [ ] Workflow tests have at least 1 snap per significant state change (before/after action)
+   - [ ] Negative tests have at least 1 snap showing the error/validation message
+   - [ ] Screenshot files in `docs/test-results/screenshots/` include both:
+     - Static page captures: `<page-name>--desktop.png` (page-level)
+     - Workflow step evidence: `<test-id>-<step>--desktop.png` (action-level)
+   - [ ] Count of step-evidence screenshots >= number of `Snap:` lines in the plan
 
    ### Acceptance criteria traceability check
    - [ ] Read the plan's `## Acceptance Criteria > Feature Criteria` section

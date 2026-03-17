@@ -14,6 +14,11 @@ export class BudgetsController {
     return this.budgetsService.getAlerts();
   }
 
+  @Get('chargeability-alerts')
+  getChargeabilityAlerts() {
+    return this.budgetsService.getChargeabilityAlerts();
+  }
+
   @Get('summary')
   getSummary() {
     return this.budgetsService.getSummary();

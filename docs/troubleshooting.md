@@ -165,6 +165,30 @@ File changed: `backend/src/integrations/integrations.controller.ts`
 
 ## E2E Test Findings
 
+### Bug: Sidebar Displays Admin Menu Items to All Roles (RBAC)
+
+**Discovered by:** E2E-RBAC-01 (employee sidebar), E2E-RBAC-02 (admin sidebar), E2E-RBAC-05 (employee blocked from admin pages) — `frontend/e2e/rbac.spec.ts`
+
+**Symptoms:**
+- Employee users could see admin nav items (Users, Calendar, Rates) in the sidebar.
+- Mobile nav showed the Approvals tab to all users regardless of role.
+- Navigating directly to `/admin/users`, `/admin/calendar`, or `/admin/rates` as an employee did not redirect or show an access-denied page.
+
+**Root Cause:**
+`layout.tsx` hardcoded the full nav item list without checking the authenticated user's role. Both the desktop sidebar and the mobile bottom nav rendered every item unconditionally, so role-restricted links were always visible in the DOM.
+
+**Fix:**
+Added role-based conditional rendering in `frontend/src/app/(authenticated)/layout.tsx`:
+- Admin-only nav items (Users, Calendar, Rates) only render when `role === 'admin'`.
+- Approvals nav item only renders for `admin`, `charge_manager`, and `pmo` roles.
+- Mobile nav uses the same role filter as the desktop sidebar.
+
+**Verified By:** E2E-RBAC-01 asserts that admin links are absent for employee nattaya; E2E-RBAC-02 asserts all links are present for admin tachongrak; E2E-RBAC-05 asserts employee direct navigation to `/admin/users` is blocked.
+
+**Files changed:** `frontend/src/app/(authenticated)/layout.tsx`
+
+---
+
 ### Bug: Charge Code Form Missing Parent Selector for Project Level
 
 **Discovered by:** E2E-CC-03 (negative test) — `frontend/e2e/charge-codes.spec.ts`
@@ -198,6 +222,41 @@ if (level !== 'program' && !parentId) {
 **Files changed:** `frontend/src/components/charge-codes/ChargeCodeForm.tsx`
 
 **Caught by:** E2E-CC-03 negative test, which selects "project" level, skips parent selection, and asserts that the error message `/must have a parent/i` appears. This test fails when the parent selector is absent because the form submits instead of rejecting the input.
+
+---
+
+## Timesheet Submission Issues
+
+### Problem: Submit returns 400 "Minimum 8 hours required on weekdays"
+
+**Symptoms:**
+- Clicking the Submit button shows an error toast listing specific dates
+- The response body contains `message: "Minimum 8 hours required on weekdays"` with a `details` array
+
+**Cause:**
+Every weekday (Monday–Friday, excluding public holidays in the calendar) must have at least 8 hours logged in total across all charge codes for that day. The submit endpoint checks each day individually.
+
+**Fix:**
+1. Return to the Time Entry page for the timesheet period.
+2. Review the dates listed in the error (e.g., `{ "date": "2026-03-10", "logged": 6, "required": 8 }`).
+3. Add hours to those dates on any assigned charge code until each day reaches 8 hours.
+4. Public holidays are automatically excluded — if a date is a declared holiday, it will not appear in the error list.
+
+---
+
+### Problem: Chargeability alerts not showing on Reports or Budget pages
+
+**Symptoms:**
+- The Alerts section on the Reports page shows budget alerts but not chargeability alerts
+- `GET /budgets/chargeability-alerts` returns an empty array `[]`
+
+**Cause:**
+Chargeability alerts are computed from approved timesheet entries. If no timesheets have been approved (`cc_approved` or `locked` status), there is no data to calculate chargeability from.
+
+**Fix:**
+1. Ensure at least one timesheet has been submitted and gone through the full approval workflow (manager approved → CC owner approved).
+2. Alternatively, trigger a budget recalculation via `POST /budgets/recalculate` (admin only) to force re-aggregation from existing approved entries.
+3. If the `cost_rates` table has no entries for the relevant job grades, cost impact will be zero even if hours exist. Check the Admin → Rates page.
 
 ---
 
@@ -287,3 +346,48 @@ curl -H "Authorization: Bearer $TOKEN" \
 ```
 
 A valid JSON response (not 401/500) confirms auth is wired correctly end-to-end.
+
+---
+
+## Chore: Hardcoded Mock Data Removed from Frontend
+
+**Date:** 2026-03-17
+
+### What Was Removed
+
+Several frontend components and pages contained hardcoded placeholder values that were never replaced with real API data. These showed fake information to users, making the application appear broken, inconsistent, or misleading in a production environment.
+
+| Location | What was hardcoded | What replaced it |
+|----------|--------------------|------------------|
+| `frontend/src/app/(authenticated)/layout.tsx` | Notification bell badge showing `"3"` (fake unread count) | Badge removed; will be wired to a real notifications API when that feature ships |
+| `frontend/src/app/(authenticated)/layout.tsx` | Avatar fallback `"U"` (literal letter U) | Real user initials derived from `profile.full_name` |
+| `frontend/src/app/(authenticated)/layout.tsx` | Help link `href="#"` (dead link) | Link removed until a real help destination exists |
+| `frontend/src/app/(authenticated)/page.tsx` | Dashboard stat deltas `"+4h"` and `"+2%"` | Computed deltas derived from current vs. previous period API data |
+| `frontend/src/app/(authenticated)/page.tsx` | `"Period closes Mar 31"` hard-coded date string | Dynamic period close date sourced from the active period returned by the `/periods` endpoint |
+| `frontend/src/app/(authenticated)/page.tsx` | `"Send Reminders"` button that performed no action | Button removed; will be reintroduced when the notifications/scheduler feature is complete |
+| `frontend/src/components/timesheets/TimesheetReview.tsx` | `mockDetail` object containing `"John Doe"` and sample hours | Replaced with real timesheet data fetched from the API |
+| `frontend/src/app/(authenticated)/admin/users/page.tsx` | `"Active"` badge hardcoded on every user row | Badge now reflects the real `is_active` field from the user profile API |
+| `frontend/src/app/(authenticated)/approvals/page.tsx` | Hardcoded period dropdown options (e.g. `"Mar 2026"`) | Dropdown populated dynamically from the `/periods` API endpoint |
+
+### Why This Matters
+
+Hardcoded sample data causes several problems in production:
+
+- **Misleading UI:** Users see counts, dates, and names that do not reflect reality, eroding trust in the application.
+- **Silent API failures:** When a fallback constant is shown instead of an error state, real connectivity or auth problems go unnoticed.
+- **Test blind spots:** E2E tests that assert on visible values may pass against mock data even when the API is broken.
+
+### How to Avoid Reintroducing Mock Data
+
+- **Never use hardcoded sample values as production fallbacks.** If the API is unreachable, show a loading skeleton or an error state — not a fake value.
+- **Use loading and error states explicitly.** Components should handle `isLoading`, `isError`, and empty-data states as distinct conditions.
+- **Do not leave `TODO: replace with API` comments in production code.** Either wire the data or remove the element entirely until the feature is ready.
+- **Review PRs for `MOCK_`, `mock`, `"hardcoded"`, or constant arrays defined at the top of page files.** These are a strong signal that real API integration was skipped.
+
+### Files Affected
+
+- `frontend/src/app/(authenticated)/layout.tsx`
+- `frontend/src/app/(authenticated)/page.tsx`
+- `frontend/src/app/(authenticated)/approvals/page.tsx`
+- `frontend/src/components/timesheets/TimesheetReview.tsx`
+- `frontend/src/app/(authenticated)/admin/users/page.tsx`

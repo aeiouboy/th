@@ -28,6 +28,20 @@ vi.mock('@/lib/supabase/client', () => ({
   }),
 }));
 
+// Mock currency
+vi.mock('@/lib/currency', () => ({
+  useCurrency: () => ({
+    currency: 'THB',
+    setCurrency: vi.fn(),
+    refreshSettings: vi.fn().mockResolvedValue(undefined),
+    formatCurrency: (v: number) => `฿${v.toLocaleString()}`,
+    formatCurrencyShort: (v: number) => `฿${v}`,
+    symbol: '฿',
+  }),
+  CurrencyProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  formatCurrencyStatic: (v: number) => `฿${v}`,
+}));
+
 // Mock lucide-react
 vi.mock('lucide-react', () => ({
   Plus: () => <span data-testid="plus-icon" />,

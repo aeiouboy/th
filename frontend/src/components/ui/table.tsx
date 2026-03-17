@@ -23,7 +23,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("sticky top-0 z-10 bg-[var(--bg-content)] dark:bg-[var(--bg-content)] [&_tr]:border-b", className)}
+      className={cn("sticky top-0 z-10 bg-[var(--bg-subtle)] dark:bg-[var(--bg-subtle)] [&_tr]:border-b", className)}
       {...props}
     />
   )
@@ -57,7 +57,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted even:bg-[var(--bg-content)] dark:even:bg-[var(--bg-content)]",
+        "border-b transition-colors hover:bg-[var(--bg-card-hover)] data-[state=selected]:bg-muted even:bg-[var(--bg-content)] dark:even:bg-[var(--bg-content)]",
         className
       )}
       {...props}
@@ -70,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-10 px-2 text-left align-middle text-[13px] font-semibold whitespace-nowrap text-[var(--text-secondary)] uppercase tracking-wider [&:has([role=checkbox])]:pr-0",
+        "h-10 px-2 text-left align-middle text-xs font-medium whitespace-nowrap text-[var(--text-secondary)] [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}

@@ -14,6 +14,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Plus, Search, Archive } from 'lucide-react';
 import { api } from '@/lib/api';
+import { useCurrency } from '@/lib/currency';
 import {
   ChargeCodeTree,
   type ChargeCodeNode,
@@ -50,6 +51,7 @@ const LEVEL_BADGE: Record<string, { label: string; className: string }> = {
 
 
 export default function ChargeCodesPage() {
+  const { formatCurrency, symbol } = useCurrency();
   const [tree, setTree] = useState<ChargeCodeNode[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selected, setSelected] = useState<ChargeCodeDetail | null>(null);
@@ -293,7 +295,7 @@ export default function ChargeCodesPage() {
                     <InfoItem label="Level" value={selected.level ? selected.level.charAt(0).toUpperCase() + selected.level.slice(1) : '-'} />
                     <InfoItem label="Owner" value={selected.ownerName || '-'} />
                     <InfoItem label="Approver" value={selected.approverName || '-'} />
-                    <InfoItem label="Cost Center" value={selected.costCenter || '-'} />
+                    <InfoItem label="Cost center" value={selected.costCenter || '-'} />
                     <InfoItem label="Valid" value={
                       selected.validFrom && selected.validTo
                         ? `${formatShortDate(selected.validFrom)} - ${formatShortDate(selected.validTo)}`
@@ -311,8 +313,8 @@ export default function ChargeCodesPage() {
                     <div className="rounded-lg border border-[var(--border-default)] p-3 bg-stone-50/50 dark:bg-stone-900/50">
                       <div className="mb-2 flex items-center justify-between text-xs">
                         <span className="text-[var(--text-secondary)] font-medium">Budget</span>
-                        <span className="font-[family-name:var(--font-mono)] font-medium text-[var(--text-primary)]">
-                          ${actualSpent.toLocaleString()} / ${budgetTotal.toLocaleString()}
+                        <span className="font-medium text-[var(--text-primary)]">
+                          {formatCurrency(actualSpent)} / {formatCurrency(budgetTotal)}
                         </span>
                       </div>
                       <div className="h-2.5 overflow-hidden rounded-full bg-stone-200">
@@ -325,7 +327,7 @@ export default function ChargeCodesPage() {
                           style={{ width: `${budgetPercent}%` }}
                         />
                       </div>
-                      <p className="mt-1 text-[11px] font-[family-name:var(--font-mono)] text-[var(--text-muted)]">
+                      <p className="mt-1 text-[11px] text-[var(--text-muted)]">
                         {budgetPercent}% consumed
                       </p>
                     </div>
@@ -351,25 +353,21 @@ export default function ChargeCodesPage() {
                 <div className="space-y-5">
                   <div className="grid grid-cols-2 gap-3">
                     <InfoItem
-                      label="Total Budget"
-                      value={budgetTotal > 0 ? `$${budgetTotal.toLocaleString()}` : '-'}
-                      mono
+                      label="Total budget"
+                      value={budgetTotal > 0 ? formatCurrency(budgetTotal) : '-'}
                     />
                     <InfoItem
-                      label="Actual Spent"
-                      value={`$${actualSpent.toLocaleString()}`}
-                      mono
+                      label="Actual spent"
+                      value={formatCurrency(actualSpent)}
                     />
                     <InfoItem
                       label="Remaining"
-                      value={budgetTotal > 0 ? `$${budgetRemaining.toLocaleString()}` : '-'}
-                      mono
+                      value={budgetTotal > 0 ? formatCurrency(budgetRemaining) : '-'}
                       valueClassName={budgetRemaining < 0 ? 'text-[var(--accent-red)]' : 'text-[var(--accent-green)]'}
                     />
                     <InfoItem
                       label="Usage"
                       value={`${budgetPercent}%`}
-                      mono
                       valueClassName={
                         budgetPercent >= 90 ? 'text-[var(--accent-red)]' :
                         budgetPercent >= 70 ? 'text-[var(--accent-amber)]' :
@@ -390,9 +388,9 @@ export default function ChargeCodesPage() {
                           style={{ width: `${budgetPercent}%` }}
                         />
                       </div>
-                      <div className="flex justify-between mt-1.5 text-[11px] font-[family-name:var(--font-mono)]">
-                        <span className="text-[var(--text-muted)]">$0</span>
-                        <span className="text-[var(--text-muted)]">${budgetTotal.toLocaleString()}</span>
+                      <div className="flex justify-between mt-1.5 text-[11px]">
+                        <span className="text-[var(--text-muted)]">{symbol}0</span>
+                        <span className="text-[var(--text-muted)]">{formatCurrency(budgetTotal)}</span>
                       </div>
                     </div>
                   )}

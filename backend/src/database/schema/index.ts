@@ -8,3 +8,4 @@ export * from './approval-logs';
 export * from './budgets';
 export * from './calendar';
 export * from './vacation-requests';
+export * from './system-settings';

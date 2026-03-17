@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
+import { format, subMonths } from 'date-fns';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
   Select,
@@ -14,8 +15,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ApprovalQueue } from '@/components/approvals/ApprovalQueue';
-import { Search } from 'lucide-react';
+import { Search, CheckCircle, History } from 'lucide-react';
 import { formatShortDate } from '@/lib/utils';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 
 interface PendingTimesheet {
   id: string;
@@ -66,7 +69,7 @@ export default function ApprovalsPage() {
   });
   const [history, setHistory] = useState<ApprovalHistoryItem[]>([]);
   const [search, setSearch] = useState('');
-  const [period, setPeriod] = useState('2026-03');
+  const [period, setPeriod] = useState(() => format(new Date(), 'yyyy-MM'));
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(false);
 
@@ -89,6 +92,14 @@ export default function ApprovalsPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const periodOptions = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = subMonths(now, i);
+      return { value: format(d, 'yyyy-MM'), label: format(d, 'MMM yyyy') };
+    });
+  }, []);
 
   const filterItems = (items: PendingTimesheet[]) => {
     let filtered = items;
@@ -116,17 +127,10 @@ export default function ApprovalsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">
-            Approvals
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
-            Review and approve submitted timesheets
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Approvals"
+        description="Review and approve submitted timesheets"
+      />
 
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
@@ -135,9 +139,11 @@ export default function ApprovalsPage() {
             <SelectValue placeholder="Period" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="2026-03">Mar 2026</SelectItem>
-            <SelectItem value="2026-02">Feb 2026</SelectItem>
-            <SelectItem value="2026-01">Jan 2026</SelectItem>
+            {periodOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
@@ -236,8 +242,12 @@ function ApprovalSkeleton() {
 function HistoryTable({ items }: { items: ApprovalHistoryItem[] }) {
   if (items.length === 0) {
     return (
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] py-12 text-center text-[var(--text-secondary)] text-sm shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        No approval history
+      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <EmptyState
+          icon={History}
+          title="No approval history"
+          description="Your past approval actions will appear here"
+        />
       </div>
     );
   }
@@ -247,22 +257,22 @@ function HistoryTable({ items }: { items: ApprovalHistoryItem[] }) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-[var(--border-default)] bg-stone-50 dark:bg-stone-900 sticky top-0">
-            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
               Employee
             </th>
-            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
               Period
             </th>
-            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
               Action
             </th>
-            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
               Type
             </th>
-            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
               Comment
             </th>
-            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs uppercase tracking-wider">
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
               Date
             </th>
           </tr>
@@ -285,7 +295,7 @@ function HistoryTable({ items }: { items: ApprovalHistoryItem[] }) {
                   </div>
                 )}
               </td>
-              <td className="px-4 py-2.5 text-[var(--text-secondary)] font-[family-name:var(--font-mono)] text-xs">
+              <td className="px-4 py-2.5 text-[var(--text-secondary)] text-xs">
                 {formatShortDate(item.timesheet.periodStart)} -{' '}
                 {formatShortDate(item.timesheet.periodEnd)}
               </td>
@@ -300,7 +310,7 @@ function HistoryTable({ items }: { items: ApprovalHistoryItem[] }) {
               <td className="px-4 py-2.5 text-[var(--text-secondary)] max-w-[200px] truncate text-xs">
                 {item.comment || '-'}
               </td>
-              <td className="px-4 py-2.5 text-[var(--text-muted)] font-[family-name:var(--font-mono)] text-xs">
+              <td className="px-4 py-2.5 text-[var(--text-muted)] text-xs">
                 {new Date(item.approvedAt).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',

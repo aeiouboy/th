@@ -3,10 +3,36 @@ import path from 'path';
 
 export const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/test-results/screenshots');
 
+export const AUTH_DIR = path.join(__dirname, '.auth');
+
+export function authFile(name: string): string {
+  return path.join(AUTH_DIR, `${name}.json`);
+}
+
+export const USERS = [
+  { name: 'tachongrak', email: 'tachongrak@central.co.th', password: 'password1234', role: 'admin' },
+  { name: 'wichai', email: 'wichai.s@central.co.th', password: 'password1234', role: 'charge_manager' },
+  { name: 'ploy', email: 'ploy.r@central.co.th', password: 'password1234', role: 'pmo' },
+  { name: 'nattaya', email: 'nattaya.k@central.co.th', password: 'password1234', role: 'employee' },
+  { name: 'somchai', email: 'somchai.p@central.co.th', password: 'password1234', role: 'employee' },
+] as const;
+
 export async function takeScreenshots(page: Page, pageName: string) {
   // Desktop screenshot (already at 1280x720 for desktop project)
   await page.screenshot({
     path: path.join(SCREENSHOTS_DIR, `${pageName}--desktop.png`),
+    fullPage: false,
+  });
+}
+
+/**
+ * Capture evidence screenshot at a workflow step.
+ * Naming: <testId>-<stepName>--desktop.png (all kebab-case, lowercase)
+ */
+export async function snap(page: Page, testId: string, stepName: string) {
+  const fileName = `${testId}-${stepName}--desktop.png`.toLowerCase().replace(/\s+/g, '-');
+  await page.screenshot({
+    path: path.join(SCREENSHOTS_DIR, fileName),
     fullPage: false,
   });
 }
@@ -29,7 +55,7 @@ export async function apiRequest(
   apiPath: string,
   body?: unknown,
 ) {
-  const baseUrl = 'http://localhost:3001/api/v1';
+  const baseUrl = 'http://127.0.0.1:3001/api/v1';
   const url = `${baseUrl}${apiPath}`;
 
   // Extract the access token from cookies
@@ -51,6 +77,7 @@ export async function apiRequest(
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache',  // bypass HTTP cache to ensure fresh response body
   };
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`;
@@ -94,4 +121,24 @@ export function findInTree(nodes: any[], name: string): any {
 export function findInChildren(parentNode: any, childName: string): any {
   if (!parentNode || !parentNode.children) return null;
   return findInTree(parentNode.children, childName);
+}
+
+/**
+ * Get the current Monday's date as YYYY-MM-DD string.
+ */
+export function getCurrentMondayStr(): string {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diff);
+  return monday.toISOString().split('T')[0];
+}
+
+/**
+ * Get the current period as YYYY-MM string.
+ */
+export function getCurrentPeriod(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }

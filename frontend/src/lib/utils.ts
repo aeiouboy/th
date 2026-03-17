@@ -5,11 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(value: number) {
-  if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
-  return `$${value.toFixed(0)}`;
-}
+export { formatCurrencyStatic as formatCurrency } from './currency';
 
 export function formatShortDate(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00');

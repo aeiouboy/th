@@ -14,7 +14,13 @@ export const DrizzleProvider: Provider = {
     if (!connectionString) {
       throw new Error('SUPABASE_DB_URL environment variable is not set');
     }
-    const client = postgres(connectionString, { prepare: false });
+    const client = postgres(connectionString, {
+      prepare: false,
+      max: 8,               // Allow enough concurrent connections for parallel auth + queries
+      idle_timeout: 20,     // Release idle connections after 20s
+      max_lifetime: 1800,   // Recycle connections after 30min to prevent stale handles
+      connect_timeout: 15,
+    });
     return drizzle(client, { schema });
   },
 };

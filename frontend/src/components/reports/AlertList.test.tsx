@@ -74,8 +74,8 @@ describe('AlertList', () => {
 
     it('should render formatted budget amounts', () => {
       render(<AlertList alerts={mockAlerts} />);
-      // $200,000 formatted
-      expect(screen.getByText('$200,000')).toBeInTheDocument();
+      // 200000 formatted via formatCurrencyStatic (default THB) → ฿200K
+      expect(screen.getByText('฿200K')).toBeInTheDocument();
     });
 
     it('should render severity indicators for all alerts', () => {

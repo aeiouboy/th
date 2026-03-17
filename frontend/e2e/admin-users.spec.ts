@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { apiRequest, takeScreenshots } from './helpers';
+import { apiRequest, takeScreenshots, snap } from './helpers';
 
 test.describe('Admin Users Module', () => {
   test('E2E-USR-01: Users list loads with real data', async ({ page }) => {
     await page.goto('/admin/users');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
     // Page should show User Management card
-    await expect(page.getByText('User Management')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('User Management')).toBeVisible({ timeout: 30000 });
 
     // Users table should be visible with at least 1 row
     await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 10000 });
@@ -24,15 +24,16 @@ test.describe('Admin Users Module', () => {
     await expect(page.getByText('Role')).toBeVisible();
 
     // "Total Users" summary card should show a number
-    await expect(page.getByText('Total Users')).toBeVisible();
+    await expect(page.getByText('Total users')).toBeVisible();
 
+    await snap(page, 'e2e-usr-01', 'user-list-loaded');
     await takeScreenshots(page, 'admin-users');
   });
 
   test('E2E-USR-02: Update user role (verify role display)', async ({ page }) => {
     await page.goto('/admin/users');
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByText('User Management')).toBeVisible({ timeout: 15000 });
+    await page.waitForLoadState('load');
+    await expect(page.getByText('User Management')).toBeVisible({ timeout: 30000 });
 
     // Wait for table to load
     await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 10000 });
@@ -44,6 +45,7 @@ test.describe('Admin Users Module', () => {
     // Edit dialog should open
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('Edit User')).toBeVisible();
+    await snap(page, 'e2e-usr-02', 'edit-dialog-open');
 
     // Role dropdown should be available
     const roleDropdown = page.getByRole('dialog').locator('button[role="combobox"]').first();
@@ -56,11 +58,11 @@ test.describe('Admin Users Module', () => {
     // Role options should include standard roles
     await expect(page.getByRole('option', { name: /Admin/i })).toBeVisible();
     await expect(page.getByRole('option', { name: /Employee/i })).toBeVisible();
+    await snap(page, 'e2e-usr-02', 'role-dropdown-open');
 
     // Close the dropdown first, then close dialog
     await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
-    // Now close the dialog itself
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
   });

@@ -37,6 +37,9 @@ import {
   Loader2Icon,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useCurrency } from '@/lib/currency';
+import { StatCard } from '@/components/shared/StatCard';
+import { EmptyState } from '@/components/shared/EmptyState';
 
 interface Rate {
   id: number;
@@ -52,10 +55,6 @@ const STATUS_STYLES: Record<string, string> = {
   upcoming: 'bg-[var(--accent-amber-light)] text-[var(--accent-amber)] border-[var(--accent-amber)]/20',
 };
 
-function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount);
-}
-
 function formatDate(dateStr: string) {
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -69,6 +68,7 @@ function getRateStatus(rate: Rate): 'active' | 'expired' | 'upcoming' {
 }
 
 export default function AdminRatesPage() {
+  const { currency, formatCurrency } = useCurrency();
   const [rates, setRates] = useState<Rate[]>([]);
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -163,45 +163,23 @@ export default function AdminRatesPage() {
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="hover:translate-y-0 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <CardContent className="flex items-center gap-3 pt-0">
-            <div className="w-10 h-10 rounded-lg bg-[var(--accent-teal-light)] flex items-center justify-center">
-              <DollarSignIcon className="w-5 h-5 text-[var(--accent-teal)]" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-mono)]">
-                {activeRates.length}
-              </p>
-              <p className="text-xs text-[var(--text-secondary)]">Active Rates</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="hover:translate-y-0 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <CardContent className="flex items-center gap-3 pt-0">
-            <div className="w-10 h-10 rounded-lg bg-[var(--accent-amber-light)] flex items-center justify-center">
-              <TrendingUpIcon className="w-5 h-5 text-[var(--accent-amber)]" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-mono)]">
-                {formatCurrency(avgRate, 'USD')}
-              </p>
-              <p className="text-xs text-[var(--text-secondary)]">Avg Hourly Rate</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="hover:translate-y-0 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <CardContent className="flex items-center gap-3 pt-0">
-            <div className="w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-              <DollarSignIcon className="w-5 h-5 text-[var(--text-muted)]" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-mono)]">
-                {rates.length}
-              </p>
-              <p className="text-xs text-[var(--text-secondary)]">Total Rate Records</p>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          label="Active rates"
+          value={activeRates.length}
+          icon={DollarSignIcon}
+          accent="var(--accent-teal)"
+        />
+        <StatCard
+          label="Avg hourly rate"
+          value={formatCurrency(avgRate)}
+          icon={TrendingUpIcon}
+          accent="var(--accent-amber)"
+        />
+        <StatCard
+          label="Total rate records"
+          value={rates.length}
+          icon={DollarSignIcon}
+        />
       </div>
 
       {/* Rate table */}
@@ -232,9 +210,11 @@ export default function AdminRatesPage() {
               <Loader2Icon className="w-6 h-6 animate-spin text-[var(--text-muted)]" />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-sm text-[var(--text-muted)]">No rates found.</p>
-            </div>
+            <EmptyState
+              icon={DollarSignIcon}
+              title="No rates found"
+              description="No rate records match your current filter criteria"
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -255,13 +235,13 @@ export default function AdminRatesPage() {
                         {rate.jobGrade}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-[family-name:var(--font-mono)] font-semibold text-[var(--text-primary)]">
-                      {formatCurrency(parseFloat(rate.hourlyRate), 'USD')}
+                    <TableCell className="font-semibold text-[var(--text-primary)]">
+                      {formatCurrency(parseFloat(rate.hourlyRate))}
                     </TableCell>
-                    <TableCell className="font-[family-name:var(--font-mono)] text-[var(--text-secondary)]">
+                    <TableCell className="text-[var(--text-secondary)]">
                       {formatDate(rate.effectiveFrom)}
                     </TableCell>
-                    <TableCell className="font-[family-name:var(--font-mono)] text-[var(--text-secondary)]">
+                    <TableCell className="text-[var(--text-secondary)]">
                       {rate.effectiveTo ? formatDate(rate.effectiveTo) : '--'}
                     </TableCell>
                     <TableCell>
@@ -309,7 +289,7 @@ export default function AdminRatesPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">Hourly Rate (USD)</label>
+              <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">Hourly Rate ({currency})</label>
               <Input
                 type="number"
                 step="0.01"

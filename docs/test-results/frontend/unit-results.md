@@ -2,8 +2,8 @@
 
 **Date**: 2026-03-17
 **Runner**: Vitest v4.1.0 + React Testing Library
-**Total**: 273 tests | 273 passed | 0 failed
-**Test Files**: 110 suites
+**Total**: 274 tests | 274 passed | 0 failed
+**Test Files**: 27 suites
 
 ## Test Suites
 
@@ -14,7 +14,7 @@
 | `app/login/page.test.tsx` | 8 | PASS |
 | `components/approvals/ApprovalQueue.test.tsx` | 21 | PASS |
 | `components/approvals/BulkApprovalBar.test.tsx` | 10 | PASS |
-| `components/approvals/TimesheetReview.test.tsx` | 8 | PASS |
+| `components/approvals/TimesheetReview.test.tsx` | 9 | PASS |
 | `components/charge-codes/AccessManager.test.tsx` | 11 | PASS |
 | `components/charge-codes/ChargeCodeForm.test.tsx` | 20 | PASS |
 | `components/charge-codes/ChargeCodeTree.test.tsx` | 16 | PASS |
@@ -140,7 +140,8 @@
 | TimesheetReview > success state > should render charge code names | pass |
 | TimesheetReview > success state > should render charge code IDs | pass |
 | TimesheetReview > success state > should render Daily Total row | pass |
-| TimesheetReview > error/fallback state > should render mock data when API fails | pass |
+| TimesheetReview > error/fallback state > should render error message when API fails | pass |
+| TimesheetReview > error/fallback state > should render retry button when API fails | pass |
 | TimesheetReview > empty state > should render empty state when no entries | pass |
 
 ### components/charge-codes/AccessManager.test.tsx

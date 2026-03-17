@@ -1,0 +1,8 @@
+{
+  "session_id": "2add33c4-9992-488f-936f-8136053bec60",
+  "prompts": [
+    "git first commit https://github.com/aeiouboy/th",
+    "install https://supabase.com/docs/guides/local-development/cli/getting-started"
+  ],
+  "agent_name": "Helix"
+}

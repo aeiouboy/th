@@ -101,10 +101,10 @@ describe('DashboardPage', () => {
   it('should render 4 metric cards', async () => {
     render(<DashboardPage />);
     await waitFor(() => {
-      expect(screen.getByText('Hours This Period')).toBeInTheDocument();
+      expect(screen.getByText('Hours this period')).toBeInTheDocument();
       expect(screen.getByText('Chargeability')).toBeInTheDocument();
-      expect(screen.getByText('Pending Approvals')).toBeInTheDocument();
-      expect(screen.getByText('Active Charge Codes')).toBeInTheDocument();
+      expect(screen.getByText('Pending approvals')).toBeInTheDocument();
+      expect(screen.getByText('Active charge codes')).toBeInTheDocument();
     });
   });
 

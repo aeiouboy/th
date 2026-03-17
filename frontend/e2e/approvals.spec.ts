@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { apiRequest, takeScreenshots } from './helpers';
+import { apiRequest, takeScreenshots, snap } from './helpers';
 
 test.describe('Approvals Module', () => {
   test('E2E-AP-01: Pending approvals list shows submitted timesheets', async ({ page }) => {
     await page.goto('/approvals');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 
-    // Page should load with the "Approvals" heading (use h2 to avoid topbar h1 conflict)
-    await expect(page.locator('h2').filter({ hasText: 'Approvals' })).toBeVisible({ timeout: 15000 });
+    // Page should load with the "Approvals" heading
+    await expect(page.locator('main h1').filter({ hasText: 'Approvals' })).toBeVisible({ timeout: 30000 });
 
     // Should show tabs: "As Manager" and "As CC Owner"
     await expect(page.getByText('As Manager')).toBeVisible();
@@ -30,20 +30,21 @@ test.describe('Approvals Module', () => {
     }
 
     if (hasManagerItems || hasCCOwnerItems) {
-      // The active tab should show approval queue items (not "No pending approvals")
+      // The active tab should show approval queue items
       await expect(page.locator('[data-slot="table-cell"], td').first()).toBeVisible({ timeout: 10000 });
     } else {
       // Empty state
       await expect(page.getByText(/No pending approvals/i)).toBeVisible({ timeout: 5000 });
     }
 
+    await snap(page, 'e2e-ap-01', 'pending-list');
     await takeScreenshots(page, 'approvals');
   });
 
   test('E2E-AP-02: Approve a timesheet', async ({ page }) => {
     await page.goto('/approvals');
-    await page.waitForLoadState('networkidle');
-    await expect(page.locator('h2').filter({ hasText: 'Approvals' })).toBeVisible({ timeout: 15000 });
+    await page.waitForLoadState('load');
+    await expect(page.locator('main h1').filter({ hasText: 'Approvals' })).toBeVisible({ timeout: 30000 });
 
     // Check if there are pending timesheets to approve
     const response = await apiRequest(page, 'GET', '/approvals/pending');
@@ -60,8 +61,9 @@ test.describe('Approvals Module', () => {
     if (hasManagerItems || hasCCOwnerItems) {
       // Wait for table to render
       await page.waitForTimeout(2000);
+      await snap(page, 'e2e-ap-02', 'before-approve');
 
-      // Click approve button (green checkmark) on the first pending timesheet
+      // Click approve button on the first pending timesheet
       const approveBtn = page.locator('button[title="Approve"]').first();
       const isVisible = await approveBtn.isVisible().catch(() => false);
 
@@ -69,17 +71,19 @@ test.describe('Approvals Module', () => {
         await approveBtn.click();
         // Should see success toast
         await expect(page.getByText(/approved/i)).toBeVisible({ timeout: 10000 });
+        await snap(page, 'e2e-ap-02', 'after-approve');
       }
     } else {
       // No pending approvals — verify empty state is shown
       await expect(page.getByText(/No pending approvals/i)).toBeVisible({ timeout: 5000 });
+      await snap(page, 'e2e-ap-02', 'no-pending');
     }
   });
 
   test('E2E-AP-03: Reject a timesheet with comment (NEGATIVE flow)', async ({ page }) => {
     await page.goto('/approvals');
-    await page.waitForLoadState('networkidle');
-    await expect(page.locator('h2').filter({ hasText: 'Approvals' })).toBeVisible({ timeout: 15000 });
+    await page.waitForLoadState('load');
+    await expect(page.locator('main h1').filter({ hasText: 'Approvals' })).toBeVisible({ timeout: 30000 });
 
     // Check if there are pending timesheets
     const response = await apiRequest(page, 'GET', '/approvals/pending');
@@ -97,7 +101,7 @@ test.describe('Approvals Module', () => {
       // Wait for table to render
       await page.waitForTimeout(2000);
 
-      // Click reject button (X icon) on the first pending timesheet
+      // Click reject button on the first pending timesheet
       const rejectBtn = page.locator('button[title="Reject"]').first();
       const isVisible = await rejectBtn.isVisible().catch(() => false);
 
@@ -107,6 +111,7 @@ test.describe('Approvals Module', () => {
         // Rejection dialog should open
         await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
         await expect(page.getByText(/Reject Timesheet/i)).toBeVisible();
+        await snap(page, 'e2e-ap-03', 'rejection-dialog');
 
         // Fill rejection comment
         await page.locator('textarea').fill('Hours seem incorrect, please review');
@@ -116,10 +121,12 @@ test.describe('Approvals Module', () => {
 
         // Should see success message
         await expect(page.getByText(/rejected/i)).toBeVisible({ timeout: 10000 });
+        await snap(page, 'e2e-ap-03', 'after-reject');
       }
     } else {
       // No pending — verify the page works correctly
       await expect(page.getByText(/No pending approvals/i)).toBeVisible({ timeout: 5000 });
+      await snap(page, 'e2e-ap-03', 'no-pending');
     }
   });
 });

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatCurrencyStatic } from '@/lib/currency';
 
 export interface ChargeCodeNode {
   id: string;
@@ -40,7 +41,7 @@ function TreeNode({
   onAddChild?: (parentId: string, parentLevel: string) => void;
   depth?: number;
 }) {
-  const [expanded, setExpanded] = useState(depth < 1);
+  const [expanded, setExpanded] = useState(false);
   const hasChildren = node.children.length > 0;
   const badge = node.level ? LEVEL_BADGE[node.level] : null;
   const isSelected = selectedId === node.id;
@@ -90,7 +91,7 @@ function TreeNode({
         </span>
         {node.budgetAmount && (
           <span className="ml-auto shrink-0 text-[11px] font-[family-name:var(--font-mono)] text-[var(--text-muted)]">
-            ${Number(node.budgetAmount).toLocaleString()}
+            {formatCurrencyStatic(Number(node.budgetAmount))}
           </span>
         )}
         {onAddChild && node.level && CHILD_LEVEL[node.level] && (

@@ -46,7 +46,19 @@ This automatically:
       - **Assertions after actions**: at least 1 `expect()` that runs AFTER a user action (NOT just checking page load)
       - **Negative case**: at least 1 test per module that verifies error handling (invalid input → error message)
    d. If any E2E test only checks element visibility without performing actions, mark it as **FAIL** with healing instruction: "test-writer must rewrite E2E test to perform real user actions and assert outcomes, not just check element visibility"
-5. **Validate Acceptance Criteria Traceability** (MANDATORY) — Prevents criteria from being "verified" by unrelated tests:
+5. **Validate No Silent Skips** (MANDATORY) — Prevents tests that pass without testing:
+   a. For each E2E test, check if its core action (the action described in its test name) could be silently skipped by a conditional guard
+   b. Cross-reference with snap evidence: if a test has `Snap:` lines in the spec but the corresponding screenshot files are missing, the action was likely skipped — mark as **FAIL**
+   c. A test that passes without executing its core action is worse than a failing test
+
+6. **Validate Screenshot Evidence** (MANDATORY for workflow tests) — Prevents empty evidence:
+   a. Read the plan's `## E2E Test Specifications` section and count all `Snap:` lines
+   b. List all screenshot files in `docs/test-results/screenshots/` that contain a test ID pattern (e.g., `e2e-wf-01-*`, `e2e-cc-01-*`)
+   c. For each `Snap:` line, verify a corresponding screenshot file exists
+   d. If step-evidence screenshots are missing (only static page captures exist), mark as **FAIL** with healing instruction: "test-writer must add snap() calls for every Snap: line in the E2E spec"
+   e. Report: "X/Y snap evidence screenshots found" in the validation report
+
+6. **Validate Acceptance Criteria Traceability** (MANDATORY) — Prevents criteria from being "verified" by unrelated tests:
    a. Read the plan's `## Acceptance Criteria > Feature Criteria` section
    b. For each criterion with a `Verified by: TEST-ID` line, READ the actual test code for TEST-ID
    c. Verify the test actually asserts the criterion described (not just renders a related page)

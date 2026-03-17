@@ -54,7 +54,7 @@ export function BudgetChart({ data }: BudgetChartProps) {
           axisLine={{ stroke: 'var(--border-default)' }}
         />
         <YAxis
-          tickFormatter={formatCurrency}
+          tickFormatter={(value) => formatCurrency(value)}
           tick={{ fontSize: 12, fill: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}
           tickLine={{ stroke: 'var(--border-default)' }}
           axisLine={{ stroke: 'var(--border-default)' }}

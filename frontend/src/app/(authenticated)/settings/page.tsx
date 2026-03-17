@@ -20,7 +20,10 @@ import {
   CalendarIcon,
   GlobeIcon,
   CheckIcon,
+  DollarSignIcon,
 } from 'lucide-react';
+import { useCurrency } from '@/lib/currency';
+import { api } from '@/lib/api';
 
 interface NotificationPref {
   key: string;
@@ -44,7 +47,16 @@ const TIMEZONES = [
   { value: 'Australia/Sydney', label: 'Australia/Sydney (UTC+11)' },
 ];
 
+const CURRENCY_OPTIONS = [
+  { value: 'THB', label: 'THB (฿ Thai Baht)' },
+  { value: 'USD', label: 'USD ($ US Dollar)' },
+  { value: 'EUR', label: 'EUR (€ Euro)' },
+  { value: 'JPY', label: 'JPY (¥ Japanese Yen)' },
+];
+
 export default function SettingsPage() {
+  const { currency, setCurrency, formatCurrency, refreshSettings } = useCurrency();
+  const [currencySaving, setCurrencySaving] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [defaultView, setDefaultView] = useState<'weekly' | 'bi-weekly'>('weekly');
   const [timezone, setTimezone] = useState('Asia/Bangkok');
@@ -155,6 +167,56 @@ export default function SettingsPage() {
                 )}
               </span>
             </button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Currency */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSignIcon className="w-4 h-4 text-[var(--accent-teal)]" />
+            Currency
+          </CardTitle>
+          <CardDescription>
+            Set the default currency for the organization.{' '}
+            <span className="text-[var(--text-muted)]">(Admin only — affects all users)</span>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Select
+            value={currency}
+            onValueChange={async (v) => {
+              if (!v || v === currency) return;
+              setCurrencySaving(true);
+              try {
+                await api.put('/settings/default_currency', { value: v });
+                setCurrency(v);
+                await refreshSettings();
+              } catch {
+                // toast is handled by api client
+              } finally {
+                setCurrencySaving(false);
+              }
+            }}
+            disabled={currencySaving}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCY_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="rounded-md bg-stone-50 dark:bg-stone-900 px-4 py-3 border border-[var(--border-default)]">
+            <p className="text-xs text-[var(--text-muted)] mb-1">Preview</p>
+            <p className="text-lg font-semibold text-[var(--text-primary)] font-[family-name:var(--font-mono)]">
+              {formatCurrency(1234567)}
+            </p>
           </div>
         </CardContent>
       </Card>

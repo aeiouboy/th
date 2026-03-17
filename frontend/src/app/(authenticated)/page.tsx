@@ -7,8 +7,12 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { format, startOfWeek, addDays } from 'date-fns';
+import { format, startOfWeek, addDays, differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
+import { formatCurrencyStatic } from '@/lib/currency';
+import { StatCard } from '@/components/shared/StatCard';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { Clock, Percent, ClipboardCheck, Tag, CheckCircle, Users, Bell } from 'lucide-react';
 
 // --- Types ---
 
@@ -127,6 +131,19 @@ export default function DashboardPage() {
     enabled: !!timesheet?.id,
   });
 
+  const prevPeriod = format(addDays(weekStart, -7), 'yyyy-MM-dd');
+
+  const { data: prevTimesheet } = useQuery<Timesheet | null>({
+    queryKey: ['timesheet', prevPeriod],
+    queryFn: () => api.get(`/timesheets?period=${prevPeriod}`),
+  });
+
+  const { data: prevEntries = [] } = useQuery<Entry[]>({
+    queryKey: ['timesheet-entries-prev', prevTimesheet?.id],
+    queryFn: () => api.get(`/timesheets/${prevTimesheet!.id}/entries`),
+    enabled: !!prevTimesheet?.id,
+  });
+
   const { data: chargeCodes = [] } = useQuery<ChargeCode[]>({
     queryKey: ['timesheet-charge-codes'],
     queryFn: () => api.get('/timesheets/charge-codes'),
@@ -169,6 +186,16 @@ export default function DashboardPage() {
   const pendingCount = pending
     ? pending.asManager.length + pending.asCCOwner.length
     : 0;
+  const prevWeeklyHours = prevEntries.reduce((s, e) => s + parseFloat(e.hours), 0);
+  const prevBillableHours = prevEntries
+    .filter((e) => e.isBillable)
+    .reduce((s, e) => s + parseFloat(e.hours), 0);
+  const prevChargeability =
+    prevWeeklyHours > 0 ? Math.round((prevBillableHours / prevWeeklyHours) * 100) : 0;
+
+  const hoursDelta = prevTimesheet ? weeklyHours - prevWeeklyHours : undefined;
+  const chargeabilityDelta = prevTimesheet ? chargeability - prevChargeability : undefined;
+
   const progressPct = Math.min((weeklyHours / TARGET_WEEKLY) * 100, 100);
   const missingHours = Math.max(TARGET_WEEKLY - weeklyHours, 0);
 
@@ -194,7 +221,7 @@ export default function DashboardPage() {
         <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-default)] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:-translate-y-px hover:shadow-md">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-[family-name:var(--font-heading)] font-bold text-[var(--text-primary)]">
+              <h2 className="text-2xl font-[family-name:var(--font-heading)] font-bold text-[var(--text-primary)]">
                 {getGreeting()}, {user?.fullName || 'there'}
               </h2>
               <p className="text-sm text-[var(--text-secondary)] mt-0.5 flex items-center gap-2">
@@ -216,14 +243,14 @@ export default function DashboardPage() {
           {/* Progress bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
-              <span className="font-[family-name:var(--font-mono)] font-medium">
+              <span className="font-medium">
                 {weeklyHours.toFixed(1)}h / {TARGET_WEEKLY}h logged
               </span>
               <span>
                 {progressPct >= 100 ? (
                   <span className="text-[var(--accent-green)] font-medium">Complete</span>
                 ) : (
-                  <span className="font-[family-name:var(--font-mono)]">{Math.round(progressPct)}%</span>
+                  <span>{Math.round(progressPct)}%</span>
                 )}
               </span>
             </div>
@@ -248,7 +275,7 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={day}
-                    className={`flex-1 text-center py-1.5 rounded text-xs font-[family-name:var(--font-mono)] ${
+                    className={`flex-1 text-center py-1.5 rounded text-xs ${
                       met
                         ? 'bg-[var(--accent-teal-light)] text-[var(--accent-teal)]'
                         : h > 0
@@ -286,34 +313,34 @@ export default function DashboardPage() {
           ))
         ) : (
           <>
-            <MetricCard
-              label="Hours This Period"
-              value={`${weeklyHours.toFixed(0)}`}
-              valueDetail={`/ ${TARGET_WEEKLY}`}
+            <StatCard
+              label="Hours this period"
+              value={`${weeklyHours.toFixed(0)} / ${TARGET_WEEKLY}`}
               subtext={weeklyHours >= TARGET_WEEKLY ? 'Target met' : `${missingHours.toFixed(0)}h remaining`}
-              delta={weeklyHours > 0 ? '+4h vs last period' : undefined}
-              accent={weeklyHours >= TARGET_WEEKLY ? 'teal' : weeklyHours > 0 ? 'amber' : 'stone'}
+              icon={Clock}
+              accent={weeklyHours >= TARGET_WEEKLY ? 'var(--accent-teal)' : weeklyHours > 0 ? 'var(--accent-amber)' : undefined}
+              trend={hoursDelta !== undefined ? { value: `${hoursDelta >= 0 ? '+' : ''}${hoursDelta.toFixed(0)}h vs last period`, direction: hoursDelta >= 0 ? 'up' : 'down' } : undefined}
             />
-            <MetricCard
+            <StatCard
               label="Chargeability"
               value={`${chargeability}%`}
-              subtext={`target 80%`}
-              delta={chargeability >= 80 ? '+2% vs prior' : `${chargeability - 80}%`}
-              accent={chargeability >= 80 ? 'emerald' : chargeability > 0 ? 'amber' : 'stone'}
+              subtext="Target 80%"
+              icon={Percent}
+              accent={chargeability >= 80 ? 'var(--accent-green)' : chargeability > 0 ? 'var(--accent-amber)' : undefined}
+              trend={chargeabilityDelta !== undefined ? { value: `${chargeabilityDelta >= 0 ? '+' : ''}${chargeabilityDelta}% vs prior`, direction: chargeabilityDelta >= 0 ? 'up' : 'down' } : undefined}
             />
-            <MetricCard
-              label="Pending Approvals"
+            <StatCard
+              label="Pending approvals"
               value={String(pendingCount)}
-              subtext={pendingCount > 0 ? 'awaiting your review' : 'All clear'}
-              accent={pendingCount > 0 ? 'amber' : 'stone'}
-              href={pendingCount > 0 ? '/approvals' : undefined}
+              subtext={pendingCount > 0 ? 'Awaiting your review' : 'All clear'}
+              icon={ClipboardCheck}
+              accent={pendingCount > 0 ? 'var(--accent-amber)' : undefined}
             />
-            <MetricCard
-              label="Active Charge Codes"
+            <StatCard
+              label="Active charge codes"
               value={String(chargeCodes.length)}
               subtext={`${chargeCodes.filter((c) => c.isBillable).length} billable`}
-              accent="stone"
-              href="/charge-codes"
+              icon={Tag}
             />
           </>
         )}
@@ -344,14 +371,12 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : recentEntries.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-[var(--text-muted)] text-sm">No time entries this week</p>
-                  <Link href="/time-entry">
-                    <Button variant="outline" size="sm" className="mt-3">
-                      Start Logging
-                    </Button>
-                  </Link>
-                </div>
+                <EmptyState
+                  icon={Clock}
+                  title="No time entries this week"
+                  description="Start logging your hours to track progress"
+                  action={{ label: 'Start Logging', href: '/time-entry' }}
+                />
               ) : (
                 <div className="space-y-4">
                   {recentEntries.map(([date, dateEntries]) => (
@@ -382,7 +407,7 @@ export default function DashboardPage() {
                                 {entry.chargeCodeName || entry.chargeCodeId}
                               </span>
                             </div>
-                            <span className="font-[family-name:var(--font-mono)] text-sm font-medium text-[var(--text-primary)]">
+                            <span className="text-sm font-medium text-[var(--text-primary)]">
                               {parseFloat(entry.hours).toFixed(1)}h
                             </span>
                           </div>
@@ -413,6 +438,7 @@ export default function DashboardPage() {
                 chargeability={chargeability}
                 missingHours={missingHours}
                 timesheetStatus={timesheet?.status}
+                periodEnd={timesheet?.periodEnd}
               />
             </CardContent>
           </Card>
@@ -521,9 +547,11 @@ function ManagerRow3({
         </CardHeader>
         <CardContent>
           {allPending.length === 0 ? (
-            <p className="text-sm text-[var(--text-muted)] py-4 text-center">
-              No pending approvals
-            </p>
+            <EmptyState
+              icon={CheckCircle}
+              title="No pending approvals"
+              description="Timesheets submitted by your team will appear here"
+            />
           ) : (
             <div className="space-y-1">
               <div className="flex items-center justify-between mb-2">
@@ -565,7 +593,7 @@ function ManagerRow3({
                     </p>
                     <p className="text-[11px] text-[var(--text-secondary)]">
                       {formatPeriod(item.periodStart, item.periodEnd)} &middot;{' '}
-                      <span className="font-[family-name:var(--font-mono)]">{item.totalHours}h</span>
+                      <span>{item.totalHours}h</span>
                     </p>
                   </div>
                 </label>
@@ -620,7 +648,7 @@ function ManagerRow3({
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <span className="text-xs font-[family-name:var(--font-mono)] w-12 text-right shrink-0 text-[var(--text-secondary)]">
+                  <span className="text-xs w-12 text-right shrink-0 text-[var(--text-secondary)]">
                     {hours}/{TARGET_WEEKLY}
                   </span>
                   <span className="text-sm shrink-0">
@@ -638,9 +666,6 @@ function ManagerRow3({
             <p className="text-xs text-[var(--text-muted)] mt-2 pt-2 border-t border-[var(--border-default)]">
               {completedCount}/{teamMembers.length} complete
             </p>
-            <Button variant="outline" size="sm" className="w-full text-xs">
-              Send Reminders
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -662,9 +687,11 @@ function ManagerRow3({
         <CardContent>
           <div className="space-y-2">
             {budgetAlerts.length === 0 && chargeability >= 80 ? (
-              <p className="text-sm text-[var(--text-muted)] py-4 text-center">
-                No alerts
-              </p>
+              <EmptyState
+                icon={Bell}
+                title="No alerts"
+                description="All budgets and chargeability targets are on track"
+              />
             ) : (
               <>
                 {chargeability < 80 && chargeability > 0 && (
@@ -688,7 +715,7 @@ function ManagerRow3({
                       key={alert.chargeCodeId}
                       level={alertLevel}
                       title={`${alert.chargeCodeId} budget ${percentUsed}%`}
-                      detail={alert.forecast ? `forecast overrun $${Math.round((alert.forecast - alert.budget) / 1000)}K` : alert.name}
+                      detail={alert.forecast ? `forecast overrun ${formatCurrencyStatic(alert.forecast - alert.budget)}` : alert.name}
                       linkHref="/budget"
                       linkText="View Budget"
                     />
@@ -709,10 +736,12 @@ function EmployeeAlerts({
   chargeability,
   missingHours,
   timesheetStatus,
+  periodEnd,
 }: {
   chargeability: number;
   missingHours: number;
   timesheetStatus?: string;
+  periodEnd?: string;
 }) {
   const alerts: { level: 'critical' | 'warning' | 'info'; title: string; detail: string; linkHref?: string; linkText?: string }[] =
     [];
@@ -743,19 +772,24 @@ function EmployeeAlerts({
     });
   }
 
-  if (timesheetStatus === 'draft') {
+  if (timesheetStatus === 'draft' && periodEnd) {
+    const daysUntilDue = differenceInDays(new Date(periodEnd + 'T00:00:00'), new Date());
+    const dueText = daysUntilDue <= 0 ? 'Timesheet due today' : `Timesheet due in ${daysUntilDue} day${daysUntilDue === 1 ? '' : 's'}`;
+    const closeText = `Period closes ${format(new Date(periodEnd + 'T00:00:00'), 'MMM d')}`;
     alerts.push({
       level: 'info',
-      title: 'Timesheet due in 2 days',
-      detail: 'Period closes Mar 31',
+      title: dueText,
+      detail: closeText,
     });
   }
 
   if (alerts.length === 0) {
     return (
-      <p className="text-sm text-[var(--text-muted)] py-4 text-center">
-        No alerts &mdash; you&apos;re all set!
-      </p>
+      <EmptyState
+        icon={CheckCircle}
+        title="All clear"
+        description="No alerts -- you're all set!"
+      />
     );
   }
 
@@ -810,65 +844,6 @@ function AlertItem({
       </div>
     </div>
   );
-}
-
-function MetricCard({
-  label,
-  value,
-  valueDetail,
-  subtext,
-  delta,
-  accent,
-  href,
-}: {
-  label: string;
-  value: string;
-  valueDetail?: string;
-  subtext: string;
-  delta?: string;
-  accent: 'emerald' | 'amber' | 'stone' | 'teal';
-  href?: string;
-}) {
-  const topBorderColors = {
-    emerald: 'border-t-[var(--accent-green)]',
-    amber: 'border-t-[var(--accent-amber)]',
-    stone: 'border-t-stone-300',
-    teal: 'border-t-[var(--accent-teal)]',
-  };
-
-  const content = (
-    <div
-      className={`bg-[var(--bg-card)] rounded-lg border border-[var(--border-default)] border-t-[3px] ${topBorderColors[accent]} p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:-translate-y-px hover:shadow-md ${href ? 'cursor-pointer' : ''}`}
-    >
-      <p className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wide font-[family-name:var(--font-heading)]">
-        {label}
-      </p>
-      <p className="text-2xl font-bold text-[var(--text-primary)] mt-1 font-[family-name:var(--font-mono)]">
-        {value}
-        {valueDetail && (
-          <span className="text-base font-normal text-[var(--text-muted)] ml-1">{valueDetail}</span>
-        )}
-      </p>
-      <p className="text-xs text-[var(--text-muted)] mt-0.5">{subtext}</p>
-      {delta && (
-        <p className={`text-[11px] mt-1 font-[family-name:var(--font-mono)] ${
-          delta.startsWith('+')
-            ? 'text-[var(--accent-green)]'
-            : delta.startsWith('-')
-              ? 'text-[var(--accent-red)]'
-              : 'text-[var(--text-muted)]'
-        }`}>
-          {delta.startsWith('+') ? <span>&#9650; </span> : delta.startsWith('-') ? <span>&#9660; </span> : null}
-          {delta}
-        </p>
-      )}
-    </div>
-  );
-
-  if (href) {
-    return <Link href={href}>{content}</Link>;
-  }
-  return content;
 }
 
 function Skeleton({ className }: { className?: string }) {

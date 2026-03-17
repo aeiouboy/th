@@ -56,6 +56,7 @@ vi.mock('lucide-react', () => ({
   Check: () => <span data-testid="check-icon" />,
   X: () => <span data-testid="x-icon-2" />,
   AlertTriangle: () => <span data-testid="alert-triangle-icon" />,
+  CheckCircle: () => <span data-testid="check-circle-icon" />,
 }));
 
 const makePendingTimesheet = (overrides = {}) => ({

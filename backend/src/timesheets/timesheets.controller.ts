@@ -31,6 +31,11 @@ export class TimesheetsController {
     return this.timesheetsService.findByPeriod(user.id, effectivePeriod);
   }
 
+  @Get('periods')
+  getAvailablePeriods(@CurrentUser() user: any) {
+    return this.timesheetsService.getAvailablePeriods(user.id);
+  }
+
   @Get('charge-codes')
   getUserChargeCodes(@CurrentUser() user: any) {
     return this.timesheetsService.getUserChargeCodes(user.id);

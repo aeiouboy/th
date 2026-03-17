@@ -15,8 +15,11 @@ import { BudgetChart } from '@/components/reports/BudgetChart';
 import { ChargeabilityGauge } from '@/components/reports/ChargeabilityGauge';
 import { ActivityPie } from '@/components/reports/ActivityPie';
 import { AlertList } from '@/components/reports/AlertList';
-import { FileDown, FileText } from 'lucide-react';
+import { FinancialPL } from '@/components/reports/FinancialPL';
+import { FileDown, FileText, DollarSign, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { StatCard } from '@/components/shared/StatCard';
+import { PageHeader } from '@/components/shared/PageHeader';
 
 // Types
 interface BudgetSummary {
@@ -82,6 +85,18 @@ interface BudgetAlert {
   forecast: number | null;
   severity: string;
   rootCauseActivity: string | null;
+}
+
+interface ChargeabilityAlert {
+  type: 'chargeability';
+  employeeId: string;
+  name: string;
+  billableHours: number;
+  totalHours: number;
+  chargeability: number;
+  target: number;
+  severity: string;
+  costImpact: number;
 }
 
 interface ChargeCode {
@@ -177,6 +192,11 @@ export default function ReportsPage() {
     queryFn: () => api.get('/reports/budget-alerts'),
   });
 
+  const { data: chargeabilityAlerts = [] } = useQuery<ChargeabilityAlert[]>({
+    queryKey: ['reports', 'chargeability-alerts'],
+    queryFn: () => api.get('/budgets/chargeability-alerts'),
+  });
+
   const { data: projectCost } = useQuery({
     queryKey: ['reports', 'project-cost', selectedProgram],
     queryFn: () =>
@@ -225,27 +245,22 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header & Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">
-            Reports & Analytics
-          </h2>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
-            Comprehensive view of project costs, utilization, and chargeability
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportCsv}>
-            <FileDown className="w-3.5 h-3.5 mr-1.5" />
-            Export CSV
-          </Button>
-          <Button variant="outline" size="sm">
-            <FileText className="w-3.5 h-3.5 mr-1.5" />
-            Export PDF
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Reports & Analytics"
+        description="Comprehensive view of project costs, utilization, and chargeability"
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportCsv}>
+              <FileDown className="w-3.5 h-3.5 mr-1.5" />
+              Export CSV
+            </Button>
+            <Button variant="outline" size="sm">
+              <FileText className="w-3.5 h-3.5 mr-1.5" />
+              Export PDF
+            </Button>
+          </div>
+        }
+      />
 
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
@@ -293,10 +308,10 @@ export default function ReportsPage() {
           <>{[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}</>
         ) : (
           <>
-            <KpiCard label="Total Budget" value={formatCurrency(budgetSummary.totalBudget)} subtitle={`across ${budgetSummary.totalChargeCodes} programs`} accentColor="var(--accent-teal)" />
-            <KpiCard label="Actual Spent" value={formatCurrency(budgetSummary.totalActualSpent)} subtitle={`${budgetSummary.overallPercentage}% consumed`} accentColor="var(--accent-amber)" />
-            <KpiCard label="Utilization" value={`${utilization?.overallUtilization ?? 0}%`} subtitle={loadingUtil ? 'Loading...' : `${utilization?.employees.length ?? 0} employees`} accentColor="var(--accent-green)" />
-            <KpiCard label="Overrun Count" value={String(budgetSummary.chargeCodesOverBudget)} subtitle={`${budgetSummary.chargeCodesAtRisk} at risk`} accentColor="var(--accent-red)" />
+            <StatCard label="Total budget" value={formatCurrency(budgetSummary.totalBudget)} subtext={`Across ${budgetSummary.totalChargeCodes} programs`} icon={DollarSign} accent="var(--accent-teal)" />
+            <StatCard label="Actual spent" value={formatCurrency(budgetSummary.totalActualSpent)} subtext={`${budgetSummary.overallPercentage}% consumed`} icon={TrendingUp} accent="var(--accent-amber)" />
+            <StatCard label="Utilization" value={`${utilization?.overallUtilization ?? 0}%`} subtext={loadingUtil ? 'Loading...' : `${utilization?.employees.length ?? 0} employees`} icon={Users} accent="var(--accent-green)" />
+            <StatCard label="Overrun count" value={String(budgetSummary.chargeCodesOverBudget)} subtext={`${budgetSummary.chargeCodesAtRisk} at risk`} icon={AlertTriangle} accent="var(--accent-red)" />
           </>
         )}
       </div>
@@ -311,7 +326,7 @@ export default function ReportsPage() {
         </ChartCard>
       </div>
 
-      {/* ROW 3: Activity + Financial */}
+      {/* ROW 3: Activity Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ChartCard title="Activity Distribution" loading={loadingActivity}>
           <div className="h-72"><ActivityPie data={activityDist.distribution} /></div>
@@ -326,42 +341,28 @@ export default function ReportsPage() {
               <div className="border-t border-[var(--border-default)] pt-3">
                 <FinancialRow label="Net P/L Impact" value={financialImpact.netImpact} isNegative isBold />
               </div>
-              <div className="pt-2 flex items-center gap-2 text-xs text-[var(--text-muted)]">
-                <svg className="w-3.5 h-3.5 text-[var(--accent-red)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M7 7l5 5 5-5" /><path d="M7 12l5 5 5-5" /></svg>
-                <span>worse vs prior period</span>
-              </div>
             </div>
           </div>
         )}
       </div>
 
+      {/* ROW 3b: Financial P/L with Team Breakdown */}
+      <FinancialPL period={period} team={selectedTeam} />
+
       {/* ROW 4: Alert table */}
       <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <div className="px-5 py-4 border-b border-[var(--border-default)]">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">Budget Overrun Alerts</h3>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">Projects exceeding budget thresholds. Click a row to see root cause.</p>
+          <h3 className="text-sm font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">Alerts</h3>
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">Budget overruns and chargeability gaps. Click a budget row to see root cause.</p>
         </div>
         {loadingAlerts ? (
           <div className="p-5 animate-pulse space-y-3">
             {[1, 2, 3].map(i => <div key={i} className="h-4 bg-stone-200 dark:bg-stone-700 rounded" style={{ width: `${100 - i * 15}%` }} />)}
           </div>
         ) : (
-          <AlertList alerts={budgetAlerts} />
+          <AlertList alerts={budgetAlerts} chargeabilityAlerts={chargeabilityAlerts} />
         )}
       </div>
-    </div>
-  );
-}
-
-function KpiCard({ label, value, subtitle, accentColor }: { label: string; value: string; subtitle: string; accentColor: string }) {
-  return (
-    <div
-      className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-150 hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
-      style={{ borderTopWidth: '3px', borderTopColor: accentColor }}
-    >
-      <p className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">{label}</p>
-      <p className="text-2xl font-bold text-[var(--text-primary)] mt-1 font-[family-name:var(--font-mono)]">{value}</p>
-      <p className="text-xs text-[var(--text-muted)] mt-1">{subtitle}</p>
     </div>
   );
 }
@@ -383,7 +384,7 @@ function FinancialRow({ label, value, isNegative, isBold, detail }: { label: str
         <p className={`text-sm ${isBold ? 'font-semibold text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>{label}</p>
         {detail && <p className="text-xs text-[var(--text-muted)] mt-0.5">{detail}</p>}
       </div>
-      <p className={`font-[family-name:var(--font-mono)] ${isBold ? 'text-lg font-bold' : 'text-sm'} ${isNegative && value > 0 ? 'text-[var(--accent-red)]' : 'text-[var(--text-primary)]'}`}>
+      <p className={`${isBold ? 'text-lg font-bold' : 'text-sm'} ${isNegative && value > 0 ? 'text-[var(--accent-red)]' : 'text-[var(--text-primary)]'}`}>
         {isNegative && value > 0 ? '-' : ''}{formatCurrency(value)}
       </p>
     </div>

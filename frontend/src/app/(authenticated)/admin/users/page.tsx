@@ -39,6 +39,9 @@ import {
   UserCheckIcon,
 } from 'lucide-react';
 import { formatRole } from '@/lib/utils';
+import { StatCard } from '@/components/shared/StatCard';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 
 interface User {
   id: string;
@@ -134,45 +137,24 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="hover:translate-y-0 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <CardContent className="flex items-center gap-3 pt-0">
-            <div className="w-10 h-10 rounded-lg bg-[var(--accent-teal-light)] flex items-center justify-center">
-              <UsersIcon className="w-5 h-5 text-[var(--accent-teal)]" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-mono)]">
-                {users.length}
-              </p>
-              <p className="text-xs text-[var(--text-secondary)]">Total Users</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="hover:translate-y-0 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <CardContent className="flex items-center gap-3 pt-0">
-            <div className="w-10 h-10 rounded-lg bg-[var(--accent-purple)]/10 flex items-center justify-center">
-              <ShieldIcon className="w-5 h-5 text-[var(--accent-purple)]" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-mono)]">
-                {roleCounts['admin'] || 0}
-              </p>
-              <p className="text-xs text-[var(--text-secondary)]">Admins</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="hover:translate-y-0 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <CardContent className="flex items-center gap-3 pt-0">
-            <div className="w-10 h-10 rounded-lg bg-[var(--accent-green-light)] flex items-center justify-center">
-              <UserCheckIcon className="w-5 h-5 text-[var(--accent-green)]" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-[var(--text-primary)] font-[family-name:var(--font-mono)]">
-                {users.length}
-              </p>
-              <p className="text-xs text-[var(--text-secondary)]">Active</p>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          label="Total users"
+          value={users.length}
+          icon={UsersIcon}
+          accent="var(--accent-teal)"
+        />
+        <StatCard
+          label="Admins"
+          value={roleCounts['admin'] || 0}
+          icon={ShieldIcon}
+          accent="var(--accent-purple)"
+        />
+        <StatCard
+          label="Active"
+          value={users.length}
+          icon={UserCheckIcon}
+          accent="var(--accent-green)"
+        />
       </div>
 
       {/* User table */}
@@ -224,9 +206,11 @@ export default function AdminUsersPage() {
               <Loader2Icon className="w-6 h-6 animate-spin text-[var(--text-muted)]" />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-sm text-[var(--text-muted)]">No users found matching your criteria.</p>
-            </div>
+            <EmptyState
+              icon={UsersIcon}
+              title="No users found"
+              description="No users match your current search or filter criteria"
+            />
           ) : (
             <Table>
               <TableHeader>
@@ -236,7 +220,6 @@ export default function AdminUsersPage() {
                   <TableHead>Role</TableHead>
                   <TableHead>Job Grade</TableHead>
                   <TableHead>Department</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -260,11 +243,6 @@ export default function AdminUsersPage() {
                     </TableCell>
                     <TableCell className="text-[var(--text-secondary)]">
                       {user.department || '-'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="bg-[var(--accent-green-light)] text-[var(--accent-green)] border-[var(--accent-green)]/20">
-                        Active
-                      </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon-xs" onClick={() => openEditUser(user)}>

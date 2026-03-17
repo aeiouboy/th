@@ -269,16 +269,30 @@ Upsert (create or update) entries for a timesheet. Replaces all existing entries
 
 ### POST /timesheets/:id/submit
 
-Submit a timesheet for manager approval. Transitions status from `draft` to `submitted`.
+Submit a timesheet for manager approval. Transitions status from `draft` or `rejected` to `submitted`.
 
 - **Auth**: Owner only
 - **Path Params**: `id` — timesheet UUID
 - **Request Body**: None
 - **Response (200)**: Updated timesheet object with `status: "submitted"`
 
+**Minimum hours validation (400 — short weekdays):**
+```json
+{
+  "message": "Minimum 8 hours required on weekdays",
+  "details": [
+    { "date": "2026-03-10", "logged": 6, "required": 8 },
+    { "date": "2026-03-11", "logged": 0, "required": 8 }
+  ]
+}
+```
+
+The `details` array lists every weekday (excluding holidays from the calendar) where the total logged hours across all charge codes is less than 8. Holidays and weekends are automatically excluded.
+
 | Error | Cause |
 |-------|-------|
-| 400 | Timesheet not in `draft` status |
+| 400 | Timesheet not in `draft` or `rejected` status |
+| 400 | One or more weekdays have fewer than 8 hours logged |
 | 401 | Unauthorized |
 | 404 | Timesheet not found |
 
@@ -578,11 +592,40 @@ Get budget alerts for charge codes exceeding spend thresholds.
     "budget": 50000,
     "actual": 45000,
     "forecast": 52000,
-    "severity": "high",
+    "severity": "orange",
     "rootCauseActivity": "ACT-002"
   }
 ]
 ```
+
+Severity values: `yellow` (≥75% consumed), `orange` (≥90%), `red` (≥100%).
+
+---
+
+### GET /budgets/chargeability-alerts
+
+Get chargeability alerts for employees who are below the target chargeability rate.
+
+- **Auth**: Any authenticated role
+- **Response (200)**:
+```json
+[
+  {
+    "type": "chargeability",
+    "employeeId": "uuid",
+    "name": "Wichai Srisuk",
+    "billableHours": 60,
+    "totalHours": 100,
+    "chargeability": 60.0,
+    "target": 80,
+    "severity": "red",
+    "costImpact": 1100
+  }
+]
+```
+
+- `severity`: `red` (chargeability < 60%), `orange` (60–69%), `yellow` (70–79%)
+- `costImpact`: estimated cost of the chargeability gap in currency units (hours × average hourly rate)
 
 ---
 
@@ -714,17 +757,43 @@ Get chargeability report showing billable vs non-billable hour ratios.
 
 ### GET /reports/financial-impact
 
-Get aggregated financial impact metrics across all approved timesheets.
+Get aggregated financial impact metrics across all approved timesheets, with team and charge code breakdowns.
 
 - **Auth**: Any authenticated role
+- **Query Params**:
+  - `period` (optional) — month string, e.g. `2026-03`
+  - `team` (optional) — department name to filter `byTeam` to a single team
 - **Response (200)**:
 ```json
 {
-  "totalCost": 480000,
-  "billableCost": 360000,
-  "nonBillableCost": 120000,
-  "byPeriod": [
-    { "period": "2026-03", "cost": 160000 }
+  "overBudgetCost": 12000,
+  "overBudgetCount": 2,
+  "lowChargeabilityCost": 8000,
+  "netImpact": 20000,
+  "avgCostRate": 55.00,
+  "targetChargeability": 80,
+  "actualChargeability": 72.5,
+  "byTeam": [
+    {
+      "department": "Engineering",
+      "totalHours": 320,
+      "billableHours": 240,
+      "chargeability": 75.0,
+      "totalCost": 17600,
+      "billableRevenue": 13200,
+      "margin": -4400,
+      "marginPercent": -25.0
+    }
+  ],
+  "byChargeCode": [
+    {
+      "chargeCodeId": "PROJ-001",
+      "chargeCodeName": "Backend API",
+      "budget": 50000,
+      "actual": 52000,
+      "variance": -2000,
+      "forecastOverrun": 3500
+    }
   ]
 }
 ```

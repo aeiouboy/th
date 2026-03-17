@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '../../../test-utils';
 import ChargeCodesPage from './page';
@@ -46,11 +47,25 @@ vi.mock('@/components/charge-codes/AccessManager', () => ({
   AccessManager: () => <div data-testid="access-manager">Access Manager</div>,
 }));
 
+// Mock currency provider
+vi.mock('@/lib/currency', () => ({
+  CurrencyProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useCurrency: () => ({
+    formatCurrency: (v: number) => `฿${v.toLocaleString()}`,
+    symbol: '฿',
+    currency: 'THB',
+  }),
+}));
+
 // Mock lucide-react
 vi.mock('lucide-react', () => ({
   Plus: () => <span data-testid="plus-icon" />,
   Search: () => <span data-testid="search-icon" />,
   Archive: () => <span data-testid="archive-icon" />,
+  Filter: () => <span data-testid="filter-icon" />,
+  ChevronRight: () => <span data-testid="chevron-right-icon" />,
+  ChevronDown: () => <span data-testid="chevron-down-icon" />,
+  BarChart3: () => <span data-testid="barchart-icon" />,
 }));
 
 // Mock UI components

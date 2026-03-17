@@ -28,6 +28,29 @@ vi.mock('lucide-react', () => ({
   CalendarIcon: () => <span data-testid="calendar-icon" />,
   GlobeIcon: () => <span data-testid="globe-icon" />,
   CheckIcon: () => <span data-testid="check-icon" />,
+  DollarSignIcon: () => <span data-testid="dollar-sign-icon" />,
+}));
+
+// Mock currency
+vi.mock('@/lib/currency', () => ({
+  useCurrency: () => ({
+    currency: 'THB',
+    setCurrency: vi.fn(),
+    refreshSettings: vi.fn().mockResolvedValue(undefined),
+    formatCurrency: (v: number) => `฿${v.toLocaleString()}`,
+    formatCurrencyShort: (v: number) => `฿${v}`,
+    symbol: '฿',
+  }),
+  CurrencyProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  formatCurrencyStatic: (v: number) => `฿${v}`,
+}));
+
+// Mock API
+vi.mock('@/lib/api', () => ({
+  api: {
+    get: vi.fn().mockRejectedValue(new Error('API not available')),
+    put: vi.fn().mockRejectedValue(new Error('API not available')),
+  },
 }));
 
 // Mock UI components
