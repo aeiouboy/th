@@ -2,197 +2,125 @@
 
 **Date**: 2026-03-17
 **Framework**: Playwright 1.58.2
-**Viewports tested**: desktop (1280x720), mobile (375x812)
-**Total**: 100 tests | 100 passed | 0 failed
+**Project**: desktop (Chromium, 1280x720)
+**Total**: 29 tests | 28 passed | 1 failed
 
-Each spec file runs against both desktop and mobile viewports, giving 2 test runs per spec.
+## Summary by File
 
----
+| File | Total | Pass | Fail |
+|---|---|---|---|
+| `auth.setup.ts` | 1 | 1 | 0 |
+| `admin-calendar.spec.ts` | 3 | 3 | 0 |
+| `admin-rates.spec.ts` | 2 | 2 | 0 |
+| `admin-users.spec.ts` | 2 | 2 | 0 |
+| `approvals.spec.ts` | 3 | 3 | 0 |
+| `budget.spec.ts` | 2 | 2 | 0 |
+| `charge-codes.spec.ts` | 5 | 4 | 1 |
+| `dashboard.spec.ts` | 2 | 2 | 0 |
+| `login.spec.ts` | 3 | 3 | 0 |
+| `reports.spec.ts` | 2 | 2 | 0 |
+| `time-entry.spec.ts` | 4 | 4 | 0 |
 
-## Summary
+## Test Results by Suite
 
-| File | Suite | Specs | Desktop | Mobile | Total |
-|------|-------|-------|---------|--------|-------|
-| `admin-calendar.spec.ts` | Admin Calendar page | 4 | PASS | PASS | 8 |
-| `admin-rates.spec.ts` | Admin Rates page | 4 | PASS | PASS | 8 |
-| `admin-users.spec.ts` | Admin Users page | 5 | PASS | PASS | 10 |
-| `approvals.spec.ts` | Approvals page | 4 | PASS | PASS | 8 |
-| `budget.spec.ts` | Budget page | 3 | PASS | PASS | 6 |
-| `charge-codes.spec.ts` | Charge Codes page | 4 | PASS | PASS | 8 |
-| `dashboard.spec.ts` | Dashboard page | 4 | PASS | PASS | 8 |
-| `login.spec.ts` | Login page | 4 | PASS | PASS | 8 |
-| `profile.spec.ts` | Profile page | 5 | PASS | PASS | 10 |
-| `reports.spec.ts` | Reports page | 4 | PASS | PASS | 8 |
-| `settings.spec.ts` | Settings page | 5 | PASS | PASS | 10 |
-| `time-entry.spec.ts` | Time Entry page | 4 | PASS | PASS | 8 |
-| **Total** | | **50 specs** | **50** | **50** | **100** |
+### auth.setup.ts
 
----
+| Test | Status | Notes |
+|---|---|---|
+| authenticate | pass |  |
 
-## admin-calendar.spec.ts — 8 / 8 PASS
+### admin-calendar.spec.ts
 
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders admin calendar page with core elements | PASS | PASS |
-| calendar month navigation buttons are present | PASS | PASS |
-| add holiday button is present | PASS | PASS |
-| holidays table or no-holidays message is shown | PASS | PASS |
+| Test | Status | Notes |
+|---|---|---|
+| E2E-CAL-01: Create a holiday | pass |  |
+| E2E-CAL-02: Delete a holiday | pass |  |
+| E2E-CAL-03: Calendar displays year and navigation | pass |  |
 
-Screenshots: `admin-calendar--desktop.png`, `admin-calendar--mobile.png`
+### admin-rates.spec.ts
 
----
+| Test | Status | Notes |
+|---|---|---|
+| E2E-RATE-01: Rates table loads with real data | pass |  |
+| E2E-RATE-02: Add a new cost rate | pass |  |
 
-## admin-rates.spec.ts — 8 / 8 PASS
+### admin-users.spec.ts
 
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders admin rates page with core elements | PASS | PASS |
-| add rate button is present | PASS | PASS |
-| rates table is rendered | PASS | PASS |
-| rate card or summary is visible | PASS | PASS |
+| Test | Status | Notes |
+|---|---|---|
+| E2E-USR-01: Users list loads with real data | pass |  |
+| E2E-USR-02: Update user role (verify role display) | pass |  |
 
-Screenshots: `admin-rates--desktop.png`, `admin-rates--mobile.png`
+### approvals.spec.ts
 
----
+| Test | Status | Notes |
+|---|---|---|
+| E2E-AP-01: Pending approvals list shows submitted timesheets | pass |  |
+| E2E-AP-02: Approve a timesheet | pass |  |
+| E2E-AP-03: Reject a timesheet with comment (NEGATIVE flow) | pass |  |
 
-## admin-users.spec.ts — 10 / 10 PASS
+### budget.spec.ts
 
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders admin users page with core elements | PASS | PASS |
-| search input is present | PASS | PASS |
-| add user button is present | PASS | PASS |
-| users table or list is rendered | PASS | PASS |
-| role filter dropdown is present | PASS | PASS |
+| Test | Status | Notes |
+|---|---|---|
+| E2E-BUD-01: Budget summary loads with real data | pass |  |
+| E2E-BUD-02: Budget alerts section is visible | pass |  |
 
-Screenshots: `admin-users--desktop.png`, `admin-users--mobile.png`
+### charge-codes.spec.ts
 
----
+| Test | Status | Notes |
+|---|---|---|
+| E2E-CC-01: Create a new program (top-level charge code) | pass |  |
+| E2E-CC-02: Create a project under a program (hierarchy + parent selector) | pass |  |
+| E2E-CC-03: Project without parent fails (NEGATIVE) | pass |  |
+| E2E-CC-04: Edit an existing charge code | pass |  |
+| E2E-CC-05: Search filters the charge code tree | FAIL | Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoCont... |
 
-## approvals.spec.ts — 8 / 8 PASS
+### dashboard.spec.ts
 
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders approvals page with core elements | PASS | PASS |
-| search input is visible | PASS | PASS |
-| tabs for approval queues are present | PASS | PASS |
-| filter dropdowns are present | PASS | PASS |
+| Test | Status | Notes |
+|---|---|---|
+| E2E-DASH-01: Dashboard shows real KPI metrics | pass |  |
+| E2E-DASH-02: Dashboard navigation works | pass |  |
 
-Screenshots: `approvals--desktop.png`, `approvals--mobile.png`
+### login.spec.ts
 
----
+| Test | Status | Notes |
+|---|---|---|
+| E2E-LOGIN-01: Successful login redirects to dashboard | pass |  |
+| E2E-LOGIN-02: Invalid credentials show error (NEGATIVE) | pass |  |
+| E2E-LOGIN-03: Empty form shows validation | pass |  |
 
-## budget.spec.ts — 6 / 6 PASS
+### reports.spec.ts
 
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders budget page with core elements | PASS | PASS |
-| budget summary metrics are shown | PASS | PASS |
-| charge code list or alerts section is visible | PASS | PASS |
+| Test | Status | Notes |
+|---|---|---|
+| E2E-RPT-01: Utilization report loads with real data | pass |  |
+| E2E-RPT-02: Export CSV button works | pass |  |
 
-Screenshots: `budget--desktop.png`, `budget--mobile.png`
+### time-entry.spec.ts
 
----
+| Test | Status | Notes |
+|---|---|---|
+| E2E-TS-01: Create timesheet and add entries | pass |  |
+| E2E-TS-02: Submit timesheet for approval | pass |  |
+| E2E-TS-03: Submit empty timesheet shows warning (NEGATIVE) | pass |  |
+| E2E-TS-04: Week navigation changes the displayed period | pass |  |
 
-## charge-codes.spec.ts — 8 / 8 PASS
+## Failures
 
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders charge codes page with core elements | PASS | PASS |
-| shows filter selects | PASS | PASS |
-| search input is functional | PASS | PASS |
-| charge code tree data is loaded | PASS | PASS |
-
-Screenshots: `charge-codes--desktop.png`, `charge-codes--mobile.png`
-
----
-
-## dashboard.spec.ts — 8 / 8 PASS
-
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders dashboard with key UI elements | PASS | PASS |
-| sidebar is visible on desktop | PASS | PASS |
-| mobile bottom nav is visible on mobile | PASS | PASS |
-| notification bell is visible in topbar | PASS | PASS |
-
-Screenshots: `dashboard--desktop.png`, `dashboard--mobile.png`
-
----
-
-## login.spec.ts — 8 / 8 PASS
-
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders login form with correct elements | PASS | PASS |
-| shows password toggle button | PASS | PASS |
-| shows error when forgot password clicked without email | PASS | PASS |
-| email input accepts text | PASS | PASS |
-
-Screenshots: `login--desktop.png`, `login--mobile.png`
-
----
-
-## profile.spec.ts — 10 / 10 PASS
-
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders profile page with core elements | PASS | PASS |
-| profile fields are shown | PASS | PASS |
-| edit profile button is present | PASS | PASS |
-| avatar or user icon is shown | PASS | PASS |
-| change password section is present | PASS | PASS |
-
-Screenshots: `profile--desktop.png`, `profile--mobile.png`
-
----
-
-## reports.spec.ts — 8 / 8 PASS
-
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders reports page with core elements | PASS | PASS |
-| export buttons are present | PASS | PASS |
-| period selector is present | PASS | PASS |
-| report charts or summaries are rendered | PASS | PASS |
-
-Screenshots: `reports--desktop.png`, `reports--mobile.png`
-
----
-
-## settings.spec.ts — 10 / 10 PASS
-
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders settings page with core elements | PASS | PASS |
-| theme toggle is present | PASS | PASS |
-| notification preferences section is visible | PASS | PASS |
-| timezone selector is present | PASS | PASS |
-| save settings button is present | PASS | PASS |
-
-Screenshots: `settings--desktop.png`, `settings--mobile.png`
-
----
-
-## time-entry.spec.ts — 8 / 8 PASS
-
-| Spec | Desktop | Mobile |
-|------|---------|--------|
-| renders time entry page with core elements | PASS | PASS |
-| week navigation buttons are present | PASS | PASS |
-| timesheet grid shows rows with mock data | PASS | PASS |
-| biweek toggle switches view mode | PASS | PASS |
-
-Screenshots: `time-entry--desktop.png`, `time-entry--mobile.png`
-
----
+### FAIL: E2E-CC-05: Search filters the charge code tree
+- **File**: `frontend/e2e/charge-codes.spec.ts`
+- **Error**: Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32me
+- **Root Cause**: No charge codes with name containing "Digital" exist in the database
+- **Action**: Test requires seed data or should use a known existing charge code name
 
 ## Configuration
 
-- **Config file**: `frontend/playwright.config.ts`
+- **Config**: `frontend/playwright.config.ts`
 - **Test directory**: `frontend/e2e/`
-- **Retries**: 1 per test
-- **Timeout**: 30000ms per test
-- **Web server**: `pnpm dev --turbopack` at `http://localhost:3000`
-- **Report output**: `docs/test-results/e2e/e2e-results.json`
+- **Retries**: 1
+- **Timeout**: 30000ms
+- **Web server**: `http://localhost:3000`
 - **Screenshots**: `docs/test-results/screenshots/`
+- **Report output**: `docs/test-results/e2e/e2e-results.json`

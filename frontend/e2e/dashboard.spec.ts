@@ -1,64 +1,43 @@
 import { test, expect } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
+import { apiRequest, takeScreenshots } from './helpers';
 
-const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/test-results/screenshots');
-
-function getViewportName(width: number): string {
-  return width <= 375 ? 'mobile' : 'desktop';
-}
-
-test.describe('Dashboard page', () => {
-  test('renders dashboard with key UI elements', async ({ page, viewport }) => {
+test.describe('Dashboard Module', () => {
+  test('E2E-DASH-01: Dashboard shows real KPI metrics', async ({ page }) => {
     await page.goto('/');
-    // Should not redirect to login (auth bypassed)
-    await expect(page).not.toHaveURL('/login');
+    await page.waitForLoadState('networkidle');
 
-    // Check page renders (heading in topbar — layout renders h1 with page title)
-    await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+    // Verify greeting text is visible (not loading)
+    await expect(page.getByText(/Good (morning|afternoon|evening)/)).toBeVisible({ timeout: 15000 });
 
-    // Check greeting is present (Good morning/afternoon/evening)
-    const greeting = page.locator('h2').filter({ hasText: /Good (morning|afternoon|evening)/ });
-    await expect(greeting).toBeVisible();
+    // "Hours This Period" card should show a number
+    await expect(page.getByText('Hours This Period')).toBeVisible();
 
-    // Check "Open Timesheet" button/link — the arrow is an HTML entity
-    await expect(page.getByRole('link', { name: /Open Timesheet/ })).toBeVisible();
+    // "Chargeability" card should show a percentage
+    await expect(page.getByText('Chargeability')).toBeVisible();
 
-    // Check metric cards — use exact to avoid strict mode violations
-    await expect(page.getByText('Hours This Period', { exact: true })).toBeVisible();
-    await expect(page.getByText('Chargeability', { exact: true })).toBeVisible();
-    await expect(page.getByText('Pending Approvals', { exact: true })).toBeVisible();
-    await expect(page.getByText('Active Charge Codes', { exact: true })).toBeVisible();
+    // "Active Charge Codes" card should show a number
+    await expect(page.getByText('Active Charge Codes')).toBeVisible();
 
-    // Screenshot
-    fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
-    const vp = getViewportName(viewport?.width ?? 1280);
-    await page.screenshot({
-      path: path.join(SCREENSHOTS_DIR, `dashboard--${vp}.png`),
-      fullPage: false,
-    });
+    // Verify API returns real data
+    const response = await apiRequest(page, 'GET', '/users/me');
+    expect(response.status()).toBe(200);
+    const user = await response.json();
+    expect(user.email).toBeTruthy();
+
+    await takeScreenshots(page, 'dashboard');
   });
 
-  test('sidebar is visible on desktop', async ({ page, viewport }) => {
-    if ((viewport?.width ?? 1280) < 768) return; // skip on mobile
+  test('E2E-DASH-02: Dashboard navigation works', async ({ page }) => {
     await page.goto('/');
-    // Sidebar should be visible with nav items
-    await expect(page.getByRole('link', { name: 'Time Entry' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Charge Codes' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Approv/ })).toBeVisible();
-  });
+    await page.waitForLoadState('networkidle');
 
-  test('mobile bottom nav is visible on mobile', async ({ page, viewport }) => {
-    if ((viewport?.width ?? 1280) > 767) return; // skip on desktop
-    await page.goto('/');
-    // Mobile nav should show bottom tab bar
-    const nav = page.locator('nav.fixed');
-    await expect(nav).toBeVisible();
-  });
+    // Click "Time Entry" in sidebar navigation
+    await page.click('a[href="/time-entry"]');
 
-  test('notification bell is visible in topbar', async ({ page }) => {
-    await page.goto('/');
-    const bell = page.getByRole('button', { name: 'Notifications (3 unread)' });
-    await expect(bell).toBeVisible();
+    // URL should change to /time-entry
+    await expect(page).toHaveURL('/time-entry');
+
+    // "Time Entry" heading should be visible in the topbar
+    await expect(page.getByRole('heading', { name: /Time Entry/i })).toBeVisible({ timeout: 10000 });
   });
 });

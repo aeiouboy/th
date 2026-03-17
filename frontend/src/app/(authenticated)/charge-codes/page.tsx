@@ -56,6 +56,8 @@ export default function ChargeCodesPage() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [createParentId, setCreateParentId] = useState<string | undefined>();
+  const [createChildLevel, setCreateChildLevel] = useState<string | undefined>();
   const [search, setSearch] = useState('');
   const [levelFilter, setLevelFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -213,6 +215,16 @@ export default function ChargeCodesPage() {
               tree={filteredTree}
               selectedId={selectedId}
               onSelect={setSelectedId}
+              onAddChild={(parentId, parentLevel) => {
+                const childLevelMap: Record<string, string> = {
+                  program: 'project',
+                  project: 'activity',
+                  activity: 'task',
+                };
+                setCreateParentId(parentId);
+                setCreateChildLevel(childLevelMap[parentLevel]);
+                setShowCreate(true);
+              }}
             />
           )}
         </div>
@@ -393,9 +405,18 @@ export default function ChargeCodesPage() {
 
       {/* Create Dialog */}
       <ChargeCodeForm
+        key={createParentId || 'new'}
         open={showCreate}
-        onOpenChange={setShowCreate}
+        onOpenChange={(open) => {
+          setShowCreate(open);
+          if (!open) {
+            setCreateParentId(undefined);
+            setCreateChildLevel(undefined);
+          }
+        }}
         onSuccess={handleRefresh}
+        parentId={createParentId}
+        defaultLevel={createChildLevel}
       />
 
       {/* Edit Dialog */}

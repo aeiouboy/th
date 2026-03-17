@@ -53,7 +53,13 @@ PATH_TO_PLAN: $ARGUMENTS
 11. Assign the first unblocked task(s) to the appropriate teammate(s) using `TaskUpdate` with `owner`.
 12. When a teammate completes a task, mark it completed via `TaskUpdate` and assign the next unblocked task.
 13. Follow the `## Pipeline` section ordering from the plan.
-14. **For the Write Tests task**: Ensure the tester writes BOTH unit tests (mocked) AND at least 1 E2E smoke test (real services). If the project has a dev server + database, the smoke test must: start server → authenticate → call API → verify real data. Tests that only mock everything are insufficient.
+14. **For the Write Tests task**: Ensure the tester writes BOTH unit tests (mocked) AND E2E tests (real services).
+    - E2E tests MUST implement every spec listed in the plan's `## E2E Test Specifications` section
+    - E2E tests MUST perform real user actions (click, fill, submit) — NOT just check element visibility
+    - E2E tests MUST include negative cases (invalid input → error shown)
+    - E2E tests MUST run against real backend — NO mocked API responses
+    - Tests that only check page rendering (headings, buttons visible) are INSUFFICIENT and must be rejected
+    - After the tester reports completion, SPOT-CHECK at least 2 E2E test files: read the code and verify it contains real user actions and meaningful assertions. If it only checks visibility, send back for rewrite.
 15. **For the Validate task**: Ensure the validator starts real servers, makes real API calls with real auth tokens, and verifies response bodies contain actual data from the database — not just HTTP 200 status codes.
 16. If a validation step fails, follow the `## Healing Rules` to route fixes to the right agent.
 17. Continue until all tasks are completed or max retries are exhausted.

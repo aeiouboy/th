@@ -1,195 +1,194 @@
 # Backend Unit Test Results
 
 **Date**: 2026-03-17
-**Framework**: Jest + NestJS Testing + ts-jest
-**Total**: 127 tests | 9 suites | All passing
+**Runner**: Jest + ts-jest + NestJS Testing
+**Total**: 127 tests | 127 passed | 0 failed
 
----
+## Test Suites
 
-## timesheets.service.spec.ts — 18 tests PASS
+| Suite File | Tests | Status |
+|---|---|---|
+| `reports/reports.service.spec.ts` | 15 | PASS |
+| `cost-rates/cost-rates.service.spec.ts` | 9 | PASS |
+| `approvals/approvals.service.spec.ts` | 15 | PASS |
+| `users/users.service.spec.ts` | 10 | PASS |
+| `common/guards/supabase-auth.guard.spec.ts` | 11 | PASS |
+| `calendar/calendar.service.spec.ts` | 18 | PASS |
+| `budgets/budgets.service.spec.ts` | 17 | PASS |
+| `timesheets/timesheets.service.spec.ts` | 18 | PASS |
+| `charge-codes/charge-codes.service.spec.ts` | 14 | PASS |
 
-| Test | Result |
-|------|--------|
-| getWeekBounds: normalize Wednesday to Monday start | PASS |
-| getWeekBounds: return existing timesheet if already exists | PASS |
-| findByPeriod: returns null when no timesheet exists | PASS |
-| findByPeriod: returns timesheet when it exists | PASS |
-| findById: throws NotFoundException when not found | PASS |
-| findById: returns timesheet with entries | PASS |
-| upsertEntries: throws NotFoundException when sheet not found | PASS |
-| upsertEntries: throws ForbiddenException when status is submitted | PASS |
-| upsertEntries: throws ForbiddenException when status is locked | PASS |
-| upsertEntries: allows editing when status is draft | PASS |
-| upsertEntries: allows editing when status is rejected | PASS |
-| upsertEntries: validates charge codes are assigned to user | PASS |
-| upsertEntries: filters out entries with 0 hours | PASS |
-| submit: throws NotFoundException when not found | PASS |
-| submit: throws BadRequestException when already submitted | PASS |
-| submit: throws BadRequestException when locked | PASS |
-| submit: transitions draft to submitted | PASS |
-| submit: allows resubmitting rejected timesheet | PASS |
+## Test Details
 
----
+### reports/reports.service.spec.ts
 
-## charge-codes.service.spec.ts — 14 tests PASS
+| Test | Status |
+|---|---|
+| ReportsService > getProjectCostReport > should return empty report when charge code does not exist | pass |
+| ReportsService > getProjectCostReport > should return report with budget and actuals | pass |
+| ReportsService > getProjectCostReport > should include child breakdown in report | pass |
+| ReportsService > getChargeabilityReport > should return zero chargeability when no hours logged | pass |
+| ReportsService > getChargeabilityReport > should calculate chargeability correctly (billable/total) | pass |
+| ReportsService > getChargeabilityReport > should have 80% target chargeability | pass |
+| ReportsService > getActivityDistribution > should return empty distribution when no entries exist | pass |
+| ReportsService > getActivityDistribution > should calculate percentage for each category | pass |
+| ReportsService > getActivityDistribution > should sort distribution by hours descending | pass |
+| ReportsService > getUtilizationReport > should fallback to 22 working days when calendar has no data | pass |
+| ReportsService > getUtilizationReport > should calculate utilization rate per employee | pass |
+| ReportsService > getBudgetAlerts > should return formatted budget alerts with overrunAmount calculated | pass |
+| ReportsService > getBudgetAlerts > should pass through severity values from budgets service (red, orange, yellow) | pass |
+| ReportsService > getBudgetAlerts > should calculate overrunPercent as percentage over budget | pass |
+| ReportsService > getBudgetAlerts > should return zero overrunAmount when actual is less than budget | pass |
 
-| Test | Result |
-|------|--------|
-| create: creates program with PRG- prefix | PASS |
-| create: auto-generate sequential IDs PRG-002 after PRG-001 | PASS |
-| create: creates project with PRJ- prefix under program | PASS |
-| create: throws BadRequestException when program has parentId | PASS |
-| create: throws BadRequestException when project has no parentId | PASS |
-| create: throws BadRequestException when project parent is wrong level | PASS |
-| create: builds materialized path from parent | PASS |
-| findById: throws NotFoundException | PASS |
-| findById: returns charge code with assigned users | PASS |
-| findChildren: returns direct children | PASS |
-| findChildren: returns empty for leaf nodes | PASS |
-| updateAccess: throws NotFoundException | PASS |
-| updateAccess: adds users | PASS |
-| updateAccess: removes users | PASS |
+### cost-rates/cost-rates.service.spec.ts
 
----
+| Test | Status |
+|---|---|
+| CostRatesService > findAll > should return all cost rates ordered by jobGrade and effectiveFrom | pass |
+| CostRatesService > findAll > should return empty array when no cost rates exist | pass |
+| CostRatesService > create > should create a new cost rate and return it | pass |
+| CostRatesService > create > should create cost rate with effectiveTo date when provided | pass |
+| CostRatesService > update > should update an existing cost rate and return it | pass |
+| CostRatesService > update > should throw NotFoundException when cost rate does not exist | pass |
+| CostRatesService > update > should allow partial updates (only jobGrade) | pass |
+| CostRatesService > remove > should delete a cost rate and return { deleted: true } | pass |
+| CostRatesService > remove > should throw NotFoundException when cost rate does not exist | pass |
 
-## approvals.service.spec.ts — 15 tests PASS
+### approvals/approvals.service.spec.ts
 
-| Test | Result |
-|------|--------|
-| getPending: returns empty when no approvals | PASS |
-| getPending: returns manager-pending timesheets | PASS |
-| approve: throws NotFoundException when not found | PASS |
-| approve: throws BadRequestException for locked status | PASS |
-| approve: throws ForbiddenException when not the manager | PASS |
-| approve: transitions submitted to manager_approved | PASS |
-| approve: creates audit log | PASS |
-| approve: auto-locks when no CC approvers needed | PASS |
-| approve: throws ForbiddenException for wrong CC approver | PASS |
-| reject: throws NotFoundException | PASS |
-| reject: throws BadRequestException for locked status | PASS |
-| reject: transitions submitted to rejected | PASS |
-| reject: creates audit log | PASS |
-| bulkApprove: approves multiple timesheets | PASS |
-| bulkApprove: includes error entry when individual fails | PASS |
+| Test | Status |
+|---|---|
+| ApprovalsService > getPending > should return empty results when no pending approvals exist | pass |
+| ApprovalsService > getPending > should return timesheets pending manager approval | pass |
+| ApprovalsService > approve > should throw NotFoundException when timesheet does not exist | pass |
+| ApprovalsService > approve > should throw BadRequestException when timesheet is in locked status | pass |
+| ApprovalsService > approve > should throw ForbiddenException when approver is not the employee manager | pass |
+| ApprovalsService > approve > should transition timesheet from submitted to manager_approved | pass |
+| ApprovalsService > approve > should create an audit log entry when approving | pass |
+| ApprovalsService > approve > should auto-lock when no CC approvers are needed | pass |
+| ApprovalsService > approve > should throw ForbiddenException when CC approver does not own any charge code on the timesheet | pass |
+| ApprovalsService > reject > should throw NotFoundException when timesheet does not exist | pass |
+| ApprovalsService > reject > should throw BadRequestException when rejecting a locked timesheet | pass |
+| ApprovalsService > reject > should reject a submitted timesheet and set status to rejected | pass |
+| ApprovalsService > reject > should create audit log with reject action | pass |
+| ApprovalsService > bulkApprove > should approve multiple timesheets and return results | pass |
+| ApprovalsService > bulkApprove > should include error entry when individual approval fails | pass |
 
----
+### users/users.service.spec.ts
 
-## budgets.service.spec.ts — 17 tests PASS
+| Test | Status |
+|---|---|
+| UsersService > findAll > should return all user profiles | pass |
+| UsersService > findAll > should return empty array when no profiles exist | pass |
+| UsersService > findById > should return the user when found | pass |
+| UsersService > findById > should throw NotFoundException when user does not exist | pass |
+| UsersService > updateProfile > should update and return the user profile | pass |
+| UsersService > updateProfile > should throw NotFoundException when user to update does not exist | pass |
+| UsersService > updateRole > should update user role successfully | pass |
+| UsersService > updateRole > should throw NotFoundException when user does not exist | pass |
+| UsersService > updateJobGrade > should update job grade successfully | pass |
+| UsersService > updateJobGrade > should throw NotFoundException when user does not exist | pass |
 
-| Test | Result |
-|------|--------|
-| getBudgetForChargeCode: throws NotFoundException | PASS |
-| getBudgetForChargeCode: returns budget with percentage | PASS |
-| getBudgetForChargeCode: returns 0 percentage when budget is 0 | PASS |
-| getStatus: returns under_budget below 80% | PASS |
-| getStatus: returns warning between 80-90% | PASS |
-| getStatus: returns critical between 90-100% | PASS |
-| getStatus: returns overrun above 100% | PASS |
-| getForecast: throws NotFoundException | PASS |
-| getForecast: returns null when no dates | PASS |
-| getForecast: calculates forecast with dates | PASS |
-| getAlerts: returns empty when no codes over threshold | PASS |
-| getAlerts: returns yellow alert at 81% | PASS |
-| getAlerts: returns orange alert at 91% | PASS |
-| getAlerts: returns red alert at 101% | PASS |
-| getAlerts: sorts red first then orange then yellow | PASS |
-| getSummary: returns zero when no records | PASS |
-| getSummary: counts over-budget codes | PASS |
+### common/guards/supabase-auth.guard.spec.ts
 
----
+| Test | Status |
+|---|---|
+| SupabaseAuthGuard > should allow public routes without a token | pass |
+| SupabaseAuthGuard > should throw UnauthorizedException when Authorization header is missing | pass |
+| SupabaseAuthGuard > should throw UnauthorizedException when Authorization header does not start with Bearer | pass |
+| SupabaseAuthGuard > should throw UnauthorizedException when JWT verification fails (invalid token) | pass |
+| SupabaseAuthGuard > should throw UnauthorizedException when user profile is not found in DB | pass |
+| SupabaseAuthGuard > should allow request and attach profile when JWT is valid | pass |
+| RolesGuard > should allow access when no roles are required | pass |
+| RolesGuard > should allow access when user has the required role | pass |
+| RolesGuard > should throw ForbiddenException when user does not have the required role | pass |
+| RolesGuard > should throw ForbiddenException when no user is on the request | pass |
+| RolesGuard > should allow access when user role matches one of multiple required roles | pass |
 
-## calendar.service.spec.ts — 18 tests PASS
+### calendar/calendar.service.spec.ts
 
-| Test | Result |
-|------|--------|
-| populateWeekends: inserts entries for year | PASS |
-| populateWeekends: only inserts weekend dates | PASS |
-| createHoliday: creates new entry | PASS |
-| createHoliday: updates existing entry | PASS |
-| updateHoliday: throws NotFoundException when not found | PASS |
-| updateHoliday: throws NotFoundException when not a holiday | PASS |
-| updateHoliday: updates name | PASS |
-| deleteHoliday: throws NotFoundException | PASS |
-| deleteHoliday: clears fields when also a weekend | PASS |
-| deleteHoliday: deletes entry when only a holiday | PASS |
-| getWorkingDays: excludes weekends and holidays | PASS |
-| getWorkingDays: subtracts vacation days | PASS |
-| createVacation: throws BadRequestException for bad dates | PASS |
-| createVacation: creates request | PASS |
-| approveVacation: throws NotFoundException | PASS |
-| approveVacation: throws BadRequestException when not pending | PASS |
-| approveVacation: throws ForbiddenException when not manager | PASS |
-| approveVacation: approves pending request | PASS |
+| Test | Status |
+|---|---|
+| CalendarService > populateWeekends > should insert weekend entries for a given year | pass |
+| CalendarService > populateWeekends > should only insert weekend dates (count matches expected weekends for 2026) | pass |
+| CalendarService > createHoliday > should create a new holiday entry when date does not exist | pass |
+| CalendarService > createHoliday > should update existing entry to be a holiday when date already exists | pass |
+| CalendarService > updateHoliday > should throw NotFoundException when holiday does not exist | pass |
+| CalendarService > updateHoliday > should throw NotFoundException when entry exists but is not a holiday | pass |
+| CalendarService > updateHoliday > should update holiday name successfully | pass |
+| CalendarService > deleteHoliday > should throw NotFoundException when holiday does not exist | pass |
+| CalendarService > deleteHoliday > should clear holiday fields (not delete) when entry is also a weekend | pass |
+| CalendarService > deleteHoliday > should delete the entry entirely when it is only a holiday | pass |
+| CalendarService > getWorkingDays > should count working days excluding weekends and holidays | pass |
+| CalendarService > getWorkingDays > should subtract vacation days when userId is provided | pass |
+| CalendarService > createVacation > should throw BadRequestException when end date is before start date | pass |
+| CalendarService > createVacation > should create a vacation request successfully | pass |
+| CalendarService > approveVacation > should throw NotFoundException when vacation does not exist | pass |
+| CalendarService > approveVacation > should throw BadRequestException when vacation is not pending | pass |
+| CalendarService > approveVacation > should throw ForbiddenException when approver is not the manager | pass |
+| CalendarService > approveVacation > should approve a pending vacation successfully | pass |
 
----
+### budgets/budgets.service.spec.ts
 
-## reports.service.spec.ts — 15 tests PASS
+| Test | Status |
+|---|---|
+| BudgetsService > getBudgetForChargeCode > should throw NotFoundException when charge code does not exist | pass |
+| BudgetsService > getBudgetForChargeCode > should return budget with percentage when budget record exists | pass |
+| BudgetsService > getBudgetForChargeCode > should return 0 percentage when budget is 0 | pass |
+| BudgetsService > getStatus (via getBudgetForChargeCode) > should return under_budget status when usage is below 80% | pass |
+| BudgetsService > getStatus (via getBudgetForChargeCode) > should return warning status when usage is between 80-90% | pass |
+| BudgetsService > getStatus (via getBudgetForChargeCode) > should return critical status when usage is between 90-100% | pass |
+| BudgetsService > getStatus (via getBudgetForChargeCode) > should return overrun status when usage exceeds 100% | pass |
+| BudgetsService > getForecast > should throw NotFoundException when charge code does not exist | pass |
+| BudgetsService > getForecast > should return null forecast when charge code has no dates | pass |
+| BudgetsService > getForecast > should calculate forecast at completion when dates are present | pass |
+| BudgetsService > getAlerts > should return empty array when no charge codes are over threshold | pass |
+| BudgetsService > getAlerts > should return yellow alert at 81% usage | pass |
+| BudgetsService > getAlerts > should return orange alert at 91% usage | pass |
+| BudgetsService > getAlerts > should return red alert at 101% usage | pass |
+| BudgetsService > getAlerts > should sort alerts: red first, then orange, then yellow | pass |
+| BudgetsService > getSummary > should return zero summary when no budget records exist | pass |
+| BudgetsService > getSummary > should correctly count over-budget charge codes | pass |
 
-| Test | Result |
-|------|--------|
-| getProjectCostReport: returns empty when CC not found | PASS |
-| getProjectCostReport: returns budget and actuals | PASS |
-| getProjectCostReport: includes child breakdown | PASS |
-| getChargeabilityReport: returns zero with no hours | PASS |
-| getChargeabilityReport: calculates billable/total | PASS |
-| getChargeabilityReport: has 80% target | PASS |
-| getActivityDistribution: returns empty | PASS |
-| getActivityDistribution: calculates percentages | PASS |
-| getActivityDistribution: sorts by hours desc | PASS |
-| getUtilizationReport: fallback to 22 working days | PASS |
-| getUtilizationReport: calculates utilization per employee | PASS |
-| getBudgetAlerts: returns formatted alerts with overrunAmount | PASS |
-| getBudgetAlerts: passes through severity values (red/orange/yellow) | PASS |
-| getBudgetAlerts: calculates overrunPercent | PASS |
-| getBudgetAlerts: returns zero overrunAmount when under budget | PASS |
+### timesheets/timesheets.service.spec.ts
 
----
+| Test | Status |
+|---|---|
+| TimesheetsService > getWeekBounds (via create) > should normalize a Wednesday to its Monday start | pass |
+| TimesheetsService > getWeekBounds (via create) > should return existing timesheet if one already exists for that week | pass |
+| TimesheetsService > findByPeriod > should return null when no timesheet exists for the period | pass |
+| TimesheetsService > findByPeriod > should return the timesheet when it exists | pass |
+| TimesheetsService > findById > should throw NotFoundException when timesheet does not exist | pass |
+| TimesheetsService > findById > should return timesheet with entries when it exists | pass |
+| TimesheetsService > upsertEntries > should throw NotFoundException when timesheet does not exist | pass |
+| TimesheetsService > upsertEntries > should throw ForbiddenException when timesheet status is submitted | pass |
+| TimesheetsService > upsertEntries > should throw ForbiddenException when timesheet status is locked | pass |
+| TimesheetsService > upsertEntries > should allow editing when status is draft | pass |
+| TimesheetsService > upsertEntries > should allow editing when status is rejected | pass |
+| TimesheetsService > upsertEntries > should validate that charge codes are assigned to the user | pass |
+| TimesheetsService > upsertEntries > should filter out entries with 0 hours | pass |
+| TimesheetsService > submit > should throw NotFoundException when timesheet does not exist | pass |
+| TimesheetsService > submit > should throw BadRequestException when status is already submitted | pass |
+| TimesheetsService > submit > should throw BadRequestException when status is locked | pass |
+| TimesheetsService > submit > should transition draft timesheet to submitted | pass |
+| TimesheetsService > submit > should allow resubmitting a rejected timesheet | pass |
 
-## supabase-auth.guard.spec.ts — 11 tests PASS
+### charge-codes/charge-codes.service.spec.ts
 
-| Test | Result |
-|------|--------|
-| SupabaseAuthGuard: allows public routes | PASS |
-| SupabaseAuthGuard: throws 401 with missing auth header | PASS |
-| SupabaseAuthGuard: throws 401 for non-Bearer header | PASS |
-| SupabaseAuthGuard: throws 401 for invalid JWT (JWKS error) | PASS |
-| SupabaseAuthGuard: throws 401 when user profile not found | PASS |
-| SupabaseAuthGuard: allows request with valid JWT and attaches profile | PASS |
-| RolesGuard: allows when no roles required | PASS |
-| RolesGuard: allows when user has required role | PASS |
-| RolesGuard: throws ForbiddenException for wrong role | PASS |
-| RolesGuard: throws ForbiddenException with no user | PASS |
-| RolesGuard: allows matching one of multiple roles | PASS |
+| Test | Status |
+|---|---|
+| ChargeCodesService > create > should create a program-level charge code with auto-generated PRG- prefix | pass |
+| ChargeCodesService > create > should auto-generate sequential IDs (PRG-002 after PRG-001) | pass |
+| ChargeCodesService > create > should create a project with PRJ- prefix under a program parent | pass |
+| ChargeCodesService > create > should throw BadRequestException when program has a parentId | pass |
+| ChargeCodesService > create > should throw BadRequestException when project has no parentId | pass |
+| ChargeCodesService > create > should throw BadRequestException when project parent is not a program | pass |
+| ChargeCodesService > create > should build materialized path from parent | pass |
+| ChargeCodesService > findById > should throw NotFoundException when charge code does not exist | pass |
+| ChargeCodesService > findById > should return charge code with assigned users | pass |
+| ChargeCodesService > findChildren > should return direct children of a charge code | pass |
+| ChargeCodesService > findChildren > should return empty array for leaf nodes | pass |
+| ChargeCodesService > updateAccess > should throw NotFoundException when charge code does not exist | pass |
+| ChargeCodesService > updateAccess > should add users to a charge code | pass |
+| ChargeCodesService > updateAccess > should remove users from a charge code | pass |
 
----
-
-## users.service.spec.ts — 10 tests PASS (NEW)
-
-| Test | Result |
-|------|--------|
-| findAll: returns all user profiles | PASS |
-| findAll: returns empty array when no profiles | PASS |
-| findById: returns user when found | PASS |
-| findById: throws NotFoundException when not found | PASS |
-| updateProfile: updates and returns profile | PASS |
-| updateProfile: throws NotFoundException when not found | PASS |
-| updateRole: updates role successfully | PASS |
-| updateRole: throws NotFoundException when not found | PASS |
-| updateJobGrade: updates job grade successfully | PASS |
-| updateJobGrade: throws NotFoundException when not found | PASS |
-
----
-
-## cost-rates.service.spec.ts — 9 tests PASS (NEW)
-
-| Test | Result |
-|------|--------|
-| findAll: returns all cost rates ordered | PASS |
-| findAll: returns empty array when none exist | PASS |
-| create: creates new cost rate | PASS |
-| create: creates cost rate with effectiveTo date | PASS |
-| update: updates cost rate | PASS |
-| update: throws NotFoundException when not found | PASS |
-| update: allows partial updates | PASS |
-| remove: deletes and returns { deleted: true } | PASS |
-| remove: throws NotFoundException when not found | PASS |

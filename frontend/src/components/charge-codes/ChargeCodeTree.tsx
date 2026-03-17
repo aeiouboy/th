@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface ChargeCodeNode {
@@ -21,15 +21,23 @@ const LEVEL_BADGE: Record<string, { label: string; className: string }> = {
   task: { label: 'TSK', className: 'bg-[var(--accent-purple)] text-white' },
 };
 
+const CHILD_LEVEL: Record<string, string> = {
+  program: 'project',
+  project: 'activity',
+  activity: 'task',
+};
+
 function TreeNode({
   node,
   selectedId,
   onSelect,
+  onAddChild,
   depth = 0,
 }: {
   node: ChargeCodeNode;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onAddChild?: (parentId: string, parentLevel: string) => void;
   depth?: number;
 }) {
   const [expanded, setExpanded] = useState(depth < 1);
@@ -42,7 +50,7 @@ function TreeNode({
       <button
         onClick={() => onSelect(node.id)}
         className={cn(
-          'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-[var(--bg-card-hover)]',
+          'group/node flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-[var(--bg-card-hover)]',
           isSelected && 'bg-[var(--accent-teal-light)] ring-1 ring-[var(--accent-teal)]/20 font-medium',
         )}
         style={{ paddingLeft: `${depth * 20 + 8}px` }}
@@ -85,6 +93,18 @@ function TreeNode({
             ${Number(node.budgetAmount).toLocaleString()}
           </span>
         )}
+        {onAddChild && node.level && CHILD_LEVEL[node.level] && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddChild(node.id, node.level!);
+            }}
+            className="ml-auto shrink-0 rounded p-0.5 opacity-0 group-hover/node:opacity-100 hover:bg-stone-200 transition-all"
+            title={`Add ${CHILD_LEVEL[node.level]}`}
+          >
+            <Plus className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+          </span>
+        )}
       </button>
       {expanded && hasChildren && (
         <div>
@@ -94,6 +114,7 @@ function TreeNode({
               node={child}
               selectedId={selectedId}
               onSelect={onSelect}
+              onAddChild={onAddChild}
               depth={depth + 1}
             />
           ))}
@@ -107,10 +128,12 @@ export function ChargeCodeTree({
   tree,
   selectedId,
   onSelect,
+  onAddChild,
 }: {
   tree: ChargeCodeNode[];
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onAddChild?: (parentId: string, parentLevel: string) => void;
 }) {
   if (tree.length === 0) {
     return (
@@ -128,6 +151,7 @@ export function ChargeCodeTree({
           node={node}
           selectedId={selectedId}
           onSelect={onSelect}
+          onAddChild={onAddChild}
         />
       ))}
     </div>

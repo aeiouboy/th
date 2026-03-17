@@ -539,7 +539,50 @@ Research (if needed) → Infra Verify → Build → Code Review → Write Tests 
 - **Heal**: CONDITIONAL. If validation fails, parse failures and route each to the correct agent per Healing Rules. Max 2 retries.
 
 ## Acceptance Criteria
-<list specific, measurable criteria that must be met for the task to be considered complete>
+
+IMPORTANT: Every feature criterion MUST have a `Verified by:` line linking to specific test IDs. Criteria without test coverage are NOT considered complete.
+
+### Feature Criteria
+<list specific, measurable criteria. EVERY criterion must include a `Verified by:` line>
+
+Format:
+```
+- [ ] <criterion description>
+      Verified by: <test IDs that prove this works — e.g., UNIT-CC-03, E2E-CC-01>
+```
+
+Example:
+```
+- [ ] Charge codes support 4-level hierarchy (Program > Project > Activity > Task)
+      Verified by: UNIT-CC-03 (hierarchy CRUD), E2E-CC-01 (create project under program), E2E-CC-02 (negative: project without parent fails)
+```
+
+### E2E Test Specifications (MANDATORY for UI projects)
+
+Every E2E test case MUST be written in Given-When-Then format with:
+1. **Preconditions** (Given) — what state must exist before the test
+2. **Actions** (When) — exact user steps (click, fill, select, submit)
+3. **Assertions** (Then) — what the test verifies (UI state AND backend state)
+4. **Negative case** — at least 1 negative scenario per feature (invalid input, missing required field, unauthorized access)
+
+Format:
+```
+E2E-<MODULE>-<NUM>: <test name>
+  Given: <preconditions — logged-in user, existing data, role>
+  When: <step 1 — e.g., Click "Create New" button>
+  When: <step 2 — e.g., Select level "project" from dropdown>
+  When: <step 3 — e.g., Select parent "Digital Transformation" from parent dropdown>
+  When: <step 4 — e.g., Fill name="New OMS", budget=2000000, click Create>
+  Then: <UI assertion — e.g., Tree shows "New OMS" nested under "Digital Transformation">
+  Then: <API assertion — e.g., GET /charge-codes/tree returns node with parentId matching program ID>
+  Negative: <what happens when input is invalid — e.g., Submit without parent → error "A project must have a parent">
+```
+
+<list E2E test specs here using the format above. Minimum coverage:>
+- At least 1 CRUD flow per core module (create → read → update → verify)
+- At least 1 multi-step workflow (e.g., login → create → submit → approve)
+- At least 1 negative test per module (invalid input, missing required field, unauthorized)
+- At least 1 role-based access test (admin can, employee cannot)
 
 ### Infrastructure Criteria (verified by Infra Verify stage)
 - All external service connections verified with real queries/requests (not just config file checks)
@@ -550,7 +593,8 @@ Research (if needed) → Infra Verify → Build → Code Review → Write Tests 
 ### Quality Criteria
 - Code review passes with no remaining quality issues
 - All unit tests pass (mocked dependencies)
-- All E2E smoke tests pass (real services — at least 1 full user flow: auth → create → read → verify)
+- All E2E tests pass against real running servers (NOT mocked) — every E2E spec listed above must pass
+- Every feature criterion has at least 1 test ID in its `Verified by:` line
 
 ### Documentation Criteria
 - All documentation files referenced in indexes/READMEs actually exist (no broken internal links)

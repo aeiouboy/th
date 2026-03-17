@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -19,6 +19,12 @@ import {
 } from '@/components/ui/select';
 import { api } from '@/lib/api';
 
+interface ParentOption {
+  id: string;
+  name: string;
+  level: string;
+}
+
 interface ChargeCodeFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -35,6 +41,7 @@ interface ChargeCodeFormProps {
     isBillable: boolean | null;
   };
   parentId?: string;
+  defaultLevel?: string;
 }
 
 const LEVELS = [
@@ -44,18 +51,28 @@ const LEVELS = [
   { value: 'task', label: 'Task' },
 ];
 
+// Which parent level is required for each child level
+const PARENT_LEVEL: Record<string, string> = {
+  project: 'program',
+  activity: 'project',
+  task: 'activity',
+};
+
 export function ChargeCodeForm({
   open,
   onOpenChange,
   onSuccess,
   editData,
-  parentId,
+  parentId: parentIdProp,
+  defaultLevel,
 }: ChargeCodeFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [parentOptions, setParentOptions] = useState<ParentOption[]>([]);
+  const [selectedParentId, setSelectedParentId] = useState(parentIdProp || '');
 
   const [name, setName] = useState(editData?.name || '');
-  const [level, setLevel] = useState(editData?.level || 'program');
+  const [level, setLevel] = useState(editData?.level || defaultLevel || 'program');
   const [programName, setProgramName] = useState(editData?.programName || '');
   const [costCenter, setCostCenter] = useState(editData?.costCenter || '');
   const [budgetAmount, setBudgetAmount] = useState(
@@ -67,17 +84,42 @@ export function ChargeCodeForm({
     editData?.isBillable ?? true,
   );
 
+  const needsParent = !editData && level !== 'program';
+
+  // Fetch potential parents when level changes
+  useEffect(() => {
+    if (!needsParent) {
+      setParentOptions([]);
+      return;
+    }
+    const requiredParentLevel = PARENT_LEVEL[level];
+    if (!requiredParentLevel) return;
+
+    api
+      .get<ParentOption[]>(`/charge-codes?level=${requiredParentLevel}`)
+      .then((data) => setParentOptions(data))
+      .catch(() => setParentOptions([]));
+  }, [level, needsParent]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    const resolvedParentId = parentIdProp || selectedParentId;
+
+    if (needsParent && !resolvedParentId) {
+      setError(`A ${level} must have a parent`);
+      setLoading(false);
+      return;
+    }
 
     const body: Record<string, string | boolean | number> = {
       name,
       level,
       isBillable,
     };
-    if (parentId) body.parentId = parentId;
+    if (resolvedParentId) body.parentId = resolvedParentId;
     if (programName) body.programName = programName;
     if (costCenter) body.costCenter = costCenter;
     if (budgetAmount) body.budgetAmount = parseFloat(budgetAmount);
@@ -131,7 +173,7 @@ export function ChargeCodeForm({
               <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
                 Level
               </label>
-              <Select value={level} onValueChange={(v) => setLevel(v ?? 'program')}>
+              <Select value={level} onValueChange={(v) => { setLevel(v ?? 'program'); setSelectedParentId(''); }}>
                 <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -143,6 +185,31 @@ export function ChargeCodeForm({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          )}
+
+          {needsParent && !parentIdProp && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
+                Parent ({PARENT_LEVEL[level]?.charAt(0).toUpperCase() + PARENT_LEVEL[level]?.slice(1)})
+              </label>
+              <Select value={selectedParentId} onValueChange={(v) => setSelectedParentId(v ?? '')}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a parent..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {parentOptions.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {parentOptions.length === 0 && (
+                <p className="mt-1 text-xs text-[var(--text-muted)]">
+                  No {PARENT_LEVEL[level]}s found. Create one first.
+                </p>
+              )}
             </div>
           )}
 

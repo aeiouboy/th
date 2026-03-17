@@ -49,10 +49,52 @@ When invoked, you must follow these steps:
    - **API integration mocks** — mock API calls, verify correct data display from response
 
    **E2E tests** (Playwright — MANDATORY if project has UI pages):
-   - **Critical user flows** — login → navigate → perform action → verify result
-   - **Page load verification** — all key pages load without console errors
-   - **Screenshots** — capture each page at desktop (1280×720) and mobile (375×667)
+
+   CRITICAL: E2E tests must test REAL USER FLOWS against a REAL running backend. Tests that only check element visibility (e.g., `expect(heading).toBeVisible()`) are NOT sufficient. Every E2E test must perform actions and verify outcomes.
+
+   **Required E2E test structure:**
+
+   a. **Read the plan's `## E2E Test Specifications` section** — the plan contains Given-When-Then specs for every required E2E test. Implement EVERY spec listed there. Do NOT skip any.
+
+   b. **Each E2E test must follow this pattern:**
+      ```typescript
+      test('E2E-CC-01: Create project under program', async ({ page }) => {
+        // GIVEN: preconditions (navigate, ensure data exists)
+        await page.goto('/charge-codes');
+
+        // WHEN: user actions (click, fill, select, submit)
+        await page.click('button:has-text("Create New")');
+        await page.selectOption('[name=level]', 'project');
+        await page.selectOption('[name=parent]', { label: 'Digital Transformation' });
+        await page.fill('[name=name]', 'New OMS');
+        await page.click('button:has-text("Create")');
+
+        // THEN: verify outcome (UI state AND/OR API response)
+        await expect(page.locator('text=New OMS')).toBeVisible();
+
+        // THEN: verify backend state
+        const response = await page.request.get('/api/v1/charge-codes/tree');
+        const tree = await response.json();
+        const newProject = tree.flatMap(n => n.children).find(c => c.name === 'New OMS');
+        expect(newProject).toBeTruthy();
+        expect(newProject.parentId).toBeTruthy();
+      });
+      ```
+
+   c. **Every E2E test MUST include:**
+      - At least 1 **action** (click, fill, submit — not just navigation)
+      - At least 1 **UI assertion** (element appears/disappears after action)
+      - At least 1 **state assertion** (API response, URL change, or localStorage change)
+
+   d. **Negative tests are MANDATORY** — for each CRUD flow, include at least 1 test where:
+      - Required field is missing → error message appears
+      - Invalid input → validation error shown
+      - Unauthorized role → access denied or element hidden
+
+   e. **Screenshots** — capture each page at desktop (1280×720) and mobile (375×667)
    - Save screenshots to `docs/test-results/screenshots/<page-name>--<viewport>.png`
+
+   f. **Tests must NOT mock the backend** — E2E tests run against real running servers. If tests need auth, obtain a real token via Supabase auth API or use storageState from a global setup that logs in once.
 5. **Run the tests.** Execute the test suite to confirm all new tests pass. Fix any failures in the test code (never in the implementation code).
 6. **Save test results.** You MUST create ALL of the following files before marking the task complete. A PostToolUse validator will **block** your TaskUpdate if any are missing.
 
@@ -156,6 +198,8 @@ TC-003,Returns 400 on missing email,unit,Server Actions — Users,tests/users/va
 - For screenshots, use Playwright to capture each key page at desktop (1280x720) and optionally mobile (375x667)
 
 7. **Self-validate before completing.** Before calling TaskUpdate with status=completed, verify:
+
+   ### File existence checks
    - [ ] `docs/test-results/test-cases.csv` exists with header row and all 7 columns (ID,Test Name,Type,Category,File,Status,Notes)
    - [ ] `docs/test-results/test-cases.md` exists and has the same data as CSV in markdown table
    - [ ] `docs/test-results/summary.md` exists with date, pass/fail counts, AND separate backend/frontend breakdown
@@ -168,7 +212,21 @@ TC-003,Returns 400 on missing email,unit,Server Actions — Users,tests/users/va
    - [ ] `docs/test-results/screenshots/` has at least 1 screenshot per key page (if project has UI pages)
    - [ ] Screenshots use `<name>--<viewport>.png` naming (double-dash before viewport)
    - [ ] test-cases.csv includes BOTH backend AND frontend test entries (if both exist)
-   If any check fails, fix it before completing. Do NOT mark the task done with missing files.
+
+   ### E2E assertion quality checks (CRITICAL — prevents shallow tests)
+   - [ ] Every E2E test file contains at least 1 `click`, `fill`, or `selectOption` call (tests perform actions, not just visit pages)
+   - [ ] Every E2E test contains at least 1 assertion AFTER an action (not just `toBeVisible` on page load)
+   - [ ] At least 1 E2E test verifies API response data (e.g., `page.request.get()` or intercept + assert)
+   - [ ] At least 1 E2E test is a negative case (verifies error message appears for invalid input)
+   - [ ] Every `E2E-*` spec listed in the plan's `## E2E Test Specifications` section has a corresponding test implemented
+   - [ ] No E2E test uses mocked API responses — all tests run against real backend
+
+   ### Acceptance criteria traceability check
+   - [ ] Read the plan's `## Acceptance Criteria > Feature Criteria` section
+   - [ ] For each criterion with a `Verified by:` line, confirm the referenced test ID exists in test-cases.csv
+   - [ ] For each referenced test ID, confirm the test actually asserts the criterion (not just renders a page)
+
+   If any check fails, fix it before completing. Do NOT mark the task done with missing files or shallow tests.
 
 8. **Report and complete.** Use TaskUpdate to mark the task complete with a summary of what was tested.
 

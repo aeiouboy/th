@@ -163,6 +163,44 @@ File changed: `backend/src/integrations/integrations.controller.ts`
 
 ---
 
+## E2E Test Findings
+
+### Bug: Charge Code Form Missing Parent Selector for Project Level
+
+**Discovered by:** E2E-CC-03 (negative test) — `frontend/e2e/charge-codes.spec.ts`
+
+**Symptoms:**
+- When creating a charge code with level set to "project", the form does not show a parent selector dropdown
+- Submitting a project without a parent succeeds silently instead of showing a validation error
+- The `must have a parent` error message is never displayed
+
+**Root Cause:**
+The `ChargeCodeForm` component only rendered the parent selector when the level was "task" or lower. The "project" level was incorrectly treated as a top-level entry, omitting the parent selector dropdown entirely. Since the selector was absent, the user had no way to assign a parent, and the form submitted without the required `parentId` field. The backend created an orphaned project node in the hierarchy.
+
+**Fix:**
+Update the form's conditional rendering logic to show the parent selector whenever the selected level is NOT "program" (i.e., for "project" and "task" levels):
+
+```typescript
+// ChargeCodeForm.tsx — show parent selector for non-top-level types
+{level !== 'program' && (
+  <ParentSelector ... />
+)}
+```
+
+Also add frontend validation before submission:
+```typescript
+if (level !== 'program' && !parentId) {
+  setError('parentId', { message: 'Project must have a parent' });
+  return;
+}
+```
+
+**Files changed:** `frontend/src/components/charge-codes/ChargeCodeForm.tsx`
+
+**Caught by:** E2E-CC-03 negative test, which selects "project" level, skips parent selection, and asserts that the error message `/must have a parent/i` appears. This test fails when the parent selector is absent because the form submits instead of rejecting the input.
+
+---
+
 ## Runtime & Data Issues
 
 ### Problem: API Calls Return Mock Data Instead of Real Data

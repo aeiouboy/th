@@ -22,6 +22,22 @@
         "metadata": {
           "actualWorkers": 1
         },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "/Users/tachongrak/Projects/ts/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/auth\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "desktop",
         "name": "desktop",
         "testDir": "/Users/tachongrak/Projects/ts/frontend/e2e",
@@ -51,14 +67,7 @@
     "quiet": false,
     "reporter": [
       [
-        "json",
-        {
-          "outputFile": "../docs/test-results/e2e/e2e-results.json"
-        }
-      ],
-      [
-        "list",
-        null
+        "json"
       ]
     ],
     "reportSlowTests": {
@@ -73,13 +82,55 @@
     "version": "1.58.2",
     "workers": 1,
     "webServer": {
-      "command": "NEXT_PUBLIC_E2E_TEST=true pnpm dev --turbopack",
+      "command": "pnpm dev --turbopack",
       "url": "http://localhost:3000",
       "reuseExistingServer": true,
       "timeout": 120000
     }
   },
   "suites": [
+    {
+      "title": "auth.setup.ts",
+      "file": "auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2895,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-03-17T10:03:44.577Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "17e3fe6f4d9d8bd79c6b-60f085b113a677673906",
+          "file": "auth.setup.ts",
+          "line": 12,
+          "column": 6
+        }
+      ]
+    },
     {
       "title": "admin-calendar.spec.ts",
       "file": "admin-calendar.spec.ts",
@@ -88,13 +139,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Admin Calendar page",
+          "title": "Admin Calendar Module",
           "file": "admin-calendar.spec.ts",
-          "line": 11,
-          "column": 6,
+          "line": 4,
+          "column": 15,
           "specs": [
             {
-              "title": "renders admin calendar page with core elements",
+              "title": "E2E-CAL-01: Create a holiday",
               "ok": true,
               "tags": [],
               "tests": [
@@ -106,15 +157,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1179,
+                      "duration": 4339,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:17.190Z",
+                      "startTime": "2026-03-17T10:03:48.374Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -122,13 +173,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "3c3185538ec1b819c8bd-a0c838fbfa974a1b2017",
+              "id": "3c3185538ec1b819c8bd-29682ff706f4862d5606",
               "file": "admin-calendar.spec.ts",
-              "line": 12,
+              "line": 7,
               "column": 7
             },
             {
-              "title": "calendar month navigation buttons are present",
+              "title": "E2E-CAL-02: Delete a holiday",
               "ok": true,
               "tags": [],
               "tests": [
@@ -140,15 +191,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 247,
+                      "duration": 6340,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:19.582Z",
+                      "startTime": "2026-03-17T10:03:53.139Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -156,13 +207,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "3c3185538ec1b819c8bd-2c5802d32f78ed59f907",
+              "id": "3c3185538ec1b819c8bd-2afe90ba98c54df27beb",
               "file": "admin-calendar.spec.ts",
-              "line": 31,
+              "line": 52,
               "column": 7
             },
             {
-              "title": "add holiday button is present",
+              "title": "E2E-CAL-03: Calendar displays year and navigation",
               "ok": true,
               "tags": [],
               "tests": [
@@ -174,83 +225,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 261,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:19.833Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3c3185538ec1b819c8bd-f1199cd68c5a0a2e4f1f",
-              "file": "admin-calendar.spec.ts",
-              "line": 37,
-              "column": 7
-            },
-            {
-              "title": "holidays table or no-holidays message is shown",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 264,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:20.098Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3c3185538ec1b819c8bd-414c2759286dff12eafc",
-              "file": "admin-calendar.spec.ts",
-              "line": 44,
-              "column": 7
-            },
-            {
-              "title": "renders admin calendar page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 815,
+                      "duration": 2881,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:42.868Z",
+                      "startTime": "2026-03-17T10:03:59.485Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -258,111 +241,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "3c3185538ec1b819c8bd-d559e8f0e96ef7a1693a",
+              "id": "3c3185538ec1b819c8bd-8d228711e5a2a1734748",
               "file": "admin-calendar.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "calendar month navigation buttons are present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 340,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:43.908Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3c3185538ec1b819c8bd-ce74d5cf842288abb29b",
-              "file": "admin-calendar.spec.ts",
-              "line": 31,
-              "column": 7
-            },
-            {
-              "title": "add holiday button is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 315,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:44.257Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3c3185538ec1b819c8bd-e0341d53dc70dc09f25a",
-              "file": "admin-calendar.spec.ts",
-              "line": 37,
-              "column": 7
-            },
-            {
-              "title": "holidays table or no-holidays message is shown",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 301,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:44.578Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3c3185538ec1b819c8bd-5575f9845a57c1e5e39a",
-              "file": "admin-calendar.spec.ts",
-              "line": 44,
+              "line": 80,
               "column": 7
             }
           ]
@@ -377,13 +258,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Admin Rates page",
+          "title": "Admin Rates Module",
           "file": "admin-rates.spec.ts",
-          "line": 11,
-          "column": 6,
+          "line": 4,
+          "column": 15,
           "specs": [
             {
-              "title": "renders admin rates page with core elements",
+              "title": "E2E-RATE-01: Rates table loads with real data",
               "ok": true,
               "tags": [],
               "tests": [
@@ -395,15 +276,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 378,
+                      "duration": 1323,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:20.368Z",
+                      "startTime": "2026-03-17T10:04:02.374Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -411,13 +292,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "8f925593326d96746e43-03050ac4ce8b705f0572",
+              "id": "8f925593326d96746e43-accb10d46c7d1f25efab",
               "file": "admin-rates.spec.ts",
-              "line": 12,
+              "line": 7,
               "column": 7
             },
             {
-              "title": "add rate button is present",
+              "title": "E2E-RATE-02: Add a new cost rate",
               "ok": true,
               "tags": [],
               "tests": [
@@ -429,117 +310,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 235,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:20.749Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8f925593326d96746e43-d6fa7fc879588ac3cdf6",
-              "file": "admin-rates.spec.ts",
-              "line": 28,
-              "column": 7
-            },
-            {
-              "title": "rates table is rendered",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 243,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:20.988Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8f925593326d96746e43-028351a7708f8d71fee7",
-              "file": "admin-rates.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "rate card or summary is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 245,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:21.235Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8f925593326d96746e43-980ec8b4e261a734be98",
-              "file": "admin-rates.spec.ts",
-              "line": 40,
-              "column": 7
-            },
-            {
-              "title": "renders admin rates page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 380,
+                      "duration": 3481,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:44.885Z",
+                      "startTime": "2026-03-17T10:04:03.702Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -547,111 +326,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "8f925593326d96746e43-c0df4c852891c727720e",
+              "id": "8f925593326d96746e43-49a034f664d2c021b20a",
               "file": "admin-rates.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "add rate button is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 322,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:45.270Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8f925593326d96746e43-f615939fdaa6b0818dc8",
-              "file": "admin-rates.spec.ts",
-              "line": 28,
-              "column": 7
-            },
-            {
-              "title": "rates table is rendered",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 343,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:45.596Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8f925593326d96746e43-80181f3b7e8d9c034990",
-              "file": "admin-rates.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "rate card or summary is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 319,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:45.943Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "8f925593326d96746e43-9bc671c9ff161451e806",
-              "file": "admin-rates.spec.ts",
-              "line": 40,
+              "line": 25,
               "column": 7
             }
           ]
@@ -666,13 +343,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Admin Users page",
+          "title": "Admin Users Module",
           "file": "admin-users.spec.ts",
-          "line": 30,
+          "line": 4,
           "column": 6,
           "specs": [
             {
-              "title": "renders admin users page with core elements",
+              "title": "E2E-USR-01: Users list loads with real data",
               "ok": true,
               "tags": [],
               "tests": [
@@ -684,15 +361,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 356,
+                      "duration": 1676,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:21.486Z",
+                      "startTime": "2026-03-17T10:04:07.190Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -700,13 +377,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "9d69cbef181f9ad01509-26f9d8646d4618529007",
+              "id": "9d69cbef181f9ad01509-2a46eec3f13d08fcd958",
               "file": "admin-users.spec.ts",
-              "line": 47,
+              "line": 5,
               "column": 7
             },
             {
-              "title": "search input is present",
+              "title": "E2E-USR-02: Update user role (verify role display)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -718,151 +395,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 215,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:21.847Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-6b98d7364655540e76e3",
-              "file": "admin-users.spec.ts",
-              "line": 63,
-              "column": 7
-            },
-            {
-              "title": "add user button is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 240,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:22.066Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-bbfc8f077949be5084f9",
-              "file": "admin-users.spec.ts",
-              "line": 69,
-              "column": 7
-            },
-            {
-              "title": "users table or list is rendered",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 330,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:22.314Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-09eddbf983bb2fc074b7",
-              "file": "admin-users.spec.ts",
-              "line": 75,
-              "column": 7
-            },
-            {
-              "title": "role filter dropdown is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 229,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:22.649Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-3e116a83df2246f5de84",
-              "file": "admin-users.spec.ts",
-              "line": 82,
-              "column": 7
-            },
-            {
-              "title": "renders admin users page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 363,
+                      "duration": 2308,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:46.275Z",
+                      "startTime": "2026-03-17T10:04:08.871Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -870,145 +411,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "9d69cbef181f9ad01509-c34159fcca6129aab92b",
+              "id": "9d69cbef181f9ad01509-4cf638c03454a97d2e0c",
               "file": "admin-users.spec.ts",
-              "line": 47,
-              "column": 7
-            },
-            {
-              "title": "search input is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 322,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:46.643Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-877753ebafe15ca49f83",
-              "file": "admin-users.spec.ts",
-              "line": 63,
-              "column": 7
-            },
-            {
-              "title": "add user button is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 338,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:46.970Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-ad60b0f7bfd53e3225e0",
-              "file": "admin-users.spec.ts",
-              "line": 69,
-              "column": 7
-            },
-            {
-              "title": "users table or list is rendered",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 448,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:47.322Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-df3a0f168d5c11251a4d",
-              "file": "admin-users.spec.ts",
-              "line": 75,
-              "column": 7
-            },
-            {
-              "title": "role filter dropdown is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 536,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:47.775Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d69cbef181f9ad01509-e1f7f72eb2768686bf64",
-              "file": "admin-users.spec.ts",
-              "line": 82,
+              "line": 32,
               "column": 7
             }
           ]
@@ -1023,13 +428,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Approvals page",
+          "title": "Approvals Module",
           "file": "approvals.spec.ts",
-          "line": 11,
+          "line": 4,
           "column": 6,
           "specs": [
             {
-              "title": "renders approvals page with core elements",
+              "title": "E2E-AP-01: Pending approvals list shows submitted timesheets",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1041,15 +446,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 394,
+                      "duration": 2372,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:22.883Z",
+                      "startTime": "2026-03-17T10:04:11.188Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1057,13 +462,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "972180bc72c2792ab3fa-65e8fe1875e1e44eaba7",
+              "id": "972180bc72c2792ab3fa-cb5ef40af520af50899f",
               "file": "approvals.spec.ts",
-              "line": 12,
+              "line": 5,
               "column": 7
             },
             {
-              "title": "search input is visible",
+              "title": "E2E-AP-02: Approve a timesheet",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1075,15 +480,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 235,
+                      "duration": 2383,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:23.281Z",
+                      "startTime": "2026-03-17T10:04:13.565Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1091,13 +496,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "972180bc72c2792ab3fa-7bff06b1a1d92581d7b2",
+              "id": "972180bc72c2792ab3fa-83a09c2a9037f718e791",
               "file": "approvals.spec.ts",
-              "line": 28,
+              "line": 43,
               "column": 7
             },
             {
-              "title": "tabs for approval queues are present",
+              "title": "E2E-AP-03: Reject a timesheet with comment (NEGATIVE flow)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1109,83 +514,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 216,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:23.519Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "972180bc72c2792ab3fa-387105746fb1cbff5229",
-              "file": "approvals.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "filter dropdowns are present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 239,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:23.738Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "972180bc72c2792ab3fa-f3bdb6a3aff8c893506b",
-              "file": "approvals.spec.ts",
-              "line": 40,
-              "column": 7
-            },
-            {
-              "title": "renders approvals page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 661,
+                      "duration": 2320,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:48.322Z",
+                      "startTime": "2026-03-17T10:04:15.953Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1193,111 +530,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "972180bc72c2792ab3fa-83acef3aa1b37ef74534",
+              "id": "972180bc72c2792ab3fa-78c7eb766599653ecf38",
               "file": "approvals.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "search input is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 546,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:48.993Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "972180bc72c2792ab3fa-47f1e5c1948e0c8f99ac",
-              "file": "approvals.spec.ts",
-              "line": 28,
-              "column": 7
-            },
-            {
-              "title": "tabs for approval queues are present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 502,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:49.556Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "972180bc72c2792ab3fa-0ab2a7a0a6348443619a",
-              "file": "approvals.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "filter dropdowns are present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 623,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:50.067Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "972180bc72c2792ab3fa-b837f0a7c5aa29533e19",
-              "file": "approvals.spec.ts",
-              "line": 40,
+              "line": 79,
               "column": 7
             }
           ]
@@ -1312,13 +547,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Budget page",
+          "title": "Budget Module",
           "file": "budget.spec.ts",
-          "line": 11,
+          "line": 4,
           "column": 6,
           "specs": [
             {
-              "title": "renders budget page with core elements",
+              "title": "E2E-BUD-01: Budget summary loads with real data",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1330,15 +565,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 310,
+                      "duration": 2930,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:23.983Z",
+                      "startTime": "2026-03-17T10:04:18.281Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1346,13 +581,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "bfff7a1deaa6eae76f63-de5467848d8c3bff9362",
+              "id": "bfff7a1deaa6eae76f63-dbaec6a69d3af869edbf",
               "file": "budget.spec.ts",
-              "line": 12,
+              "line": 5,
               "column": 7
             },
             {
-              "title": "budget summary metrics are shown",
+              "title": "E2E-BUD-02: Budget alerts section is visible",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1364,15 +599,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2077,
+                      "duration": 3741,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:24.295Z",
+                      "startTime": "2026-03-17T10:04:21.216Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1380,145 +615,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "bfff7a1deaa6eae76f63-3d915684f4eef4ae0161",
+              "id": "bfff7a1deaa6eae76f63-9ad8277557406fe9c19f",
               "file": "budget.spec.ts",
               "line": 31,
-              "column": 7
-            },
-            {
-              "title": "charge code list or alerts section is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 218,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:26.376Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "bfff7a1deaa6eae76f63-04b04a65e6467146abc9",
-              "file": "budget.spec.ts",
-              "line": 37,
-              "column": 7
-            },
-            {
-              "title": "renders budget page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 570,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:50.706Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "bfff7a1deaa6eae76f63-5b84f72a8e3624dcbfea",
-              "file": "budget.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "budget summary metrics are shown",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2395,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:51.286Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "bfff7a1deaa6eae76f63-40c7a4d181aeb1111f62",
-              "file": "budget.spec.ts",
-              "line": 31,
-              "column": 7
-            },
-            {
-              "title": "charge code list or alerts section is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 399,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:53.698Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "bfff7a1deaa6eae76f63-09a7a6cc98a200d64876",
-              "file": "budget.spec.ts",
-              "line": 37,
               "column": 7
             }
           ]
@@ -1533,13 +632,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Charge Codes page",
+          "title": "Charge Codes Module",
           "file": "charge-codes.spec.ts",
-          "line": 11,
-          "column": 6,
+          "line": 4,
+          "column": 15,
           "specs": [
             {
-              "title": "renders charge codes page with core elements",
+              "title": "E2E-CC-01: Create a new program (top-level charge code)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1551,29 +650,48 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 325,
+                      "duration": 3923,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:26.601Z",
+                      "startTime": "2026-03-17T10:04:24.964Z",
                       "annotations": [],
                       "attachments": []
+                    },
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4094,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-03-17T10:04:48.699Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--8f4ea-gram-top-level-charge-code--desktop-retry1/trace.zip"
+                        }
+                      ]
                     }
                   ],
                   "status": "expected"
                 }
               ],
-              "id": "25337b92e5bcfe983c4c-494fca8e952e244c5974",
+              "id": "25337b92e5bcfe983c4c-d2836c828efbed41fa48",
               "file": "charge-codes.spec.ts",
-              "line": 12,
+              "line": 8,
               "column": 7
             },
             {
-              "title": "shows filter selects",
+              "title": "E2E-CC-02: Create a project under a program (hierarchy + parent selector)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1585,29 +703,48 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 231,
+                      "duration": 5596,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:26.929Z",
+                      "startTime": "2026-03-17T10:04:28.891Z",
                       "annotations": [],
                       "attachments": []
+                    },
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5684,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-03-17T10:04:53.305Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--a1f75--hierarchy-parent-selector--desktop-retry1/trace.zip"
+                        }
+                      ]
                     }
                   ],
                   "status": "expected"
                 }
               ],
-              "id": "25337b92e5bcfe983c4c-fca72bd69aa866ba54aa",
+              "id": "25337b92e5bcfe983c4c-ded195363d748ddd0260",
               "file": "charge-codes.spec.ts",
-              "line": 34,
+              "line": 55,
               "column": 7
             },
             {
-              "title": "search input is functional",
+              "title": "E2E-CC-03: Project without parent fails (NEGATIVE)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1619,29 +756,48 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 261,
+                      "duration": 2151,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:27.164Z",
+                      "startTime": "2026-03-17T10:04:34.491Z",
                       "annotations": [],
                       "attachments": []
+                    },
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2224,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-03-17T10:04:59.033Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--063b1-hout-parent-fails-NEGATIVE--desktop-retry1/trace.zip"
+                        }
+                      ]
                     }
                   ],
                   "status": "expected"
                 }
               ],
-              "id": "25337b92e5bcfe983c4c-d1c0176504eb0495f27f",
+              "id": "25337b92e5bcfe983c4c-9497f14c4df809076d2c",
               "file": "charge-codes.spec.ts",
-              "line": 41,
+              "line": 105,
               "column": 7
             },
             {
-              "title": "charge code tree data is loaded",
+              "title": "E2E-CC-04: Edit an existing charge code",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1653,161 +809,166 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 297,
+                      "duration": 4574,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:27.429Z",
+                      "startTime": "2026-03-17T10:04:36.646Z",
                       "annotations": [],
                       "attachments": []
+                    },
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4501,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-03-17T10:05:01.288Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--5bc4b-dit-an-existing-charge-code-desktop-retry1/trace.zip"
+                        }
+                      ]
                     }
                   ],
                   "status": "expected"
                 }
               ],
-              "id": "25337b92e5bcfe983c4c-a85a86cb859456605149",
+              "id": "25337b92e5bcfe983c4c-d32aae8efdda349890c4",
               "file": "charge-codes.spec.ts",
-              "line": 48,
+              "line": 134,
               "column": 7
             },
             {
-              "title": "renders charge codes page with core elements",
-              "ok": true,
+              "title": "E2E-CC-05: Search filters the charge code tree",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
                   "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
                   "results": [
                     {
                       "workerIndex": 1,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 663,
-                      "errors": [],
+                      "status": "failed",
+                      "duration": 6868,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:178:29",
+                        "location": {
+                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
+                          "column": 29,
+                          "line": 178
+                        },
+                        "snippet": "  176 |     // Only charge codes matching \"Digital\" should be visible\n  177 |     const treePanel = page.locator('[class*=\"overflow-y-auto\"]').last();\n> 178 |     await expect(treePanel).toContainText('Digital', { timeout: 5000 });\n      |                             ^\n  179 |\n  180 |     // Clear the search input\n  181 |     await searchInput.clear();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
+                            "column": 29,
+                            "line": 178
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n\n\n  176 |     // Only charge codes matching \"Digital\" should be visible\n  177 |     const treePanel = page.locator('[class*=\"overflow-y-auto\"]').last();\n> 178 |     await expect(treePanel).toContainText('Digital', { timeout: 5000 });\n      |                             ^\n  179 |\n  180 |     // Clear the search input\n  181 |     await searchInput.clear();\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:178:29"
+                        }
+                      ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:54.108Z",
+                      "startTime": "2026-03-17T10:04:41.227Z",
                       "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "25337b92e5bcfe983c4c-b13bce0039d84d0a486f",
-              "file": "charge-codes.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "shows filter selects",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
+                        "column": 29,
+                        "line": 178
+                      }
+                    },
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 462,
-                      "errors": [],
+                      "status": "failed",
+                      "duration": 7068,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:178:29",
+                        "location": {
+                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
+                          "column": 29,
+                          "line": 178
+                        },
+                        "snippet": "  176 |     // Only charge codes matching \"Digital\" should be visible\n  177 |     const treePanel = page.locator('[class*=\"overflow-y-auto\"]').last();\n> 178 |     await expect(treePanel).toContainText('Digital', { timeout: 5000 });\n      |                             ^\n  179 |\n  180 |     // Clear the search input\n  181 |     await searchInput.clear();"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
+                            "column": 29,
+                            "line": 178
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[class*=\"overflow-y-auto\"]').last()\nExpected substring: \u001b[32m\"Digital\"\u001b[39m\nReceived string:    \u001b[31m\"No charge codes found\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[class*=\"overflow-y-auto\"]').last()\u001b[22m\n\u001b[2m    9 × locator resolved to <div class=\"flex-1 overflow-y-auto p-2\">…</div>\u001b[22m\n\u001b[2m      - unexpected value \"No charge codes found\"\u001b[22m\n\n\n  176 |     // Only charge codes matching \"Digital\" should be visible\n  177 |     const treePanel = page.locator('[class*=\"overflow-y-auto\"]').last();\n> 178 |     await expect(treePanel).toContainText('Digital', { timeout: 5000 });\n      |                             ^\n  179 |\n  180 |     // Clear the search input\n  181 |     await searchInput.clear();\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:178:29"
+                        }
+                      ],
                       "stdout": [],
                       "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:54.780Z",
+                      "retry": 1,
+                      "startTime": "2026-03-17T10:05:05.836Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/charge-codes-Charge-Codes--b8590-ilters-the-charge-code-tree-desktop-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts",
+                        "column": 29,
+                        "line": 178
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
-              "id": "25337b92e5bcfe983c4c-9ccd1283a7edf6edc71d",
+              "id": "25337b92e5bcfe983c4c-e2fe48943e3998be4e8a",
               "file": "charge-codes.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "search input is functional",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 519,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:55.252Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "25337b92e5bcfe983c4c-945dbf0139f7b30c9cd5",
-              "file": "charge-codes.spec.ts",
-              "line": 41,
-              "column": 7
-            },
-            {
-              "title": "charge code tree data is loaded",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 735,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:55.784Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "25337b92e5bcfe983c4c-f584488ab32fe2a56993",
-              "file": "charge-codes.spec.ts",
-              "line": 48,
+              "line": 167,
               "column": 7
             }
           ]
@@ -1822,13 +983,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Dashboard page",
+          "title": "Dashboard Module",
           "file": "dashboard.spec.ts",
-          "line": 11,
+          "line": 4,
           "column": 6,
           "specs": [
             {
-              "title": "renders dashboard with key UI elements",
+              "title": "E2E-DASH-01: Dashboard shows real KPI metrics",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1840,15 +1001,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2132,
+                      "duration": 3397,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:27.731Z",
+                      "startTime": "2026-03-17T10:05:13.515Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1856,13 +1017,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "90cda532ab82d274b30b-be9d8fe9c25f2f72c9c4",
+              "id": "90cda532ab82d274b30b-343db96089b6410d7fdd",
               "file": "dashboard.spec.ts",
-              "line": 12,
+              "line": 5,
               "column": 7
             },
             {
-              "title": "sidebar is visible on desktop",
+              "title": "E2E-DASH-02: Dashboard navigation works",
               "ok": true,
               "tags": [],
               "tests": [
@@ -1874,15 +1035,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 244,
+                      "duration": 3027,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:29.866Z",
+                      "startTime": "2026-03-17T10:05:17.403Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1890,213 +1051,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "90cda532ab82d274b30b-efe4cb442c8c250e19fd",
+              "id": "90cda532ab82d274b30b-5a93b816892ba327d4d5",
               "file": "dashboard.spec.ts",
-              "line": 42,
-              "column": 7
-            },
-            {
-              "title": "mobile bottom nav is visible on mobile",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 41,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:30.113Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "90cda532ab82d274b30b-c5715ac9c27aee2d4826",
-              "file": "dashboard.spec.ts",
-              "line": 51,
-              "column": 7
-            },
-            {
-              "title": "notification bell is visible in topbar",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 223,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:30.158Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "90cda532ab82d274b30b-e096f8dca1461a9922e8",
-              "file": "dashboard.spec.ts",
-              "line": 59,
-              "column": 7
-            },
-            {
-              "title": "renders dashboard with key UI elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2372,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:56.531Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "90cda532ab82d274b30b-a314cbaf5729e8539c1a",
-              "file": "dashboard.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "sidebar is visible on desktop",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 95,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:58.910Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "90cda532ab82d274b30b-94a394d512fa5b401b0a",
-              "file": "dashboard.spec.ts",
-              "line": 42,
-              "column": 7
-            },
-            {
-              "title": "mobile bottom nav is visible on mobile",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 408,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:59.008Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "90cda532ab82d274b30b-4be6a750ae110f253a2c",
-              "file": "dashboard.spec.ts",
-              "line": 51,
-              "column": 7
-            },
-            {
-              "title": "notification bell is visible in topbar",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 310,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:59.420Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "90cda532ab82d274b30b-f12c6fae2396a389b2f8",
-              "file": "dashboard.spec.ts",
-              "line": 59,
+              "line": 30,
               "column": 7
             }
           ]
@@ -2111,13 +1068,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Login page",
+          "title": "Login Module",
           "file": "login.spec.ts",
-          "line": 11,
+          "line": 6,
           "column": 6,
           "specs": [
             {
-              "title": "renders login form with correct elements",
+              "title": "E2E-LOGIN-01: Successful login redirects to dashboard",
               "ok": true,
               "tags": [],
               "tests": [
@@ -2129,15 +1086,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 476,
+                      "duration": 2661,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:30.387Z",
+                      "startTime": "2026-03-17T10:05:20.436Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2145,13 +1102,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "41d3fd2474a19feb00a1-77cd3e7500577817e6c1",
+              "id": "41d3fd2474a19feb00a1-5936c43826b6de661bb9",
               "file": "login.spec.ts",
-              "line": 14,
+              "line": 12,
               "column": 7
             },
             {
-              "title": "shows password toggle button",
+              "title": "E2E-LOGIN-02: Invalid credentials show error (NEGATIVE)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -2163,15 +1120,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 367,
+                      "duration": 1265,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:30.867Z",
+                      "startTime": "2026-03-17T10:05:23.104Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2179,13 +1136,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "41d3fd2474a19feb00a1-e83422904e6177c7a49e",
+              "id": "41d3fd2474a19feb00a1-ec4a27c28112475bb8f9",
               "file": "login.spec.ts",
-              "line": 44,
+              "line": 25,
               "column": 7
             },
             {
-              "title": "shows error when forgot password clicked without email",
+              "title": "E2E-LOGIN-03: Empty form shows validation",
               "ok": true,
               "tags": [],
               "tests": [
@@ -2197,15 +1154,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 341,
+                      "duration": 847,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:31.238Z",
+                      "startTime": "2026-03-17T10:05:24.382Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2213,536 +1170,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "41d3fd2474a19feb00a1-5c0ead0d7b66158740d0",
+              "id": "41d3fd2474a19feb00a1-0f8ecca0e1484a21f41e",
               "file": "login.spec.ts",
-              "line": 56,
-              "column": 7
-            },
-            {
-              "title": "email input accepts text",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 324,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:31.583Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "41d3fd2474a19feb00a1-a1311cc7f681b79fb2ee",
-              "file": "login.spec.ts",
-              "line": 62,
-              "column": 7
-            },
-            {
-              "title": "renders login form with correct elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 389,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:59.737Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "41d3fd2474a19feb00a1-c665002b8342e164db87",
-              "file": "login.spec.ts",
-              "line": 14,
-              "column": 7
-            },
-            {
-              "title": "shows password toggle button",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 365,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:00.132Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "41d3fd2474a19feb00a1-a2d8b78d7f9cf00a0c41",
-              "file": "login.spec.ts",
-              "line": 44,
-              "column": 7
-            },
-            {
-              "title": "shows error when forgot password clicked without email",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 328,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:00.502Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "41d3fd2474a19feb00a1-473408bb7b3ea517f17b",
-              "file": "login.spec.ts",
-              "line": 56,
-              "column": 7
-            },
-            {
-              "title": "email input accepts text",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 358,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:00.834Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "41d3fd2474a19feb00a1-535359e99037b61f5187",
-              "file": "login.spec.ts",
-              "line": 62,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "profile.spec.ts",
-      "file": "profile.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Profile page",
-          "file": "profile.spec.ts",
-          "line": 20,
-          "column": 6,
-          "specs": [
-            {
-              "title": "renders profile page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 741,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:31.912Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-e8dcf50389597efd5675",
-              "file": "profile.spec.ts",
               "line": 37,
-              "column": 7
-            },
-            {
-              "title": "profile fields are shown",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 457,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:32.663Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-14ac7c44f16db969838f",
-              "file": "profile.spec.ts",
-              "line": 53,
-              "column": 7
-            },
-            {
-              "title": "edit profile button is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 449,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:33.131Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-f01859d906bd307b254f",
-              "file": "profile.spec.ts",
-              "line": 61,
-              "column": 7
-            },
-            {
-              "title": "avatar or user icon is shown",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 453,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:33.587Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-765d346e59d61d6803ef",
-              "file": "profile.spec.ts",
-              "line": 68,
-              "column": 7
-            },
-            {
-              "title": "change password section is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 454,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:34.051Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-b9492d3e8ae2373c7dc9",
-              "file": "profile.spec.ts",
-              "line": 75,
-              "column": 7
-            },
-            {
-              "title": "renders profile page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 428,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:01.198Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-17c9022102bf8ab24444",
-              "file": "profile.spec.ts",
-              "line": 37,
-              "column": 7
-            },
-            {
-              "title": "profile fields are shown",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 399,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:01.631Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-73d7055ea1210e2a1641",
-              "file": "profile.spec.ts",
-              "line": 53,
-              "column": 7
-            },
-            {
-              "title": "edit profile button is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 586,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:02.036Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-0cd6cccc615d6fec5115",
-              "file": "profile.spec.ts",
-              "line": 61,
-              "column": 7
-            },
-            {
-              "title": "avatar or user icon is shown",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 898,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:02.627Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-aed1ddd1ea1c3baa815e",
-              "file": "profile.spec.ts",
-              "line": 68,
-              "column": 7
-            },
-            {
-              "title": "change password section is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 589,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:03.534Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e8b79b4ee550a37632f1-2292758210694c2450b4",
-              "file": "profile.spec.ts",
-              "line": 75,
               "column": 7
             }
           ]
@@ -2757,13 +1187,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Reports page",
+          "title": "Reports Module",
           "file": "reports.spec.ts",
-          "line": 11,
+          "line": 4,
           "column": 6,
           "specs": [
             {
-              "title": "renders reports page with core elements",
+              "title": "E2E-RPT-01: Utilization report loads with real data",
               "ok": true,
               "tags": [],
               "tests": [
@@ -2775,15 +1205,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1295,
+                      "duration": 3630,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:34.518Z",
+                      "startTime": "2026-03-17T10:05:25.236Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2791,13 +1221,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "d2ea609703bae19dcdce-63c82223524a716eba7a",
+              "id": "d2ea609703bae19dcdce-6dcace2cc9932aaad4c1",
               "file": "reports.spec.ts",
-              "line": 12,
+              "line": 5,
               "column": 7
             },
             {
-              "title": "export buttons are present",
+              "title": "E2E-RPT-02: Export CSV button works",
               "ok": true,
               "tags": [],
               "tests": [
@@ -2809,15 +1239,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 389,
+                      "duration": 2614,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:35.823Z",
+                      "startTime": "2026-03-17T10:05:28.872Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2825,570 +1255,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "d2ea609703bae19dcdce-bd559f6e5be9510071ca",
+              "id": "d2ea609703bae19dcdce-67f72529a73be5ee2028",
               "file": "reports.spec.ts",
-              "line": 28,
-              "column": 7
-            },
-            {
-              "title": "period selector is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 347,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:36.222Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d2ea609703bae19dcdce-223d03ea3bc21a2c7834",
-              "file": "reports.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "report charts or summaries are rendered",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2257,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:36.591Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d2ea609703bae19dcdce-4cb4b38dc1f6196f3d31",
-              "file": "reports.spec.ts",
-              "line": 40,
-              "column": 7
-            },
-            {
-              "title": "renders reports page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 656,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:04.136Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d2ea609703bae19dcdce-a70f59b806773099920b",
-              "file": "reports.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "export buttons are present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 891,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:04.805Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d2ea609703bae19dcdce-e795a5ddf9d4f7b54943",
-              "file": "reports.spec.ts",
-              "line": 28,
-              "column": 7
-            },
-            {
-              "title": "period selector is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 523,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:05.707Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d2ea609703bae19dcdce-d38f80f847dea1fe8d74",
-              "file": "reports.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "report charts or summaries are rendered",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2502,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:06.238Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d2ea609703bae19dcdce-d0df90a0d3f44684c6b1",
-              "file": "reports.spec.ts",
-              "line": 40,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "settings.spec.ts",
-      "file": "settings.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Settings page",
-          "file": "settings.spec.ts",
-          "line": 11,
-          "column": 6,
-          "specs": [
-            {
-              "title": "renders settings page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 525,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:38.862Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-a6d2ca1d949a23ce2b16",
-              "file": "settings.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "theme toggle is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 391,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:39.393Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-f5b086a50b52b22db35b",
-              "file": "settings.spec.ts",
-              "line": 28,
-              "column": 7
-            },
-            {
-              "title": "notification preferences section is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 350,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:39.793Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-be923e359a8eea071105",
-              "file": "settings.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "timezone selector is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 316,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:40.155Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-0d340fa394294d34c342",
-              "file": "settings.spec.ts",
-              "line": 40,
-              "column": 7
-            },
-            {
-              "title": "save settings button is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 355,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:09:40.480Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-723debc20ca383cc082b",
-              "file": "settings.spec.ts",
-              "line": 46,
-              "column": 7
-            },
-            {
-              "title": "renders settings page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 605,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:08.751Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-b214c9bed86f6125bc1d",
-              "file": "settings.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "theme toggle is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 557,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:09.365Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-faa59ec00b94273fe821",
-              "file": "settings.spec.ts",
-              "line": 28,
-              "column": 7
-            },
-            {
-              "title": "notification preferences section is visible",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 495,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:09.928Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-afa0bbee7ba9857090e7",
-              "file": "settings.spec.ts",
-              "line": 34,
-              "column": 7
-            },
-            {
-              "title": "timezone selector is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 494,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:10.432Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-69b49b1910dc038542a1",
-              "file": "settings.spec.ts",
-              "line": 40,
-              "column": 7
-            },
-            {
-              "title": "save settings button is present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 691,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:10.941Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "d877ffdf71ec720167ae-4b3f8736d94ccd86b9ab",
-              "file": "settings.spec.ts",
-              "line": 46,
+              "line": 29,
               "column": 7
             }
           ]
@@ -3403,13 +1272,13 @@
       "specs": [],
       "suites": [
         {
-          "title": "Time Entry page",
+          "title": "Time Entry Module",
           "file": "time-entry.spec.ts",
-          "line": 11,
+          "line": 4,
           "column": 6,
           "specs": [
             {
-              "title": "renders time entry page with core elements",
+              "title": "E2E-TS-01: Create timesheet and add entries",
               "ok": true,
               "tags": [],
               "tests": [
@@ -3421,15 +1290,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 604,
+                      "duration": 2772,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:40.847Z",
+                      "startTime": "2026-03-17T10:05:31.496Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3437,13 +1306,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "9d0f6b1bd39217fcf56d-8535f4dde02ca83617eb",
+              "id": "9d0f6b1bd39217fcf56d-5fbea8c64d7575c76d80",
               "file": "time-entry.spec.ts",
-              "line": 12,
+              "line": 5,
               "column": 7
             },
             {
-              "title": "week navigation buttons are present",
+              "title": "E2E-TS-02: Submit timesheet for approval",
               "ok": true,
               "tags": [],
               "tests": [
@@ -3455,15 +1324,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 309,
+                      "duration": 2312,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:41.457Z",
+                      "startTime": "2026-03-17T10:05:34.273Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3471,13 +1340,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "9d0f6b1bd39217fcf56d-4e0222e05b006b5367af",
+              "id": "9d0f6b1bd39217fcf56d-eddc2d4e013cd84c0c76",
               "file": "time-entry.spec.ts",
-              "line": 39,
+              "line": 36,
               "column": 7
             },
             {
-              "title": "timesheet grid shows rows with mock data",
+              "title": "E2E-TS-03: Submit empty timesheet shows warning (NEGATIVE)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -3489,15 +1358,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 358,
+                      "duration": 3259,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:41.773Z",
+                      "startTime": "2026-03-17T10:05:36.591Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3505,13 +1374,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "9d0f6b1bd39217fcf56d-cc5395be318c3ccebe4e",
+              "id": "9d0f6b1bd39217fcf56d-27d763001947b8c08ec9",
               "file": "time-entry.spec.ts",
-              "line": 46,
+              "line": 61,
               "column": 7
             },
             {
-              "title": "biweek toggle switches view mode",
+              "title": "E2E-TS-04: Week navigation changes the displayed period",
               "ok": true,
               "tags": [],
               "tests": [
@@ -3523,15 +1392,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 279,
+                      "duration": 5251,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-17T06:09:42.135Z",
+                      "startTime": "2026-03-17T10:05:39.856Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3539,145 +1408,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "9d0f6b1bd39217fcf56d-1ddd6c7305947ae61a96",
+              "id": "9d0f6b1bd39217fcf56d-f2d4612b5281e6960be2",
               "file": "time-entry.spec.ts",
-              "line": 54,
-              "column": 7
-            },
-            {
-              "title": "renders time entry page with core elements",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 569,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:11.641Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d0f6b1bd39217fcf56d-4f7d28f1dd28b8350455",
-              "file": "time-entry.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "week navigation buttons are present",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 331,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:12.217Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d0f6b1bd39217fcf56d-a113d2149df6fc571ecd",
-              "file": "time-entry.spec.ts",
-              "line": 39,
-              "column": 7
-            },
-            {
-              "title": "timesheet grid shows rows with mock data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 426,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:12.552Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d0f6b1bd39217fcf56d-a835cd7f06c650f1a494",
-              "file": "time-entry.spec.ts",
-              "line": 46,
-              "column": 7
-            },
-            {
-              "title": "biweek toggle switches view mode",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile",
-                  "projectName": "mobile",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 396,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-17T06:10:12.982Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9d0f6b1bd39217fcf56d-6144727b1917994fa9f3",
-              "file": "time-entry.spec.ts",
-              "line": 54,
+              "line": 105,
               "column": 7
             }
           ]
@@ -3687,11 +1420,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-17T06:09:13.284Z",
-    "duration": 60226.471999999994,
-    "expected": 100,
+    "startTime": "2026-03-17T10:03:44.053Z",
+    "duration": 121091.74699999999,
+    "expected": 28,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 1,
     "flaky": 0
   }
 }

@@ -38,7 +38,20 @@ This automatically:
 1. **Understand the Task** — Read task description via `TaskGet` if task ID provided.
 2. **Run Validation** — Execute `python3 .claude/skills/validate/validate.py --json {plan-name}`.
 3. **Parse Results** — Read the JSON output to understand what passed and failed.
-4. **Report** — Use `TaskUpdate` to mark complete with pass/fail status and healing recommendations.
+4. **Validate E2E Test Quality** (MANDATORY for UI projects) — This step prevents shallow tests from passing validation:
+   a. Read the plan's `## E2E Test Specifications` section to get the list of required E2E specs
+   b. For each E2E spec (e.g., `E2E-CC-01`), find the corresponding test file and READ IT
+   c. Verify each test contains:
+      - **Actions**: at least 1 `click()`, `fill()`, `selectOption()`, or `press()` call (NOT just `goto()`)
+      - **Assertions after actions**: at least 1 `expect()` that runs AFTER a user action (NOT just checking page load)
+      - **Negative case**: at least 1 test per module that verifies error handling (invalid input → error message)
+   d. If any E2E test only checks element visibility without performing actions, mark it as **FAIL** with healing instruction: "test-writer must rewrite E2E test to perform real user actions and assert outcomes, not just check element visibility"
+5. **Validate Acceptance Criteria Traceability** (MANDATORY) — Prevents criteria from being "verified" by unrelated tests:
+   a. Read the plan's `## Acceptance Criteria > Feature Criteria` section
+   b. For each criterion with a `Verified by: TEST-ID` line, READ the actual test code for TEST-ID
+   c. Verify the test actually asserts the criterion described (not just renders a related page)
+   d. If a test doesn't meaningfully assert its linked criterion, mark as **FAIL**
+6. **Report** — Use `TaskUpdate` to mark complete with pass/fail status and healing recommendations.
 
 ## Report Format
 
@@ -52,10 +65,20 @@ This automatically:
 
 **Summary**: X/Y checks passed
 
-**Results**:
+**Infrastructure & Build Results**:
 - [PASS] Check 1
 - [FAIL] Check 2
   → Heal: assign to {agent} — {instruction}
+
+**E2E Test Quality Audit** (MANDATORY):
+- [PASS/FAIL] E2E-CC-01: has actions (click/fill) ✓, has post-action assertion ✓, has negative case ✓
+- [PASS/FAIL] E2E-TS-01: has actions ✓, has post-action assertion ✗ (only checks heading visibility)
+  → Heal: assign to test-writer — rewrite to perform real user actions and assert outcomes
+
+**Acceptance Criteria Traceability**:
+- [PASS/FAIL] "Charge codes support 4-level hierarchy" → Verified by UNIT-CC-03 ✓ (test creates all 4 levels)
+- [PASS/FAIL] "3-stage approval" → Verified by E2E-AP-01 ✗ (test only checks page heading, doesn't test approval flow)
+  → Heal: assign to test-writer — implement real approval flow test per E2E spec
 
 **Healing Actions Needed** (if any):
 1. Assign to {agent}: {instruction}

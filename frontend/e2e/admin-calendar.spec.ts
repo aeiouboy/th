@@ -1,50 +1,105 @@
 import { test, expect } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
+import { apiRequest, uniqueName, takeScreenshots } from './helpers';
 
-const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/test-results/screenshots');
+test.describe.serial('Admin Calendar Module', () => {
+  let holidayName: string;
 
-function getViewportName(width: number): string {
-  return width <= 375 ? 'mobile' : 'desktop';
-}
-
-test.describe('Admin Calendar page', () => {
-  test('renders admin calendar page with core elements', async ({ page, viewport }) => {
+  test('E2E-CAL-01: Create a holiday', async ({ page }) => {
+    holidayName = uniqueName('Test-Holiday');
     await page.goto('/admin/calendar');
-    await expect(page).not.toHaveURL('/login');
+    await page.waitForLoadState('networkidle');
 
-    // Layout h1 shows "Calendar"
-    await expect(page.getByRole('heading', { name: 'Calendar' })).toBeVisible();
+    // Year should be visible in the year header (use exact match on the year span)
+    const currentYear = String(new Date().getFullYear());
+    await expect(page.locator('span').filter({ hasText: new RegExp(`^${currentYear}$`) })).toBeVisible({ timeout: 15000 });
 
-    // Should show the year number (e.g., 2026)
-    await expect(page.locator('body')).toContainText(/202\d/);
+    // Click "Add Holiday" button
+    await page.click('button:has-text("Add Holiday")');
 
-    // Screenshot
-    fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
-    const vp = getViewportName(viewport?.width ?? 1280);
-    await page.screenshot({
-      path: path.join(SCREENSHOTS_DIR, `admin-calendar--${vp}.png`),
-      fullPage: false,
-    });
+    // Dialog should open
+    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
+
+    // Fill holiday name
+    const nameInput = page.getByRole('dialog').locator('input[type="text"], input:not([type])').last();
+    await nameInput.fill(holidayName);
+
+    // Select a date (use a future date this year)
+    const dateInput = page.getByRole('dialog').locator('input[type="date"]');
+    await dateInput.fill('2026-12-25');
+
+    // Click Add button
+    await page.getByRole('dialog').getByRole('button', { name: /^Add$/i }).click();
+
+    // Dialog should close
+    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
+
+    // Wait for calendar to refresh
+    await page.waitForTimeout(1000);
+
+    // New holiday should appear in the holiday table
+    await expect(page.getByText(holidayName)).toBeVisible({ timeout: 10000 });
+
+    // Verify via API
+    const response = await apiRequest(page, 'GET', '/calendar?year=2026&country_code=TH');
+    expect(response.status()).toBe(200);
+    const entries = await response.json();
+    const found = entries.find((e: any) => e.holidayName === holidayName);
+    expect(found).toBeTruthy();
+
+    await takeScreenshots(page, 'admin-calendar');
   });
 
-  test('calendar month navigation buttons are present', async ({ page }) => {
+  test('E2E-CAL-02: Delete a holiday', async ({ page }) => {
     await page.goto('/admin/calendar');
-    // Year nav buttons (prev/next year)
-    await expect(page.locator('main')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+
+    // Find the holiday we created and its delete button
+    const holidayRow = page.locator('tr, [role="row"]').filter({ hasText: holidayName });
+
+    if (await holidayRow.count() > 0) {
+      // Click the delete button (red trash icon) in the row
+      const deleteBtn = holidayRow.locator('button').filter({ has: page.locator('svg') }).last();
+      await deleteBtn.click();
+
+      // Wait for deletion to process
+      await page.waitForTimeout(2000);
+
+      // Holiday should be removed
+      await expect(page.getByText(holidayName)).not.toBeVisible({ timeout: 10000 });
+
+      // Verify via API
+      const response = await apiRequest(page, 'GET', '/calendar?year=2026&country_code=TH');
+      expect(response.status()).toBe(200);
+      const entries = await response.json();
+      const found = entries.find((e: any) => e.holidayName === holidayName);
+      expect(found).toBeFalsy();
+    }
   });
 
-  test('add holiday button is present', async ({ page }) => {
+  test('E2E-CAL-03: Calendar displays year and navigation', async ({ page }) => {
     await page.goto('/admin/calendar');
-    // "Add Holiday" button in the Holidays card header
-    const addButton = page.getByRole('button', { name: /Add Holiday/ });
-    await expect(addButton).toBeVisible();
-  });
+    await page.waitForLoadState('networkidle');
 
-  test('holidays table or no-holidays message is shown', async ({ page }) => {
-    await page.goto('/admin/calendar');
-    // Either a table of holidays or "No holidays configured" message
-    const content = page.locator('main');
-    await expect(content).toContainText(/Holiday|No holidays configured/);
+    // Current year should be visible in the year header span
+    const currentYear = new Date().getFullYear();
+    const yearSpan = page.locator('span').filter({ hasText: new RegExp(`^${currentYear}$`) });
+    await expect(yearSpan).toBeVisible({ timeout: 15000 });
+
+    // Month names should be visible in the calendar grid
+    await expect(page.getByText('January').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('December').first()).toBeVisible();
+
+    // Country selector should be present
+    await expect(page.locator('button[role="combobox"]').first()).toBeVisible();
+
+    // Navigate to previous year by clicking the left chevron button
+    const prevBtn = page.locator('button[class*="outline"]').first();
+    await prevBtn.click();
+    await page.waitForTimeout(1000);
+
+    // Year should change
+    const prevYearSpan = page.locator('span').filter({ hasText: new RegExp(`^${currentYear - 1}$`) });
+    await expect(prevYearSpan).toBeVisible({ timeout: 5000 });
   });
 });

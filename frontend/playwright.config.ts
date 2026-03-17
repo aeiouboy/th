@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
-export const SCREENSHOTS_DIR = path.resolve(__dirname, '../docs/test-results/screenshots');
+const authFile = path.join(__dirname, 'e2e', '.auth', 'user.json');
 
 export default defineConfig({
   testDir: './e2e',
@@ -19,25 +19,33 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   webServer: {
-    command: 'NEXT_PUBLIC_E2E_TEST=true pnpm dev --turbopack',
+    command: 'pnpm dev --turbopack',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
     timeout: 120000,
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+    {
       name: 'desktop',
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
+        storageState: authFile,
       },
+      dependencies: ['setup'],
     },
     {
       name: 'mobile',
       use: {
         ...devices['iPhone SE'],
         viewport: { width: 375, height: 667 },
+        storageState: authFile,
       },
+      dependencies: ['setup'],
     },
   ],
 });

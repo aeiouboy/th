@@ -248,7 +248,7 @@ export default function AuthenticatedLayout({
               </span>
             </button>
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer">
+              <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer" suppressHydrationWarning>
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-teal-600 text-white text-xs font-medium">
                     U

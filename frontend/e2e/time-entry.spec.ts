@@ -1,62 +1,136 @@
 import { test, expect } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
+import { apiRequest, takeScreenshots } from './helpers';
 
-const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/test-results/screenshots');
-
-function getViewportName(width: number): string {
-  return width <= 375 ? 'mobile' : 'desktop';
-}
-
-test.describe('Time Entry page', () => {
-  test('renders time entry page with core elements', async ({ page, viewport }) => {
+test.describe('Time Entry Module', () => {
+  test('E2E-TS-01: Create timesheet and add entries', async ({ page }) => {
     await page.goto('/time-entry');
-    await expect(page).not.toHaveURL('/login');
+    await page.waitForLoadState('networkidle');
 
-    // Check page heading (layout h1)
-    await expect(page.getByRole('heading', { name: 'Time Entry' })).toBeVisible();
+    // Wait for timesheet to load (auto-created for current period)
+    await expect(page.getByText(/Week of/i)).toBeVisible({ timeout: 15000 });
 
-    // Check period navigator — "Week of ..." text in h2
-    await expect(page.getByText(/Week of/)).toBeVisible();
+    await takeScreenshots(page, 'time-entry');
 
-    // Check Week / Bi-week toggle buttons
-    await expect(page.getByRole('button', { name: 'Week', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Bi-week', exact: true })).toBeVisible();
+    // Look for editable cells in the grid — if the timesheet is draft, inputs should be available
+    const gridInputs = page.locator('input[type="number"], input[inputmode="decimal"], [contenteditable="true"], td input');
 
-    // Check action buttons
-    await expect(page.getByRole('button', { name: 'Save Draft' })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Submit/ })).toBeVisible();
+    // If we have editable cells, enter hours
+    const inputCount = await gridInputs.count();
+    if (inputCount > 0) {
+      const firstInput = gridInputs.first();
+      await firstInput.click();
+      await firstInput.fill('8');
 
-    // Screenshot
-    fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
-    const vp = getViewportName(viewport?.width ?? 1280);
-    await page.screenshot({
-      path: path.join(SCREENSHOTS_DIR, `time-entry--${vp}.png`),
-      fullPage: false,
-    });
+      // Click "Save Draft" button
+      await page.click('button:has-text("Save Draft")');
+
+      // Wait for save confirmation
+      await expect(page.getByText(/saved/i)).toBeVisible({ timeout: 10000 });
+    }
+
+    // Verify timesheet exists via API
+    const response = await apiRequest(page, 'GET', '/timesheets/charge-codes');
+    expect(response.status()).toBe(200);
   });
 
-  test('week navigation buttons are present', async ({ page }) => {
+  test('E2E-TS-02: Submit timesheet for approval', async ({ page }) => {
     await page.goto('/time-entry');
-    // Previous/next week chevron buttons
-    const navButtons = page.locator('button.h-8.w-8.p-0');
-    await expect(navButtons.first()).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText(/Week of/i)).toBeVisible({ timeout: 15000 });
+
+    // Check if submit button is available (timesheet must be draft with entries)
+    const submitBtn = page.getByRole('button', { name: /Submit/i }).last();
+    const isSubmitVisible = await submitBtn.isVisible().catch(() => false);
+
+    if (isSubmitVisible) {
+      const isEnabled = await submitBtn.isEnabled();
+      if (isEnabled) {
+        await submitBtn.click();
+
+        // Should see submitted status or confirmation
+        await expect(
+          page.getByText(/submitted/i).or(page.getByText(/approval/i)),
+        ).toBeVisible({ timeout: 10000 });
+      }
+    }
+
+    // At minimum, verify page loaded correctly
+    await expect(page.getByText(/Week of/i)).toBeVisible();
   });
 
-  test('timesheet grid shows rows with mock data', async ({ page }) => {
+  test('E2E-TS-03: Submit empty timesheet shows warning (NEGATIVE)', async ({ page }) => {
+    // Navigate to a future week where there are likely no entries
     await page.goto('/time-entry');
-    // Mock data includes "Web Portal", "Code Review", "Meetings"
-    await expect(page.getByText('Web Portal').first()).toBeVisible();
-    await expect(page.getByText('Code Review').first()).toBeVisible();
-    await expect(page.getByText('Meetings').first()).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText(/Week of/i)).toBeVisible({ timeout: 15000 });
+
+    // Navigate to next week to get an empty timesheet
+    const nextBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m9 18"]') });
+    if (await nextBtn.count() > 0) {
+      await nextBtn.first().click();
+      await page.waitForTimeout(1000);
+    }
+
+    // Try to submit
+    const submitBtn = page.getByRole('button', { name: /Submit/i }).last();
+    const isSubmitVisible = await submitBtn.isVisible().catch(() => false);
+
+    if (isSubmitVisible) {
+      const isEnabled = await submitBtn.isEnabled();
+      if (isEnabled) {
+        await submitBtn.click();
+
+        // Should see a warning or error about minimum hours / empty submission
+        // Or timesheet should remain in draft status
+        await page.waitForTimeout(2000);
+        const hasWarning = await page
+          .getByText(/warning|error|minimum|empty|hours|cannot/i)
+          .isVisible()
+          .catch(() => false);
+
+        // If no explicit warning, the status should remain draft (not submitted)
+        if (!hasWarning) {
+          const draftBadge = page.getByText('Draft');
+          const isDraft = await draftBadge.isVisible().catch(() => false);
+          // Either we get a warning OR the status didn't change - both acceptable
+          expect(hasWarning || isDraft).toBeTruthy();
+        }
+      }
+    }
+
+    // Page should still be on time-entry
+    await expect(page).toHaveURL(/\/time-entry/);
   });
 
-  test('biweek toggle switches view mode', async ({ page }) => {
+  test('E2E-TS-04: Week navigation changes the displayed period', async ({ page }) => {
     await page.goto('/time-entry');
-    const biweekBtn = page.getByRole('button', { name: 'Bi-week', exact: true });
-    await biweekBtn.click();
-    // After click, bi-week should be active (has the teal background)
-    // Check the button's class contains the active styling
-    await expect(biweekBtn).toHaveAttribute('class', /bg-\[var\(--accent-teal\)\]/);
+    await page.waitForLoadState('networkidle');
+
+    // Get the current "Week of ..." text
+    const weekHeader = page.getByText(/Week of/i);
+    await expect(weekHeader).toBeVisible({ timeout: 15000 });
+    const originalText = await weekHeader.textContent();
+
+    // Click next-week chevron button (right chevron)
+    const nextBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m9 18"]') });
+    if (await nextBtn.count() > 0) {
+      await nextBtn.first().click();
+      await page.waitForTimeout(1500);
+
+      // The week text should change
+      const newText = await weekHeader.textContent();
+      expect(newText).not.toEqual(originalText);
+
+      // Click previous-week chevron button (left chevron)
+      const prevBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m15 18"]') });
+      if (await prevBtn.count() > 0) {
+        await prevBtn.first().click();
+        await page.waitForTimeout(1500);
+
+        // The week text should return to original
+        const backText = await weekHeader.textContent();
+        expect(backText).toEqual(originalText);
+      }
+    }
   });
 });

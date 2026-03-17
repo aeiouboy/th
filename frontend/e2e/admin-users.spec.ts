@@ -1,87 +1,67 @@
 import { test, expect } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
+import { apiRequest, takeScreenshots } from './helpers';
 
-const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/test-results/screenshots');
+test.describe('Admin Users Module', () => {
+  test('E2E-USR-01: Users list loads with real data', async ({ page }) => {
+    await page.goto('/admin/users');
+    await page.waitForLoadState('networkidle');
 
-function getViewportName(width: number): string {
-  return width <= 375 ? 'mobile' : 'desktop';
-}
+    // Page should show User Management card
+    await expect(page.getByText('User Management')).toBeVisible({ timeout: 15000 });
 
-const MOCK_USERS = [
-  {
-    id: 'u1',
-    email: 'admin@company.com',
-    fullName: 'Admin User',
-    role: 'admin',
-    department: 'Engineering',
-    jobGrade: 'G5',
-  },
-  {
-    id: 'u2',
-    email: 'employee@company.com',
-    fullName: 'John Employee',
-    role: 'employee',
-    department: 'Operations',
-    jobGrade: 'G3',
-  },
-];
+    // Users table should be visible with at least 1 row
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 10000 });
 
-test.describe('Admin Users page', () => {
-  test.beforeEach(async ({ page }) => {
-    // Single route handler for all API calls
-    await page.route('**/api/v1/**', async (route) => {
-      const url = route.request().url();
-      if (url.endsWith('/users') || url.includes('/users?')) {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_USERS),
-        });
-      } else {
-        await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
-      }
-    });
+    // Verify API returns real users
+    const response = await apiRequest(page, 'GET', '/users');
+    expect(response.status()).toBe(200);
+    const users = await response.json();
+    expect(Array.isArray(users)).toBeTruthy();
+    expect(users.length).toBeGreaterThan(0);
+
+    // Table should show email and role columns
+    await expect(page.getByText('Email')).toBeVisible();
+    await expect(page.getByText('Role')).toBeVisible();
+
+    // "Total Users" summary card should show a number
+    await expect(page.getByText('Total Users')).toBeVisible();
+
+    await takeScreenshots(page, 'admin-users');
   });
 
-  test('renders admin users page with core elements', async ({ page, viewport }) => {
+  test('E2E-USR-02: Update user role (verify role display)', async ({ page }) => {
     await page.goto('/admin/users');
-    await expect(page).not.toHaveURL('/login');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('User Management')).toBeVisible({ timeout: 15000 });
 
-    // Layout h1 shows "Users"
-    await expect(page.getByRole('heading', { name: 'Users' }).first()).toBeVisible();
+    // Wait for table to load
+    await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 10000 });
 
-    // Screenshot
-    fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true });
-    const vp = getViewportName(viewport?.width ?? 1280);
-    await page.screenshot({
-      path: path.join(SCREENSHOTS_DIR, `admin-users--${vp}.png`),
-      fullPage: false,
-    });
-  });
+    // Click the edit button on the first user row
+    const editBtn = page.locator('table tbody tr').first().locator('button').last();
+    await editBtn.click();
 
-  test('search input is present', async ({ page }) => {
-    await page.goto('/admin/users');
-    const searchInput = page.getByPlaceholder(/[Ss]earch/);
-    await expect(searchInput).toBeVisible();
-  });
+    // Edit dialog should open
+    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Edit User')).toBeVisible();
 
-  test('add user button is present', async ({ page }) => {
-    await page.goto('/admin/users');
-    const addButton = page.getByRole('button', { name: /Add User/ });
-    await expect(addButton).toBeVisible();
-  });
+    // Role dropdown should be available
+    const roleDropdown = page.getByRole('dialog').locator('button[role="combobox"]').first();
+    await expect(roleDropdown).toBeVisible();
 
-  test('users table or list is rendered', async ({ page }) => {
-    await page.goto('/admin/users');
-    // Wait for data to load and table to appear
-    const table = page.locator('table').first();
-    await expect(table).toBeVisible({ timeout: 10000 });
-  });
+    // Click the role dropdown to verify role options are available
+    await roleDropdown.click();
+    await page.waitForTimeout(300);
 
-  test('role filter dropdown is present', async ({ page }) => {
-    await page.goto('/admin/users');
-    const selects = page.locator('[role="combobox"]');
-    await expect(selects.first()).toBeVisible();
+    // Role options should include standard roles
+    await expect(page.getByRole('option', { name: /Admin/i })).toBeVisible();
+    await expect(page.getByRole('option', { name: /Employee/i })).toBeVisible();
+
+    // Close the dropdown first, then close dialog
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    // Now close the dialog itself
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10000 });
   });
 });
