@@ -16,7 +16,7 @@ import { snap, authFile } from './helpers';
  * Waits up to `maxWeeks` clicks before giving up.
  * Returns true if an editable week was found, false otherwise.
  */
-async function navigateToEditableWeek(page: Page, maxWeeks = 5): Promise<boolean> {
+async function navigateToEditableWeek(page: Page, maxWeeks = 15): Promise<boolean> {
   const nextBtn = page.locator('button.h-8.w-8').last();
 
   for (let i = 0; i < maxWeeks; i++) {
@@ -50,11 +50,11 @@ test.describe('E2E-DESC: Entry Description Modal', () => {
                      await saveDraftBtn.isEnabled({ timeout: 5000 }).catch(() => false);
 
     if (!isEditable) {
-      isEditable = await navigateToEditableWeek(page, 5);
+      isEditable = await navigateToEditableWeek(page);
     }
 
     if (!isEditable) {
-      test.skip(true, 'Could not find an editable week within 5 forward navigations');
+      test.skip(true, 'Could not find an editable week within 15 forward navigations');
       return;
     }
     await snap(page, 'e2e-desc-01', 'editable-week-found');
@@ -87,7 +87,7 @@ test.describe('E2E-DESC: Entry Description Modal', () => {
 
     // Save draft
     await saveDraftBtn.click();
-    await expect(page.getByText(/Timesheet saved/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Timesheet saved/i).first()).toBeVisible({ timeout: 10000 });
     await snap(page, 'e2e-desc-01', 'draft-saved');
 
     // WHEN: Hover a cell with hours to reveal the note icon
@@ -129,7 +129,7 @@ test.describe('E2E-DESC: Entry Description Modal', () => {
 
     // Save draft with description
     await saveDraftBtn.click();
-    await expect(page.getByText(/Timesheet saved/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Timesheet saved/i).first()).toBeVisible({ timeout: 10000 });
     await snap(page, 'e2e-desc-01', 'saved-with-note');
 
     // THEN: After reload, navigate back to the same week and check persistence
@@ -140,7 +140,7 @@ test.describe('E2E-DESC: Entry Description Modal', () => {
     // Re-navigate to the editable week (reload goes back to current week)
     const stillEditable = await saveDraftBtn.isEnabled({ timeout: 5000 }).catch(() => false);
     if (!stillEditable) {
-      const found = await navigateToEditableWeek(page, 5);
+      const found = await navigateToEditableWeek(page);
       if (!found) {
         // Note was saved successfully (verified by saved-with-note snap), reload navigation failed
         await snap(page, 'e2e-desc-01', 'note-persisted-after-reload');
@@ -180,7 +180,7 @@ test.describe('E2E-DESC: Entry Description Modal', () => {
     let isEditable = await saveDraftBtn.isVisible({ timeout: 5000 }).catch(() => false) &&
                      await saveDraftBtn.isEnabled({ timeout: 5000 }).catch(() => false);
     if (!isEditable) {
-      isEditable = await navigateToEditableWeek(page, 5);
+      isEditable = await navigateToEditableWeek(page);
     }
     if (!isEditable) {
       test.skip(true, 'No editable week found');
@@ -209,7 +209,7 @@ test.describe('E2E-DESC: Entry Description Modal', () => {
         await inp.press('Enter');
         await page.waitForTimeout(500);
         await saveDraftBtn.click();
-        await expect(page.getByText(/Timesheet saved/i)).toBeVisible({ timeout: 10000 });
+        await expect(page.getByText(/Timesheet saved/i).first()).toBeVisible({ timeout: 10000 });
         await page.reload();
         await expect(saveDraftBtn).toBeEnabled({ timeout: 20000 });
         await page.waitForTimeout(500);
@@ -275,7 +275,7 @@ test.describe('E2E-MIN: Minimum Hours Validation', () => {
     let isEditable = await saveDraftBtn.isVisible({ timeout: 5000 }).catch(() => false) &&
                      await saveDraftBtn.isEnabled({ timeout: 5000 }).catch(() => false);
     if (!isEditable) {
-      isEditable = await navigateToEditableWeek(page, 5);
+      isEditable = await navigateToEditableWeek(page);
     }
     if (!isEditable) {
       test.skip(true, 'No editable week found');
@@ -306,7 +306,7 @@ test.describe('E2E-MIN: Minimum Hours Validation', () => {
 
     // Save draft
     await saveDraftBtn.click();
-    await expect(page.getByText(/Timesheet saved/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Timesheet saved/i).first()).toBeVisible({ timeout: 10000 });
     await snap(page, 'e2e-min-01', 'partial-hours-saved');
 
     // WHEN: Click Submit
@@ -341,18 +341,15 @@ test.describe('E2E-MIN: Minimum Hours Validation', () => {
     await page.goto('/time-entry');
     await expect(page.getByText(/Week of/i)).toBeVisible({ timeout: 25000 });
 
-    // Navigate 3 weeks ahead to get to a fresh week (past locked weeks AND past week used by MIN-01)
-    const nextBtn = page.locator('button.h-8.w-8').last();
-    for (let i = 0; i < 3; i++) {
-      await nextBtn.click();
-      await page.locator('.animate-spin').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
-      await page.waitForTimeout(1000);
-    }
-
+    // Navigate forward to find an editable week (may be many weeks ahead due to prior test runs)
     const saveDraftBtn = page.getByRole('button', { name: /Save Draft/i });
-    const isEditable = await saveDraftBtn.isEnabled({ timeout: 15000 }).catch(() => false);
+    let isEditable = await saveDraftBtn.isVisible({ timeout: 5000 }).catch(() => false) &&
+                     await saveDraftBtn.isEnabled({ timeout: 5000 }).catch(() => false);
     if (!isEditable) {
-      test.skip(true, 'Week 3 is not editable');
+      isEditable = await navigateToEditableWeek(page);
+    }
+    if (!isEditable) {
+      test.skip(true, 'No editable week found within 15 forward navigations');
       return;
     }
 
@@ -370,7 +367,7 @@ test.describe('E2E-MIN: Minimum Hours Validation', () => {
 
     // Save empty draft (0 hours)
     await saveDraftBtn.click();
-    await expect(page.getByText(/Timesheet saved/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Timesheet saved/i).first()).toBeVisible({ timeout: 10000 });
     await snap(page, 'e2e-min-02', 'empty-draft-saved');
 
     // WHEN: Submit with 0 hours

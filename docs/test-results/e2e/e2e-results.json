@@ -18,7 +18,7 @@
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
-        "retries": 1,
+        "retries": 0,
         "metadata": {
           "actualWorkers": 1
         },
@@ -29,12 +29,12 @@
         "testMatch": [
           "/auth\\.setup\\.ts/"
         ],
-        "timeout": 120000
+        "timeout": 360000
       },
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
-        "retries": 1,
+        "retries": 0,
         "metadata": {
           "actualWorkers": 1
         },
@@ -45,12 +45,12 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 120000
+        "timeout": 360000
       },
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
-        "retries": 1,
+        "retries": 0,
         "metadata": {
           "actualWorkers": 1
         },
@@ -61,7 +61,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 120000
+        "timeout": 360000
       }
     ],
     "quiet": false,
@@ -108,7 +108,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 120000,
+              "timeout": 360000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "setup",
@@ -118,12 +118,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15911,
+                  "duration": 18606,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-17T21:50:47.513Z",
+                  "startTime": "2026-03-18T01:40:05.569Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -148,21 +148,21 @@
         {
           "title": "Workflow Approval Tests",
           "file": "workflow-approval.spec.ts",
-          "line": 133,
+          "line": 179,
           "column": 15,
           "specs": [],
           "suites": [
             {
               "title": "E2E-WF-07: Rejection flow",
               "file": "workflow-approval.spec.ts",
-              "line": 395,
+              "line": 440,
               "column": 8,
               "specs": [],
               "suites": [
                 {
                   "title": "Wichai submits timesheet for next week",
                   "file": "workflow-approval.spec.ts",
-                  "line": 397,
+                  "line": 442,
                   "column": 10,
                   "specs": [
                     {
@@ -171,32 +171,54 @@
                       "tags": [],
                       "tests": [
                         {
-                          "timeout": 60000,
-                          "annotations": [],
-                          "expectedStatus": "passed",
+                          "timeout": 360000,
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "location": {
+                                "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
+                                "line": 515,
+                                "column": 16
+                              }
+                            }
+                          ],
+                          "expectedStatus": "skipped",
                           "projectId": "desktop",
                           "projectName": "desktop",
                           "results": [
                             {
                               "workerIndex": 1,
                               "parallelIndex": 0,
-                              "status": "passed",
-                              "duration": 15477,
+                              "status": "skipped",
+                              "duration": 59543,
                               "errors": [],
-                              "stdout": [],
+                              "stdout": [
+                                {
+                                  "text": "WF-07: No draft week found after 25 weeks — state exhausted, skipping submission.\n"
+                                }
+                              ],
                               "stderr": [],
                               "retry": 0,
-                              "startTime": "2026-03-17T21:51:04.475Z",
-                              "annotations": [],
+                              "startTime": "2026-03-18T01:40:25.377Z",
+                              "annotations": [
+                                {
+                                  "type": "skip",
+                                  "location": {
+                                    "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
+                                    "line": 515,
+                                    "column": 16
+                                  }
+                                }
+                              ],
                               "attachments": []
                             }
                           ],
-                          "status": "expected"
+                          "status": "skipped"
                         }
                       ],
                       "id": "f3fbbcfd8414fe713405-e3e034ee2b93a24e5475",
                       "file": "workflow-approval.spec.ts",
-                      "line": 400,
+                      "line": 446,
                       "column": 11
                     }
                   ]
@@ -204,16 +226,16 @@
                 {
                   "title": "Nattaya rejects with comment",
                   "file": "workflow-approval.spec.ts",
-                  "line": 436,
+                  "line": 530,
                   "column": 10,
                   "specs": [
                     {
                       "title": "reject timesheet with comment",
-                      "ok": true,
+                      "ok": false,
                       "tags": [],
                       "tests": [
                         {
-                          "timeout": 60000,
+                          "timeout": 120000,
                           "annotations": [],
                           "expectedStatus": "passed",
                           "projectId": "desktop",
@@ -222,23 +244,58 @@
                             {
                               "workerIndex": 1,
                               "parallelIndex": 0,
-                              "status": "passed",
-                              "duration": 6294,
-                              "errors": [],
+                              "status": "failed",
+                              "duration": 18831,
+                              "error": {
+                                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[title=\"Reject\"]').first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[title=\"Reject\"]').first()\u001b[22m\n",
+                                "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[title=\"Reject\"]').first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[title=\"Reject\"]').first()\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts:557:33",
+                                "location": {
+                                  "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
+                                  "column": 33,
+                                  "line": 557
+                                },
+                                "snippet": "  555 |         }\n  556 |\n> 557 |         await expect(rejectBtn).toBeVisible({ timeout: 15000 });\n      |                                 ^\n  558 |         await rejectBtn.click();\n  559 |\n  560 |         // Rejection dialog should open"
+                              },
+                              "errors": [
+                                {
+                                  "location": {
+                                    "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
+                                    "column": 33,
+                                    "line": 557
+                                  },
+                                  "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[title=\"Reject\"]').first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[title=\"Reject\"]').first()\u001b[22m\n\n\n  555 |         }\n  556 |\n> 557 |         await expect(rejectBtn).toBeVisible({ timeout: 15000 });\n      |                                 ^\n  558 |         await rejectBtn.click();\n  559 |\n  560 |         // Rejection dialog should open\n    at /Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts:557:33"
+                                }
+                              ],
                               "stdout": [],
                               "stderr": [],
                               "retry": 0,
-                              "startTime": "2026-03-17T21:51:20.447Z",
+                              "startTime": "2026-03-18T01:41:25.324Z",
                               "annotations": [],
-                              "attachments": []
+                              "attachments": [
+                                {
+                                  "name": "screenshot",
+                                  "contentType": "image/png",
+                                  "path": "/Users/tachongrak/Projects/ts/frontend/test-results/workflow-approval-Workflow-09ca8-ject-timesheet-with-comment-desktop/test-failed-1.png"
+                                },
+                                {
+                                  "name": "error-context",
+                                  "contentType": "text/markdown",
+                                  "path": "/Users/tachongrak/Projects/ts/frontend/test-results/workflow-approval-Workflow-09ca8-ject-timesheet-with-comment-desktop/error-context.md"
+                                }
+                              ],
+                              "errorLocation": {
+                                "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
+                                "column": 33,
+                                "line": 557
+                              }
                             }
                           ],
-                          "status": "expected"
+                          "status": "unexpected"
                         }
                       ],
                       "id": "f3fbbcfd8414fe713405-4aa6200af7a30b75fd9b",
                       "file": "workflow-approval.spec.ts",
-                      "line": 439,
+                      "line": 533,
                       "column": 11
                     }
                   ]
@@ -252,11 +309,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-17T21:50:46.802Z",
-    "duration": 39975.357,
-    "expected": 3,
-    "skipped": 0,
-    "unexpected": 0,
+    "startTime": "2026-03-18T01:40:04.225Z",
+    "duration": 99971.651,
+    "expected": 1,
+    "skipped": 1,
+    "unexpected": 1,
     "flaky": 0
   }
 }

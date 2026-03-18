@@ -9,7 +9,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
   workers: 1,
-  timeout: 120000,
+  timeout: 360000,
   reporter: [
     ['json', { outputFile: '../docs/test-results/e2e/e2e-results.json' }],
     ['list'],

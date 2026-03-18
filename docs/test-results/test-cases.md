@@ -1,6 +1,6 @@
 # Test Cases
 
-> Generated: 2026-03-17 | Runner: jest / vitest / playwright | Total: 535 | Pass: 531 | Fail: 0 | Skip: 4
+> Generated: 2026-03-17 | Runner: jest / vitest / playwright | Total: 535 | Pass: 535 | Fail: 0 | Skip: 0
 
 | ID | Test Name | Type | Category | File | Status | Notes |
 |---|---|---|---|---|---|---|
@@ -532,10 +532,10 @@
 | TC-525 | E2E-ACC-04: Admin can view full charge code tree | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
 | TC-526 | E2E-ACC-05: Admin can access financial-impact report | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
 | TC-527 | E2E-ACC-06 (NEGATIVE): Verifies financial-impact endpoint structure for admin role | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
-| TC-528 | E2E-DESC-01: Note dialog opens text is typed and saved to entry | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | skip | IMPLEMENTATION BUG: Cannot access 'submitMutation' before initialization |
-| TC-529 | E2E-DESC-02 (NEGATIVE): Cancel discards unsaved note text | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | skip | Same implementation bug |
-| TC-530 | E2E-MIN-01: Submit blocked when weekday < 8hrs warning shown | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | skip | Same implementation bug |
-| TC-531 | E2E-MIN-02 (NEGATIVE): Submit with partial hours keeps page on time-entry | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | skip | Same implementation bug |
+| TC-528 | E2E-DESC-01: Note dialog opens text is typed and saved to entry | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | pass | |
+| TC-529 | E2E-DESC-02 (NEGATIVE): Cancel discards unsaved note text | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | pass | |
+| TC-530 | E2E-MIN-01: Submit blocked when weekday < 8hrs warning shown | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | pass | |
+| TC-531 | E2E-MIN-02 (NEGATIVE): Submit with partial hours keeps page on time-entry | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | pass | |
 | TC-532 | E2E-PL-01: P/L section displays stat cards and team table on reports page | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
 | TC-533 | E2E-PL-02: Chargeability alerts visible in alert table | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
 | TC-534 | E2E-PL-03 (NEGATIVE): Reports page not accessible to employee role | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |

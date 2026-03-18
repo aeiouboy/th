@@ -2,8 +2,8 @@
 
 **Date**: 2026-03-17
 **Runner**: Vitest v4.1.0 + React Testing Library
-**Total**: 274 tests | 274 passed | 0 failed
-**Test Files**: 27 suites
+**Total**: 290 tests | 290 passed | 0 failed
+**Test Files**: 29 suites
 
 ## Test Suites
 
@@ -17,12 +17,14 @@
 | `components/approvals/TimesheetReview.test.tsx` | 9 | PASS |
 | `components/charge-codes/AccessManager.test.tsx` | 11 | PASS |
 | `components/charge-codes/ChargeCodeForm.test.tsx` | 20 | PASS |
-| `components/charge-codes/ChargeCodeTree.test.tsx` | 16 | PASS |
+| `components/charge-codes/ChargeCodeTree.test.tsx` | 15 | PASS |
 | `components/reports/ActivityPie.test.tsx` | 11 | PASS |
 | `components/reports/AlertList.test.tsx` | 16 | PASS |
 | `components/reports/BudgetChart.test.tsx` | 9 | PASS |
 | `components/reports/ChargeabilityGauge.test.tsx` | 8 | PASS |
+| `components/reports/FinancialPL.test.tsx` | 10 | PASS |
 | `components/reports/UtilizationChart.test.tsx` | 8 | PASS |
+| `components/timesheet/EntryNoteDialog.test.tsx` | 7 | PASS |
 | `components/timesheet/ChargeCodeSelector.test.tsx` | 11 | PASS |
 | `components/timesheet/EntryCell.test.tsx` | 18 | PASS |
 | `components/timesheet/TimesheetGrid.test.tsx` | 16 | PASS |

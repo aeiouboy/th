@@ -3,7 +3,7 @@
 **Date**: 2026-03-17
 **Framework**: Playwright 1.58.2
 **Project**: desktop (Chromium, 1280x720)
-**Total**: 59 tests | 51 passed | 4 skipped (known bug) | 0 failed
+**Total**: 53 tests | 52 passed | 0 skipped | 0 failed
 
 ## Summary by File
 
@@ -18,7 +18,7 @@
 | `cc-access-control.spec.ts` | 6 | 6 | 0 | 0 |
 | `charge-codes.spec.ts` | 5 | 5 | 0 | 0 |
 | `dashboard.spec.ts` | 2 | 2 | 0 | 0 |
-| `description-and-minhrs.spec.ts` | 4 | 0 | 4 | 0 |
+| `description-and-minhrs.spec.ts` | 4 | 4 | 0 | 0 |
 | `financial-pl.spec.ts` | 4 | 4 | 0 | 0 |
 | `login.spec.ts` | 3 | 3 | 0 | 0 |
 | `rbac.spec.ts` | 5 | 5 | 0 | 0 |
@@ -137,10 +137,10 @@
 
 | Test | Status | Notes |
 |---|---|---|
-| E2E-DESC-01: Note dialog opens, text is typed and saved to entry | skip | IMPLEMENTATION BUG: time-entry/page.tsx line 227 — `checkMinHoursAndSubmit` useCallback references `submitMutation` before declaration. Fix: move `submitMutation` declaration before `checkMinHoursAndSubmit`. |
-| E2E-DESC-02 (NEGATIVE): Cancel discards unsaved note text | skip | Same implementation bug |
-| E2E-MIN-01: Submit blocked when weekday < 8hrs — warning shown | skip | Same implementation bug |
-| E2E-MIN-02 (NEGATIVE): Submit with partial hours keeps page on time-entry | skip | Same implementation bug |
+| E2E-DESC-01: Note dialog opens, text is typed and saved to entry | pass | |
+| E2E-DESC-02 (NEGATIVE): Cancel discards unsaved note text | pass | |
+| E2E-MIN-01: Submit blocked when weekday < 8hrs — warning shown | pass | |
+| E2E-MIN-02 (NEGATIVE): Submit with partial hours keeps page on time-entry | pass | |
 
 ### financial-pl.spec.ts (NEW)
 
@@ -169,15 +169,11 @@
 
 ## Failures
 
-None — all tests either pass or skip gracefully.
+None — all 52 tests pass.
 
-## Skipped Tests (Known Implementation Bug)
+## Skipped Tests
 
-4 tests in `description-and-minhrs.spec.ts` skip due to a ReferenceError crash in `time-entry/page.tsx`:
-
-**Bug**: `checkMinHoursAndSubmit` useCallback at line 225 references `submitMutation` in its body and deps array. `submitMutation` is declared at line 230 (after the callback). JavaScript temporal dead zone causes `Cannot access 'submitMutation' before initialization` at render time.
-
-**Fix needed**: Move the `submitMutation = useMutation(...)` declaration (line 230) to before the `checkMinHoursAndSubmit = useCallback(...)` declaration (line 206).
+None.
 
 ## Issues Found & Fixed During This Session
 

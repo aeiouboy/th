@@ -16,9 +16,9 @@ export const DrizzleProvider: Provider = {
     }
     const client = postgres(connectionString, {
       prepare: false,
-      max: 8,               // Allow enough concurrent connections for parallel auth + queries
-      idle_timeout: 20,     // Release idle connections after 20s
-      max_lifetime: 1800,   // Recycle connections after 30min to prevent stale handles
+      max: 5,               // Conservative pool size for Supabase free-tier (20 connection limit)
+      idle_timeout: 10,     // Release idle connections after 10s to prevent pool exhaustion
+      max_lifetime: 300,    // Recycle connections after 5min to prevent stale handles
       connect_timeout: 15,
     });
     return drizzle(client, { schema });
