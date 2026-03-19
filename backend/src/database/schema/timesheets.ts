@@ -12,6 +12,7 @@ import { profiles } from './profiles';
 export const timesheetStatusEnum = pgEnum('timesheet_status', [
   'draft',
   'submitted',
+  'approved',
   'manager_approved',
   'cc_approved',
   'locked',

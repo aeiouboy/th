@@ -179,6 +179,18 @@
   }
 }
 
+/* Budget tree row slide-in */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* Page content fade-in animation */
 @keyframes fade-in {
   from {

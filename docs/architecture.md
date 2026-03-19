@@ -69,7 +69,8 @@ All pages under `(authenticated)/` require a valid Supabase session. The Next.js
 app/
 ├── login/                        # Public — Supabase email/password login
 ├── auth/callback/                # Public — OAuth callback handler
-└── (authenticated)/              # Protected layout group
+└── (authenticated)/              # Protected layout group (layout.tsx)
+    │   # Layout includes: sidebar, mobile nav, topbar with NotificationBell
     ├── page.tsx                  # Dashboard: summary, pending items, alerts
     ├── time-entry/
     │   └── page.tsx              # Timesheet entry: period selector, daily grid
@@ -80,7 +81,9 @@ app/
     ├── budget/
     │   └── page.tsx              # Budget tracking: alerts, summaries, drill-down
     ├── reports/
-    │   └── page.tsx              # Analytics: utilization, chargeability, financials
+    │   └── page.tsx              # Analytics: KPI cards, 3-col charts, Financial P/L
+    ├── notifications/
+    │   └── page.tsx              # Notification Center: filter tabs, read/unread, pagination
     ├── profile/
     │   └── page.tsx              # User profile: edit name, department
     ├── settings/
@@ -93,6 +96,67 @@ app/
         └── rates/
             └── page.tsx          # Cost rate management: job grade → hourly rate
 ```
+
+---
+
+## Reports Page Component Tree
+
+```
+reports/page.tsx
+├── PageHeader + Filter bar (period, program, team selectors)
+├── Row 1: KPI cards (StatCard × 4)
+│   └── Total Budget | Actual Spent | Utilization | Overrun Count
+├── Row 2: Charts (3-col grid on lg)
+│   ├── ChartCard > BudgetChart           # Bar chart: budget vs actual per charge code
+│   ├── ChartCard > ChargeabilityGauge    # Gauge: chargeability by team
+│   └── ChartCard > ActivityPie           # Pie: hour distribution by activity category
+└── Row 3: FinancialPL (tabs)
+    ├── Tab: "P/L Summary"
+    │   ├── StatCard × 3 (over-budget cost, low chargeability gap, net P/L)
+    │   └── Team P/L Breakdown table
+    └── Tab: "Alerts (N)"
+        └── AlertList (budget overruns + chargeability gaps combined)
+```
+
+### Shared Alert Types
+
+Alert type interfaces and helper functions shared between `AlertList`, `FinancialPL`, and `NotificationBell` are defined in:
+
+```
+frontend/src/components/reports/types.ts
+```
+
+Exported members:
+- `BudgetAlert` — interface for budget overrun alerts (`/reports/budget-alerts`)
+- `ChargeabilityAlert` — interface for chargeability alerts (`/budgets/chargeability-alerts`)
+- `severityColorClass(severity)` — maps severity string to a Tailwind CSS class
+- `compareSeverity(a, b)` — comparator for sorting alerts by severity (red → orange → yellow)
+
+---
+
+## NotificationBell Component
+
+Location: `frontend/src/components/layout/NotificationBell.tsx`
+
+The `NotificationBell` is rendered in the authenticated layout topbar (`(authenticated)/layout.tsx`). It operates independently from the Reports page — it fetches its own data rather than relying on props passed from a parent.
+
+**Data flow:**
+
+```
+layout.tsx
+└── NotificationBell
+    ├── useQuery → GET /reports/budget-alerts       (staleTime: 30s)
+    └── useQuery → GET /budgets/chargeability-alerts (staleTime: 30s)
+        → merges + sorts by severity → shows top 5 in popover
+        → badge shows total count
+        → click navigates to /reports
+```
+
+**Behavior:**
+- Badge is hidden when `totalCount === 0`
+- Popover closes on outside click (via `mousedown` event listener)
+- Each alert item in the popover navigates to `/reports` on click
+- "View all alerts" footer link also navigates to `/reports`
 
 ---
 
@@ -181,6 +245,7 @@ Ten tables managed by Drizzle ORM:
 | `calendar_days` | Working days, weekends, and holidays |
 | `vacation_requests` | Employee vacation requests |
 | `cost_rates` | Hourly cost rates by job grade |
+| `notifications` | Per-user notification inbox with read state and Teams delivery |
 
 See [database-schema.md](database-schema.md) for the full ERD and column definitions.
 
@@ -217,6 +282,37 @@ Three cron jobs run on the backend:
 - `TimesheetsScheduler` — locks approved timesheets after the cutoff date
 - `BudgetsScheduler` — recalculates `actual_spent` and `forecast_at_completion` from approved entries
 - `ReportsScheduler` — pre-aggregates report data for fast queries
+
+### Notification Flow
+
+```mermaid
+graph TD
+    Schedulers["SchedulersModule<br/>(cron jobs)"]
+    IntegSvc["IntegrationNotificationService<br/>(sends & persists)"]
+    NotiSvc["NotificationsService<br/>(DB + Teams delivery)"]
+    NotiDB[("notifications table")]
+    TeamsWebhook["TeamsWebhookService<br/>POST TEAMS_WEBHOOK_URL"]
+    Bell["NotificationBell<br/>(layout topbar)"]
+    NotiPage["/notifications page"]
+
+    Schedulers -->|"sendAllNotifications()"| IntegSvc
+    IntegSvc -->|"create(type, recipientId, subject, body)"| NotiSvc
+    NotiSvc -->|"INSERT"| NotiDB
+    NotiSvc -->|"fire-and-forget"| TeamsWebhook
+
+    Bell -->|"GET /notifications/unread-count (30s)"| NotiDB
+    NotiPage -->|"GET /notifications?limit=20&offset=0"| NotiDB
+    NotiPage -->|"PATCH /notifications/:id/read"| NotiDB
+    NotiPage -->|"POST /notifications/read-all"| NotiDB
+```
+
+**Cron schedule:**
+- Timesheet reminders — sent when a user has logged fewer hours than expected for days elapsed in the current week
+- Approval reminders — sent to managers with pending timesheets awaiting their approval
+- Manager summary — weekly digest of direct-report timesheet statuses
+- Weekly insights — chargeability and budget summary sent to `pmo`, `finance`, and `admin` users
+
+Teams delivery is fire-and-forget: a failure to reach the webhook does not block DB persistence or the API response.
 
 ### Cost Calculation
 

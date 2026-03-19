@@ -15,6 +15,7 @@ export const USERS = [
   { name: 'ploy', email: 'ploy.r@central.co.th', password: 'password1234', role: 'pmo' },
   { name: 'nattaya', email: 'nattaya.k@central.co.th', password: 'password1234', role: 'employee' },
   { name: 'somchai', email: 'somchai.p@central.co.th', password: 'password1234', role: 'employee' },
+  { name: 'kannika', email: 'kannika.t@central.co.th', password: 'password1234', role: 'finance' },
 ] as const;
 
 export async function takeScreenshots(page: Page, pageName: string) {

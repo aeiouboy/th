@@ -185,11 +185,11 @@ export class TeamsBotService {
         type: 'card',
         text:
           `Budget Status for ${budget.chargeCodeName} (${ccId}):\n` +
-          `- Budget: $${budget.budgetAmount.toLocaleString()}\n` +
-          `- Spent: $${budget.actualSpent.toLocaleString()} (${budget.percentage}%)\n` +
+          `- Budget: ฿${budget.budgetAmount.toLocaleString()}\n` +
+          `- Spent: ฿${budget.actualSpent.toLocaleString()} (${budget.percentage}%)\n` +
           `- Status: ${budget.status.replace('_', ' ')}` +
           (budget.forecastAtCompletion
-            ? `\n- Forecast: $${budget.forecastAtCompletion.toLocaleString()}`
+            ? `\n- Forecast: ฿${budget.forecastAtCompletion.toLocaleString()}`
             : ''),
         data: budget as unknown as Record<string, unknown>,
       };

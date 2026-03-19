@@ -1,0 +1,11 @@
+{
+  "session_id": "15552e3e-3825-48d7-90d7-6e228c8afca7",
+  "prompts": [
+    "/prime",
+    "/reinforce",
+    "claude other session hang and they not comple the task and not error: ## Error Type\nConsole TypeError\n\n## Error Message\nFailed to fetch\n\n\n    at request (src/lib/api.ts:36:22)\n    at async AdminRatesPage.useCallback[fetchRates] (src/app/(authenticated)/admin/rates/page.tsx:93:20)\n\n## Code Frame\n  34 |   let response: Response;\n  35 |   try {\n> 36 |     response = await fetch(url, {\n     |                      ^\n  37 |       ...options,\n  38 |       headers: {\n  39 |         ...headers,\n\nNext.js version: 16.1.6 (Turbopack)\n",
+    "error: ## Error Type\nConsole TypeError\n\n## Error Message\nFailed to fetch\n\n\n    at request (src/lib/api.ts:36:22)\n    at async AdminRatesPage.useCallback[fetchRates] (src/app/(authenticated)/admin/rates/page.tsx:93:20)\n\n## Code Frame\n  34 |   let response: Response;\n  35 |   try {\n> 36 |     response = await fetch(url, {\n     |                      ^\n  37 |       ...options,\n  38 |       headers: {\n  39 |         ...headers,\n\nNext.js version: 16.1.6 (Turbopack)\n",
+    "they working on this Report \u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e14\u0e36\u0e07\u0e04\u0e48\u0e32\u0e21\u0e32\u0e41\u0e2a\u0e14\u0e07 Budget vs Actual Chargeability by Team before handgging"
+  ],
+  "agent_name": "Nova"
+}

@@ -351,8 +351,9 @@ export function ApprovalQueue({ items, onRefresh }: ApprovalQueueProps) {
 function StatusBadge({ status }: { status: string }) {
   const configs: Record<string, { variant: 'amber' | 'green' | 'destructive' | 'slate' | 'secondary'; label: string }> = {
     submitted: { variant: 'amber', label: 'Pending' },
-    manager_approved: { variant: 'green', label: 'Manager Approved' },
-    cc_approved: { variant: 'green', label: 'CC Approved' },
+    approved: { variant: 'green', label: 'Approved' },
+    manager_approved: { variant: 'green', label: 'Approved' },
+    cc_approved: { variant: 'green', label: 'Approved' },
     locked: { variant: 'slate', label: 'Locked' },
     rejected: { variant: 'destructive', label: 'Rejected' },
     draft: { variant: 'secondary', label: 'Draft' },

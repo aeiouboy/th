@@ -1,0 +1,55 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e5]: TS
+      - navigation [ref=e6]:
+        - link "Dashboard" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - link "Time Entry" [ref=e13] [cursor=pointer]:
+          - /url: /time-entry
+          - img [ref=e14]
+        - link "Calendar" [ref=e17] [cursor=pointer]:
+          - /url: /calendar
+          - img [ref=e18]
+    - generic [ref=e21]:
+      - banner [ref=e22]:
+        - generic [ref=e23]:
+          - button "Expand sidebar" [ref=e24]:
+            - img [ref=e25]
+          - heading "Dashboard" [level=1] [ref=e27]
+        - generic [ref=e28]:
+          - button "Notifications" [ref=e30]:
+            - img [ref=e31]
+          - button "U" [ref=e34] [cursor=pointer]:
+            - generic [ref=e36]: U
+      - main [ref=e37]:
+        - generic [ref=e38]:
+          - link "My Codes" [ref=e41] [cursor=pointer]:
+            - /url: /charge-codes
+            - button "My Codes" [ref=e42]:
+              - img
+              - text: My Codes
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - generic [ref=e51]: My Recent Entries
+              - generic [ref=e53]:
+                - img [ref=e55]
+                - heading "No time entries this week" [level=3] [ref=e58]
+                - paragraph [ref=e59]: Start logging your hours to track progress
+                - link "Start Logging" [ref=e60] [cursor=pointer]:
+                  - /url: /time-entry
+            - generic [ref=e61]:
+              - generic [ref=e63]: Alerts & Notifications
+              - generic [ref=e65]:
+                - img [ref=e67]
+                - heading "All clear" [level=3] [ref=e70]
+                - paragraph [ref=e71]: No alerts -- you're all set!
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e77] [cursor=pointer]:
+    - img [ref=e78]
+  - alert [ref=e81]
+```

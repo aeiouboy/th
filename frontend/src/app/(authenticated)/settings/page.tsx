@@ -21,7 +21,12 @@ import {
   GlobeIcon,
   CheckIcon,
   DollarSignIcon,
+  SendIcon,
+  RefreshCwIcon,
+  ShieldIcon,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { useCurrency } from '@/lib/currency';
 import { api } from '@/lib/api';
 
@@ -61,6 +66,14 @@ export default function SettingsPage() {
   const [defaultView, setDefaultView] = useState<'weekly' | 'bi-weekly'>('weekly');
   const [timezone, setTimezone] = useState('Asia/Bangkok');
   const [saved, setSaved] = useState(false);
+  const [sendingAlerts, setSendingAlerts] = useState(false);
+  const [recalculating, setRecalculating] = useState(false);
+
+  const { data: userProfile } = useQuery<{ role: string }>({
+    queryKey: ['me-settings'],
+    queryFn: () => api.get('/users/me'),
+  });
+  const isAdmin = userProfile?.role === 'admin';
 
   const [notifications, setNotifications] = useState<NotificationPref[]>([
     {
@@ -287,57 +300,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Default View */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-[var(--text-secondary)]" />
-            Default View
-          </CardTitle>
-          <CardDescription>Choose your preferred timesheet view.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setDefaultView('weekly')}
-              className={`flex-1 rounded-lg border-2 p-4 text-center transition-all ${
-                defaultView === 'weekly'
-                  ? 'border-[var(--accent-teal)] bg-[var(--accent-teal-light)] dark:bg-[var(--accent-teal)]/10'
-                  : 'border-[var(--border-default)] hover:border-stone-300 dark:hover:border-stone-600'
-              }`}
-            >
-              <div className={`text-sm font-medium ${
-                defaultView === 'weekly' ? 'text-[var(--accent-teal)]' : 'text-[var(--text-primary)]'
-              }`}>
-                Weekly
-              </div>
-              <p className="text-xs text-[var(--text-muted)] mt-1">7-day view</p>
-              {defaultView === 'weekly' && (
-                <CheckIcon className="w-4 h-4 text-[var(--accent-teal)] mx-auto mt-2" />
-              )}
-            </button>
-            <button
-              onClick={() => setDefaultView('bi-weekly')}
-              className={`flex-1 rounded-lg border-2 p-4 text-center transition-all ${
-                defaultView === 'bi-weekly'
-                  ? 'border-[var(--accent-teal)] bg-[var(--accent-teal-light)] dark:bg-[var(--accent-teal)]/10'
-                  : 'border-[var(--border-default)] hover:border-stone-300 dark:hover:border-stone-600'
-              }`}
-            >
-              <div className={`text-sm font-medium ${
-                defaultView === 'bi-weekly' ? 'text-[var(--accent-teal)]' : 'text-[var(--text-primary)]'
-              }`}>
-                Bi-Weekly
-              </div>
-              <p className="text-xs text-[var(--text-muted)] mt-1">14-day view</p>
-              {defaultView === 'bi-weekly' && (
-                <CheckIcon className="w-4 h-4 text-[var(--accent-teal)] mx-auto mt-2" />
-              )}
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Timezone */}
       <Card>
         <CardHeader>
@@ -362,6 +324,72 @@ export default function SettingsPage() {
           </Select>
         </CardContent>
       </Card>
+
+      {/* Admin Actions */}
+      {isAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldIcon className="w-4 h-4 text-[var(--accent-amber)]" />
+              Admin Actions
+            </CardTitle>
+            <CardDescription>Manual triggers for system operations. Alerts will be sent to Teams.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">Send Teams Alerts</p>
+                <p className="text-xs text-[var(--text-muted)]">Send reminders, approval alerts, and weekly insights to Teams channel</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={sendingAlerts}
+                onClick={async () => {
+                  setSendingAlerts(true);
+                  try {
+                    const result = await api.post<{ timesheetReminders: number; approvalReminders: number; managerSummaries: number; weeklyInsights: number }>('/integrations/notifications/send', {});
+                    toast.success(`Sent: ${result.timesheetReminders} reminders, ${result.managerSummaries} summaries, ${result.weeklyInsights} insights`);
+                  } catch {
+                    // toast handled by api client
+                  } finally {
+                    setSendingAlerts(false);
+                  }
+                }}
+              >
+                {sendingAlerts ? <RefreshCwIcon className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <SendIcon className="w-3.5 h-3.5 mr-1.5" />}
+                {sendingAlerts ? 'Sending...' : 'Send Now'}
+              </Button>
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">Recalculate Budgets</p>
+                <p className="text-xs text-[var(--text-muted)]">Recalculate actual costs and roll up through charge code hierarchy</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={recalculating}
+                onClick={async () => {
+                  setRecalculating(true);
+                  try {
+                    const result = await api.post<{ recalculated: number }>('/budgets/recalculate', {});
+                    toast.success(`Recalculated ${result.recalculated} charge codes`);
+                  } catch {
+                    // toast handled by api client
+                  } finally {
+                    setRecalculating(false);
+                  }
+                }}
+              >
+                {recalculating ? <RefreshCwIcon className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <RefreshCwIcon className="w-3.5 h-3.5 mr-1.5" />}
+                {recalculating ? 'Calculating...' : 'Recalculate'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Save button */}
       <div className="flex justify-end pb-6">

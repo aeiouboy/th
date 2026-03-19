@@ -1,6 +1,10 @@
 {
   "session_id": "10d2419a-94ca-4c18-a503-a28cbd4dc586",
   "prompts": [
-    "<task-notification>\n<task-id>bchggy3ws</task-id>\n<tool-use-id>toolu_017MDGVXwAoaodqiAwCBo8Jn</tool-use-id>\n<output-file>/private/tmp/claude-502/-Users-tachongrak-Projects-ts/10d2419a-94ca-4c18-a503-a28cbd4dc586/tasks/bchggy3ws.output</output-file>\n<status>completed</status>\n<summary>Background command \"Re-run WF-07 tests\" completed (exit code 0)</summary>\n</task-notification>\nRead the output file to retrieve the result: /private/tmp/claude-502/-Users-tachongrak-Projects-ts/10d2419a-94ca-4c18-a503-a28cbd4dc586/tasks/bchggy3ws.output"
+    "<task-notification>\n<task-id>bchggy3ws</task-id>\n<tool-use-id>toolu_017MDGVXwAoaodqiAwCBo8Jn</tool-use-id>\n<output-file>/private/tmp/claude-502/-Users-tachongrak-Projects-ts/10d2419a-94ca-4c18-a503-a28cbd4dc586/tasks/bchggy3ws.output</output-file>\n<status>completed</status>\n<summary>Background command \"Re-run WF-07 tests\" completed (exit code 0)</summary>\n</task-notification>\nRead the output file to retrieve the result: /private/tmp/claude-502/-Users-tachongrak-Projects-ts/10d2419a-94ca-4c18-a503-a28cbd4dc586/tasks/bchggy3ws.output",
+    "\u0e17\u0e33\u0e44\u0e21 alert \u0e44\u0e21\u0e48\u0e1c\u0e39\u0e01\u0e31\u0e1a noti bell icon",
+    "Reports & Analytics \u0e2b\u0e19\u0e49\u0e32\u0e19\u0e35\u0e49\u0e21\u0e35\u0e2a\u0e48\u0e27\u0e19\u0e02\u0e2d\u0e07 alert \u0e2d\u0e22\u0e39\u0e48\u0e14\u0e49\u0e27\u0e22\u0e09\u0e31\u0e19\u0e27\u0e48\u0e32 layout \u0e14\u0e39\u0e41\u0e25\u0e49\u0e27\u0e07\u0e07\u0e21\u0e32\u0e01",
+    "\u0e25\u0e2d\u0e07\u0e41\u0e19\u0e30\u0e19\u0e33\u0e09\u0e31\u0e19\u0e2b\u0e19\u0e48\u0e2d\u0e22",
+    "\u0e40\u0e02\u0e35\u0e22\u0e19\u0e41\u0e1c\u0e19\u0e23\u0e27\u0e21\u0e01\u0e31\u0e1a\u0e40\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e41\u0e01\u0e49\u0e44\u0e02 noti /plan_w_team"
   ]
 }

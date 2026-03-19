@@ -3,12 +3,18 @@ import { Cron } from '@nestjs/schedule';
 import { eq } from 'drizzle-orm';
 import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
 import { timesheets, profiles } from '../database/schema';
+import { NotificationsService } from '../notifications/notifications.service';
+import { TeamsWebhookService } from '../integrations/teams-webhook.service';
 
 @Injectable()
 export class NotificationService {
   private readonly logger = new Logger(NotificationService.name);
 
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: DrizzleDB,
+    private readonly notificationsService: NotificationsService,
+    private readonly teamsWebhook: TeamsWebhookService,
+  ) {}
 
   /**
    * Daily reminder at 9:00 AM: check for users with incomplete timesheets
@@ -56,11 +62,27 @@ export class NotificationService {
         );
 
         for (const user of incompleteUsers) {
+          await this.notificationsService.create(
+            'timesheet_reminder',
+            user.id,
+            'Timesheet Reminder',
+            `Your timesheet for the week of ${weekStart} is incomplete. Please submit it as soon as possible.`,
+          );
           this.logger.log(
             `NOTIFICATION: Reminder to ${user.fullName ?? user.email} — timesheet for week ${weekStart} is incomplete`,
           );
-          // In production, this would send an email or push notification
         }
+        // Send summary to Teams
+        await this.teamsWebhook.sendCard(
+          'Timesheet Reminder',
+          `**${incompleteUsers.length}** user(s) have incomplete timesheets for week starting ${weekStart}.`,
+          [
+            { name: 'Week', value: weekStart },
+            { name: 'Incomplete', value: `${incompleteUsers.length} user(s)` },
+            { name: 'Total Users', value: `${allUsers.length}` },
+          ],
+          'ff9800', // orange warning
+        );
       } else {
         this.logger.log('All users have submitted timesheets for the current week');
       }

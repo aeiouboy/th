@@ -12,6 +12,8 @@ interface ChargeCodeRow {
   isBillable: boolean | null;
 }
 
+const SYSTEM_CHARGE_CODES = new Set(['LEAVE-001']);
+
 export interface GridData {
   [chargeCodeId: string]: {
     [date: string]: number;
@@ -33,6 +35,8 @@ interface TimesheetGridProps {
   onDescriptionChange?: (chargeCodeId: string, date: string, description: string) => void;
   disabled?: boolean;
   onRemoveRow?: (chargeCodeId: string) => void;
+  vacationDates?: Set<string>;
+  holidayDates?: Set<string>;
 }
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -47,6 +51,8 @@ export function TimesheetGrid({
   onDescriptionChange,
   disabled,
   onRemoveRow,
+  vacationDates,
+  holidayDates,
 }: TimesheetGridProps) {
   const [activeNote, setActiveNote] = useState<{ chargeCodeId: string; date: string } | null>(null);
 
@@ -58,6 +64,21 @@ export function TimesheetGrid({
   }, [weekStart]);
 
   const isWeekend = useCallback((idx: number) => idx >= 5, []);
+
+  const isVacation = useCallback(
+    (dateStr: string) => vacationDates?.has(dateStr) ?? false,
+    [vacationDates],
+  );
+
+  const isHoliday = useCallback(
+    (dateStr: string) => holidayDates?.has(dateStr) ?? false,
+    [holidayDates],
+  );
+
+  const isNonWorking = useCallback(
+    (idx: number) => isWeekend(idx) || isVacation(dates[idx]) || isHoliday(dates[idx]),
+    [isWeekend, isVacation, isHoliday, dates],
+  );
 
   const dailyTotals = useMemo(() => {
     return dates.map((date) => {
@@ -85,8 +106,8 @@ export function TimesheetGrid({
   );
 
   const variances = useMemo(
-    () => dailyTotals.map((t, i) => (isWeekend(i) ? null : Math.round((t - TARGET_HOURS) * 100) / 100)),
-    [dailyTotals, isWeekend],
+    () => dailyTotals.map((t, i) => (isNonWorking(i) ? null : Math.round((t - TARGET_HOURS) * 100) / 100)),
+    [dailyTotals, isNonWorking],
   );
 
   const activeNoteRow = activeNote
@@ -117,13 +138,19 @@ export function TimesheetGrid({
               <th
                 key={date}
                 className={`text-center px-2 py-2.5 font-[family-name:var(--font-heading)] font-semibold text-xs w-24 ${
-                  isWeekend(i) ? 'bg-stone-50 text-[var(--text-muted)]' : 'text-[var(--text-primary)]'
+                  isNonWorking(i) ? 'bg-stone-50 text-[var(--text-muted)]' : 'text-[var(--text-primary)]'
                 }`}
               >
                 <div>{DAYS[i]}</div>
                 <div className="font-[family-name:var(--font-mono)] font-normal text-[var(--text-muted)] mt-0.5 text-[11px]">
                   {format(parseISO(date), 'd')}
                 </div>
+                {isVacation(date) && (
+                  <div className="text-[10px] text-purple-500 font-medium mt-0.5">Vacation</div>
+                )}
+                {isHoliday(date) && !isVacation(date) && (
+                  <div className="text-[10px] text-orange-500 font-medium mt-0.5">Holiday</div>
+                )}
               </th>
             ))}
             <th className="text-center px-2 py-2.5 font-[family-name:var(--font-heading)] font-semibold text-xs text-[var(--text-primary)] w-20 bg-stone-50/50">
@@ -149,14 +176,16 @@ export function TimesheetGrid({
                   </div>
                   <Badge
                     className={`shrink-0 text-[10px] rounded-[999px] ${
-                      row.isBillable
-                        ? 'bg-[var(--accent-teal-light)] text-[var(--accent-teal)] border-teal-200'
-                        : 'bg-[var(--accent-amber-light)] text-[var(--accent-amber)] border-amber-200'
+                      SYSTEM_CHARGE_CODES.has(row.chargeCodeId)
+                        ? 'bg-purple-100 text-purple-600 border-purple-200'
+                        : row.isBillable
+                          ? 'bg-[var(--accent-teal-light)] text-[var(--accent-teal)] border-teal-200'
+                          : 'bg-[var(--accent-amber-light)] text-[var(--accent-amber)] border-amber-200'
                     }`}
                   >
-                    {row.isBillable ? 'billable' : 'non-billable'}
+                    {SYSTEM_CHARGE_CODES.has(row.chargeCodeId) ? 'leave' : row.isBillable ? 'billable' : 'non-billable'}
                   </Badge>
-                  {onRemoveRow && !disabled && (
+                  {onRemoveRow && !disabled && !SYSTEM_CHARGE_CODES.has(row.chargeCodeId) && (
                     <button
                       type="button"
                       onClick={() => onRemoveRow(row.chargeCodeId)}
@@ -171,12 +200,12 @@ export function TimesheetGrid({
               {dates.map((date, colIdx) => (
                 <td
                   key={date}
-                  className={`px-1.5 py-1.5 ${isWeekend(colIdx) ? 'bg-stone-50' : ''}`}
+                  className={`px-1.5 py-1.5 ${isNonWorking(colIdx) ? 'bg-stone-50' : ''}`}
                 >
                   <EntryCell
                     value={data[row.chargeCodeId]?.[date] || 0}
                     onChange={(v) => onCellChange(row.chargeCodeId, date, v)}
-                    disabled={disabled || isWeekend(colIdx)}
+                    disabled={disabled || isNonWorking(colIdx) || SYSTEM_CHARGE_CODES.has(row.chargeCodeId)}
                     isBillable={row.isBillable ?? false}
                     description={descriptions?.[row.chargeCodeId]?.[date]}
                     onNoteClick={() => setActiveNote({ chargeCodeId: row.chargeCodeId, date })}
@@ -209,7 +238,7 @@ export function TimesheetGrid({
             {dailyTotals.map((total, i) => (
               <td
                 key={i}
-                className={`text-center py-2 font-[family-name:var(--font-mono)] text-sm font-semibold text-[var(--text-primary)] ${isWeekend(i) ? 'bg-stone-100/50' : ''}`}
+                className={`text-center py-2 font-[family-name:var(--font-mono)] text-sm font-semibold text-[var(--text-primary)] ${isNonWorking(i) ? 'bg-stone-100/50' : ''}`}
               >
                 {total.toFixed(2)}
               </td>
@@ -229,11 +258,11 @@ export function TimesheetGrid({
                 key={i}
                 className="text-center py-1.5 font-[family-name:var(--font-mono)] text-xs text-[var(--text-muted)]"
               >
-                {isWeekend(i) ? '-' : `${TARGET_HOURS}.00`}
+                {isNonWorking(i) ? '-' : `${TARGET_HOURS}.00`}
               </td>
             ))}
             <td className="text-center py-1.5 font-[family-name:var(--font-mono)] text-xs text-[var(--text-muted)]">
-              40.00
+              {(dates.filter((_, i) => !isNonWorking(i)).length * TARGET_HOURS).toFixed(2)}
             </td>
           </tr>
 

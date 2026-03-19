@@ -5,9 +5,15 @@ import { Roles } from '../common/decorators/roles.decorator';
 
 @ApiTags('Budgets')
 @ApiBearerAuth()
+@Roles('admin', 'pmo', 'finance')
 @Controller('budgets')
 export class BudgetsController {
   constructor(private readonly budgetsService: BudgetsService) {}
+
+  @Get()
+  findAll() {
+    return this.budgetsService.findAll();
+  }
 
   @Get('alerts')
   getAlerts() {

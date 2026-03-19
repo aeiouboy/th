@@ -14,12 +14,12 @@ import {
 import { BudgetChart } from '@/components/reports/BudgetChart';
 import { ChargeabilityGauge } from '@/components/reports/ChargeabilityGauge';
 import { ActivityPie } from '@/components/reports/ActivityPie';
-import { AlertList } from '@/components/reports/AlertList';
 import { FinancialPL } from '@/components/reports/FinancialPL';
 import { FileDown, FileText, DollarSign, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { StatCard } from '@/components/shared/StatCard';
 import { PageHeader } from '@/components/shared/PageHeader';
+import { type BudgetAlert, type ChargeabilityAlert } from '@/components/reports/types';
 
 // Types
 interface BudgetSummary {
@@ -61,42 +61,10 @@ interface ChargeabilityReport {
   }[];
 }
 
-interface FinancialImpact {
-  overBudgetCost: number;
-  overBudgetCount: number;
-  lowChargeabilityCost: number;
-  netImpact: number;
-  avgCostRate: number;
-  targetChargeability: number;
-  actualChargeability: number;
-}
-
 interface ActivityDistribution {
   period: string;
   totalHours: number;
   distribution: { category: string; hours: number; percentage: number }[];
-}
-
-interface BudgetAlert {
-  chargeCodeId: string;
-  name: string;
-  budget: number;
-  actual: number;
-  forecast: number | null;
-  severity: string;
-  rootCauseActivity: string | null;
-}
-
-interface ChargeabilityAlert {
-  type: 'chargeability';
-  employeeId: string;
-  name: string;
-  billableHours: number;
-  totalHours: number;
-  chargeability: number;
-  target: number;
-  severity: string;
-  costImpact: number;
 }
 
 interface ChargeCode {
@@ -131,16 +99,6 @@ const emptyActivityDist: ActivityDistribution = {
   distribution: [],
 };
 
-const emptyFinancialImpact: FinancialImpact = {
-  overBudgetCost: 0,
-  overBudgetCount: 0,
-  lowChargeabilityCost: 0,
-  netImpact: 0,
-  avgCostRate: 0,
-  targetChargeability: 80,
-  actualChargeability: 0,
-};
-
 function getCurrentPeriod() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -149,7 +107,6 @@ function getCurrentPeriod() {
 export default function ReportsPage() {
   const [period, setPeriod] = useState(getCurrentPeriod());
   const [selectedProgram, setSelectedProgram] = useState<string>('all');
-  const [selectedTeam, setSelectedTeam] = useState<string>('all');
 
   const { data: chargeCodes = [] } = useQuery<ChargeCode[]>({
     queryKey: ['charge-codes'],
@@ -172,14 +129,9 @@ export default function ReportsPage() {
   });
 
   const { data: chargeability = emptyChargeability, isLoading: loadingCharge } = useQuery<ChargeabilityReport>({
-    queryKey: ['reports', 'chargeability', selectedTeam],
+    queryKey: ['reports', 'chargeability', selectedProgram],
     queryFn: () =>
-      api.get(`/reports/chargeability${selectedTeam !== 'all' ? `?team=${encodeURIComponent(selectedTeam)}` : ''}`),
-  });
-
-  const { data: financialImpact = emptyFinancialImpact, isLoading: loadingFinancial } = useQuery<FinancialImpact>({
-    queryKey: ['reports', 'financial-impact'],
-    queryFn: () => api.get('/reports/financial-impact'),
+      api.get(`/reports/chargeability${selectedProgram !== 'all' ? `?team=${encodeURIComponent(selectedProgram)}` : ''}`),
   });
 
   const { data: activityDist = emptyActivityDist, isLoading: loadingActivity } = useQuery<ActivityDistribution>({
@@ -197,6 +149,19 @@ export default function ReportsPage() {
     queryFn: () => api.get('/budgets/chargeability-alerts'),
   });
 
+  const { data: financialImpact } = useQuery<{
+    byChargeCode?: { chargeCodeId: string; chargeCodeName: string; budget: number; actual: number; variance: number }[];
+  }>({
+    queryKey: ['reports', 'financial-impact', period, selectedProgram],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      if (period) p.set('period', period);
+      if (selectedProgram && selectedProgram !== 'all') p.set('team', selectedProgram);
+      const q = p.toString();
+      return api.get(`/reports/financial-impact${q ? `?${q}` : ''}`);
+    },
+  });
+
   const { data: projectCost } = useQuery({
     queryKey: ['reports', 'project-cost', selectedProgram],
     queryFn: () =>
@@ -206,17 +171,26 @@ export default function ReportsPage() {
     enabled: selectedProgram !== 'all',
   });
 
-  const teams = useMemo(() => {
-    if (!utilization?.byDepartment) return [];
-    return Object.keys(utilization.byDepartment).sort();
-  }, [utilization]);
-
   const budgetChartData = useMemo(() => {
-    if (projectCost?.breakdown && projectCost.breakdown.length > 0) {
-      return projectCost.breakdown;
+    // When a specific program is selected, use project-cost breakdown
+    if (selectedProgram !== 'all' && projectCost?.breakdown && projectCost.breakdown.length > 0) {
+      return projectCost.breakdown.filter((cc) => cc.budgetAmount > 0 || cc.actualSpent > 0);
+    }
+    // When "all" is selected, use financial-impact byChargeCode data
+    if (financialImpact?.byChargeCode && financialImpact.byChargeCode.length > 0) {
+      return financialImpact.byChargeCode
+        .filter((cc) => cc.budget > 0 || cc.actual > 0)
+        .sort((a, b) => b.budget - a.budget)
+        .slice(0, 10)
+        .map((cc) => ({
+          chargeCodeId: cc.chargeCodeId,
+          chargeCodeName: cc.chargeCodeName,
+          budgetAmount: cc.budget,
+          actualSpent: cc.actual,
+        }));
     }
     return [];
-  }, [projectCost]);
+  }, [selectedProgram, projectCost, financialImpact]);
 
   const periodOptions = useMemo(() => {
     const options: string[] = [];
@@ -289,17 +263,6 @@ export default function ReportsPage() {
           </SelectContent>
         </Select>
 
-        <Select value={selectedTeam} onValueChange={(v) => v && setSelectedTeam(v)}>
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Team" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Teams</SelectItem>
-            {teams.map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       {/* ROW 1: KPI Cards with colored top borders */}
@@ -317,52 +280,26 @@ export default function ReportsPage() {
       </div>
 
       {/* ROW 2: Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ChartCard title="Budget vs Actual" loading={loadingAlerts}>
           <div className="h-72"><BudgetChart data={budgetChartData} /></div>
         </ChartCard>
         <ChartCard title="Chargeability by Team" loading={loadingCharge}>
-          <div className="h-72"><ChargeabilityGauge members={chargeability.members} target={chargeability.target} /></div>
+          <div style={{ height: Math.max(150, Math.min(288, (chargeability.members?.length ?? 2) * 55 + 50)) }}><ChargeabilityGauge members={chargeability.members} target={chargeability.target} /></div>
         </ChartCard>
-      </div>
-
-      {/* ROW 3: Activity Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ChartCard title="Activity Distribution" loading={loadingActivity}>
           <div className="h-72"><ActivityPie data={activityDist.distribution} /></div>
         </ChartCard>
-        {loadingFinancial ? <SkeletonChart /> : (
-          <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <h3 className="text-sm font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">Financial Impact Summary</h3>
-            <p className="text-xs text-[var(--text-muted)] mb-5">Profit & Loss impact analysis</p>
-            <div className="space-y-4">
-              <FinancialRow label="Over-budget cost" value={financialImpact.overBudgetCost} isNegative detail={`${financialImpact.overBudgetCount} projects over budget`} />
-              <FinancialRow label="Low chargeability" value={financialImpact.lowChargeabilityCost} isNegative detail={`Actual: ${financialImpact.actualChargeability}% vs Target: ${financialImpact.targetChargeability}%`} />
-              <div className="border-t border-[var(--border-default)] pt-3">
-                <FinancialRow label="Net P/L Impact" value={financialImpact.netImpact} isNegative isBold />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* ROW 3b: Financial P/L with Team Breakdown */}
-      <FinancialPL period={period} team={selectedTeam} />
-
-      {/* ROW 4: Alert table */}
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="px-5 py-4 border-b border-[var(--border-default)]">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">Alerts</h3>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">Budget overruns and chargeability gaps. Click a budget row to see root cause.</p>
-        </div>
-        {loadingAlerts ? (
-          <div className="p-5 animate-pulse space-y-3">
-            {[1, 2, 3].map(i => <div key={i} className="h-4 bg-stone-200 dark:bg-stone-700 rounded" style={{ width: `${100 - i * 15}%` }} />)}
-          </div>
-        ) : (
-          <AlertList alerts={budgetAlerts} chargeabilityAlerts={chargeabilityAlerts} />
-        )}
-      </div>
+      {/* ROW 3: Financial P/L with Team Breakdown + Alerts */}
+      <FinancialPL
+        period={period}
+        team={selectedProgram}
+        budgetAlerts={budgetAlerts}
+        chargeabilityAlerts={chargeabilityAlerts}
+        loadingAlerts={loadingAlerts}
+      />
     </div>
   );
 }
@@ -373,20 +310,6 @@ function ChartCard({ title, loading, children }: { title: string; loading: boole
     <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 font-[family-name:var(--font-heading)]">{title}</h3>
       {children}
-    </div>
-  );
-}
-
-function FinancialRow({ label, value, isNegative, isBold, detail }: { label: string; value: number; isNegative?: boolean; isBold?: boolean; detail?: string }) {
-  return (
-    <div className="flex items-start justify-between">
-      <div>
-        <p className={`text-sm ${isBold ? 'font-semibold text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'}`}>{label}</p>
-        {detail && <p className="text-xs text-[var(--text-muted)] mt-0.5">{detail}</p>}
-      </div>
-      <p className={`${isBold ? 'text-lg font-bold' : 'text-sm'} ${isNegative && value > 0 ? 'text-[var(--accent-red)]' : 'text-[var(--text-primary)]'}`}>
-        {isNegative && value > 0 ? '-' : ''}{formatCurrency(value)}
-      </p>
     </div>
   );
 }

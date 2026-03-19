@@ -85,6 +85,7 @@ Available at `http://localhost:3001/api/docs` when backend is running.
 | Email | Role | Notes |
 |-------|------|-------|
 | tachongrak@central.co.th | admin | CC Owner for PRG-001 |
+| admin-th@central.co.th | admin | CEO demo account |
 | nattaya.k@central.co.th | charge_manager | Manager of Wichai & Ploy |
 | wichai.s@central.co.th | employee | Backend team |
 | ploy.r@central.co.th | employee | Frontend team |
@@ -93,6 +94,10 @@ Available at `http://localhost:3001/api/docs` when backend is running.
 ## Reinforcement Learning — Past Mistakes (DO NOT REPEAT)
 
 ข้อผิดพลาดทั้งหมดที่เคยเกิดขึ้นในโปรเจคนี้ จัดเป็นหมวดหมู่ตาม pattern เพื่อป้องกันไม่ให้เกิดซ้ำ
+
+## Webhook
+
+https://centralgroup.webhook.office.com/webhookb2/8a66c931-96fd-4e87-962f-a292751aad07@817e531d-191b-4cf5-8812-f0061d89b53d/IncomingWebhook/7e1cf2f9338f4752b9fecb996eb48232/cb3342f7-d297-4017-80eb-9087c1b528dd/V2DfldJokmM-ryWVhbi6_nlymsp5eHbPNXJldHmBJBHMc1
 
 ### Category 1: Supabase Infrastructure Assumptions
 
@@ -166,6 +171,45 @@ Available at `http://localhost:3001/api/docs` when backend is running.
 
 **Rule: For hierarchical data — non-root items MUST have a parent. Validate on frontend AND backend.**
 
+### Category 8: Process & DevOps Pitfalls
+
+| # | Mistake | Root Cause | Correct Behavior |
+|---|---------|-----------|-----------------|
+| 24 | `kill -9` backend multiple times → Supabase pooler port 6543 stopped accepting connections | Zombie DB connections not cleaned up, PgBouncer connection queue full | Use `kill` (SIGTERM) not `kill -9`. For dev, use port 5432 (session mode) which is more resilient. If 6543 breaks, switch to 5432 temporarily |
+| 25 | E2E tests created timesheets months into the future (Apr-Sep 2026) and locked them all | Workflow approval tests run full approve→lock cycle on test data without cleanup | E2E tests MUST clean up created data after test (DELETE in afterAll), or use isolated test periods that won't interfere with real usage |
+| 26 | Seed data had 90+ test cost rates ("L-TEST-*"), 99 test programs ("Test-Program-*") | E2E tests create records but never delete them | Add cleanup scripts. Before seeding, delete test data. Search for "L-TEST-", "Test-Program-" before declaring done |
+
+**Rule: Never `kill -9` backend during dev — use SIGTERM. E2E tests must cleanup after themselves. Periodically audit DB for test data pollution.**
+
+### Category 9: Report Data Source Mismatch
+
+| # | Mistake | Root Cause | Correct Behavior |
+|---|---------|-----------|-----------------|
+| 27 | P/L Breakdown grouped by `profiles.department` ("Engineering") but Budget page uses charge code hierarchy ("DEPT-MER") | Two different grouping sources for the same concept | Reports that show cost/budget data MUST group by **charge code root program** (from `path` column), not `profiles.department`. This ensures consistency with Budget page |
+| 28 | Chargeability report filter `?team=DEPT-SCM` didn't work | Backend filtered by `profiles.department !== team` but frontend sent program ID | When filter param represents a charge code program, backend must filter by charge code root ID, not profile department |
+| 29 | Two "Program" filter dropdowns on Reports page controlling different things | `selectedProgram` controlled Budget chart, `selectedTeam` controlled P/L — both labeled "Program" | One filter controls everything. Remove duplicate dropdowns. Single `selectedProgram` state drives all queries |
+
+**Rule: All report sections on the same page MUST use the same filter state. Group financial data by charge code hierarchy, never by profiles.department.**
+
+### Category 10: Notification & Alert UX Gaps
+
+| # | Mistake | Root Cause | Correct Behavior |
+|---|---------|-----------|-----------------|
+| 30 | NotificationBell showed "Budget overrun: -79% over" for MER (only 21% used) | Text always said "overrun" regardless of actual vs budget comparison | Check `actual > budget` before labeling "overrun". If under budget but at risk, show "Budget at risk: X% used" |
+| 31 | Badge count included real-time alerts (budget/chargeability) that user can't dismiss | Badge = unread DB + budget alerts + chargeability alerts | Badge should only count **actionable** items (DB notifications that can be marked as read). Real-time alerts show in dropdown but don't inflate badge |
+| 32 | /notifications page showed "No notifications" while bell showed MER alert | Bell combined DB notifications + real-time alerts, but page only showed DB | Notifications page must also show real-time alerts (budget/chargeability) alongside DB notifications. Single source of truth for what user sees |
+| 33 | Clicking alert in bell navigated to /reports instead of /notifications | Separate "View alerts" link went to different page than "View all notifications" | All bell items should navigate to /notifications. Remove separate "View alerts" link. One destination |
+
+**Rule: Badge = only dismissable items. Notifications page = DB notifications + real-time alerts combined. All bell clicks → /notifications.**
+
+### Category 11: TanStack Query & React State Bugs
+
+| # | Mistake | Root Cause | Correct Behavior |
+|---|---------|-----------|-----------------|
+| 34 | FinancialPL query didn't update when filter changed | `URLSearchParams` built outside `queryFn` → stale closure captured old values | Always build URL params INSIDE `queryFn`, not outside. The queryKey triggers refetch, but queryFn must use fresh values |
+
+**Rule: In TanStack Query, build all dynamic URL params inside `queryFn`. Never rely on closure variables from render scope — they become stale.**
+
 ### Quick Checklist Before Declaring Done
 
 ```
@@ -177,4 +221,10 @@ Available at `http://localhost:3001/api/docs` when backend is running.
 [ ] Nav items and routes are role-gated (test with employee account)
 [ ] Form validations match DB constraints (required fields, hierarchy rules)
 [ ] API response shapes match frontend TypeScript interfaces
+[ ] No duplicate filter dropdowns controlling different state on same page
+[ ] Reports group by charge code hierarchy, not profiles.department
+[ ] E2E test data cleaned up (no "Test-Program-*", "L-TEST-*" in DB)
+[ ] Notification badge counts only dismissable items
+[ ] TanStack Query params built inside queryFn, not outside
+[ ] Backend restart uses SIGTERM, not kill -9
 ```

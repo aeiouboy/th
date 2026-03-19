@@ -281,7 +281,7 @@ Get direct children of a charge code.
 
 Update user access (assignments) for a charge code.
 
-- **Auth**: Yes, **admin** or **charge_manager**
+- **Auth**: Yes — **charge code owner**, **approver**, or **admin** only (AC10)
 - **Request Body**:
 ```json
 {
@@ -289,7 +289,11 @@ Update user access (assignments) for a charge code.
 }
 ```
 - **Response**: Updated access list
-- **Errors**: 400, 401, 403, 404
+- **Errors**:
+  - `400` — invalid input
+  - `401` — unauthorized
+  - `403` — caller is not the charge code owner, approver, or admin
+  - `404` — charge code not found
 
 ---
 
@@ -664,6 +668,79 @@ Get all stored notifications.
 - **Auth**: Yes, **admin** or **pmo**
 - **Response**: Array of notification objects
 - **Errors**: 401, 403
+
+---
+
+## Notifications
+
+User-facing notification inbox. Each notification is addressed to a specific user and tracks read state.
+
+### GET /notifications
+
+Get the authenticated user's notifications with optional pagination and filtering.
+
+- **Auth**: Yes (any role)
+- **Query Params**:
+  - `limit` (optional, default `20`): maximum number of notifications to return
+  - `offset` (optional, default `0`): number of notifications to skip (for pagination)
+  - `unreadOnly` (optional): `true` to return only unread notifications
+- **Response**:
+```json
+[
+  {
+    "id": "uuid",
+    "type": "timesheet_reminder",
+    "recipientId": "uuid",
+    "subject": "Timesheet Reminder",
+    "body": "You have logged 16h out of 24h expected so far this week...",
+    "isRead": false,
+    "createdAt": "2026-03-18T08:00:00.000Z",
+    "readAt": null
+  }
+]
+```
+- **Notification types**: `timesheet_reminder`, `approval_reminder`, `manager_summary`, `weekly_insights`
+- **Errors**: 401
+
+### GET /notifications/unread-count
+
+Get the count of unread notifications for the authenticated user.
+
+- **Auth**: Yes (any role)
+- **Response**:
+```json
+{
+  "count": 3
+}
+```
+- **Errors**: 401
+
+### PATCH /notifications/:id/read
+
+Mark a single notification as read.
+
+- **Auth**: Yes (owner of the notification only)
+- **Params**: `id` (UUID of the notification)
+- **Request Body**: None
+- **Response**: Updated notification object with `isRead: true` and `readAt` timestamp set
+- **Errors**:
+  - `401` — unauthorized
+  - `403` — notification belongs to a different user
+  - `404` — notification not found
+
+### POST /notifications/read-all
+
+Mark all of the authenticated user's notifications as read.
+
+- **Auth**: Yes (any role)
+- **Request Body**: None
+- **Response**:
+```json
+{
+  "success": true
+}
+```
+- **Errors**: 401
 
 ### POST /integrations/projects/upload
 

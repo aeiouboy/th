@@ -13,16 +13,19 @@ import {
   chargeCodeUsers,
   chargeCodes,
   calendar,
+  vacationRequests,
 } from '../database/schema';
 import { CreateTimesheetDto } from './dto/create-timesheet.dto';
 import { EntryDto } from './dto/upsert-entries.dto';
 import { CalendarService } from '../calendar/calendar.service';
+import { TeamsWebhookService } from '../integrations/teams-webhook.service';
 
 @Injectable()
 export class TimesheetsService {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDB,
     private readonly calendarService: CalendarService,
+    private readonly teamsWebhook: TeamsWebhookService,
   ) {}
 
   private getWeekBounds(dateStr: string): { start: string; end: string } {
@@ -76,6 +79,9 @@ export class TimesheetsService {
         status: 'draft',
       })
       .returning();
+
+    // Auto-fill leave entries for approved vacation days
+    await this.autoFillLeaveEntries(created.id, userId, week.start, week.end);
 
     return created;
   }
@@ -155,14 +161,17 @@ export class TimesheetsService {
 
     if (!sheet) throw new NotFoundException('Timesheet not found');
 
-    if (sheet.status !== 'draft' && sheet.status !== 'rejected') {
+    if (!['draft', 'rejected', 'submitted', 'approved'].includes(sheet.status)) {
       throw new ForbiddenException(
-        'Can only edit timesheets in draft or rejected status',
+        'Cannot edit timesheets that are locked',
       );
     }
 
-    // Validate charge codes are assigned to user
-    const chargeCodeIds = [...new Set(entries.map((e) => e.charge_code_id))];
+    // Filter out LEAVE-001 entries — they are system-managed and cannot be edited by users
+    const userEntries = entries.filter((e) => e.charge_code_id !== 'LEAVE-001');
+
+    // Validate charge codes are assigned to user (skip system codes like LEAVE-001)
+    const chargeCodeIds = [...new Set(userEntries.map((e) => e.charge_code_id))];
     if (chargeCodeIds.length > 0) {
       const allowedCodes = await this.db
         .select({ chargeCodeId: chargeCodeUsers.chargeCodeId })
@@ -183,16 +192,26 @@ export class TimesheetsService {
       }
     }
 
-    // Delete existing entries for this timesheet, then insert fresh
+    // Delete existing non-leave entries for this timesheet, then insert fresh
+    // Preserve system leave entries (LEAVE-001)
     await this.db
       .delete(timesheetEntries)
-      .where(eq(timesheetEntries.timesheetId, timesheetId));
+      .where(
+        and(
+          eq(timesheetEntries.timesheetId, timesheetId),
+          sql`${timesheetEntries.chargeCodeId} != 'LEAVE-001'`,
+        ),
+      );
 
-    if (entries.length === 0) {
-      return [];
+    if (userEntries.length === 0) {
+      // Still return existing leave entries
+      return this.db
+        .select()
+        .from(timesheetEntries)
+        .where(eq(timesheetEntries.timesheetId, timesheetId));
     }
 
-    const toInsert = entries
+    const toInsert = userEntries
       .filter((e) => e.hours > 0)
       .map((e) => ({
         timesheetId,
@@ -229,9 +248,31 @@ export class TimesheetsService {
 
     if (!sheet) throw new NotFoundException('Timesheet not found');
 
-    if (sheet.status !== 'draft' && sheet.status !== 'rejected') {
+    if (!['draft', 'rejected', 'submitted'].includes(sheet.status)) {
       throw new BadRequestException(
         `Cannot submit timesheet with status '${sheet.status}'`,
+      );
+    }
+
+    // Auto-fill leave entries before validation (handles vacation approved after timesheet creation)
+    await this.autoFillLeaveEntries(id, userId, sheet.periodStart, sheet.periodEnd);
+
+    // Cutoff enforcement: cutoff on 15th and end of month (per PRD)
+    const now = new Date();
+    const periodEndDate = new Date(sheet.periodEnd);
+    const year = periodEndDate.getUTCFullYear();
+    const month = periodEndDate.getUTCMonth();
+    const day = periodEndDate.getUTCDate();
+
+    // Determine cutoff date: 15th or last day of month
+    const lastDayOfMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    const cutoffDate = day <= 15
+      ? new Date(Date.UTC(year, month, 15, 23, 59, 59))
+      : new Date(Date.UTC(year, month, lastDayOfMonth, 23, 59, 59));
+
+    if (now > cutoffDate) {
+      throw new ForbiddenException(
+        `Submission period closed. Cutoff was ${cutoffDate.toISOString().split('T')[0]}. Contact your manager for late submission.`,
       );
     }
 
@@ -247,6 +288,18 @@ export class TimesheetsService {
       })
       .where(eq(timesheets.id, id))
       .returning();
+
+    // Teams notification (fire-and-forget)
+    this.teamsWebhook
+      .sendCard(
+        'Timesheet Submitted',
+        `A timesheet has been submitted for review.`,
+        [
+          { name: 'Period', value: `${sheet.periodStart} - ${sheet.periodEnd}` },
+        ],
+        '2196f3', // blue info
+      )
+      .catch(() => {});
 
     return updated;
   }
@@ -287,21 +340,47 @@ export class TimesheetsService {
 
     const nonWorkingSet = new Set(nonWorkingDays.map((d) => d.date));
 
-    // Check each weekday in the period
+    // Get approved vacation days for this user overlapping the period
+    const approvedVacations = await this.db
+      .select({
+        startDate: vacationRequests.startDate,
+        endDate: vacationRequests.endDate,
+      })
+      .from(vacationRequests)
+      .where(
+        and(
+          eq(vacationRequests.userId, userId),
+          eq(vacationRequests.status, 'approved'),
+          lte(vacationRequests.startDate, periodEnd),
+          gte(vacationRequests.endDate, periodStart),
+        ),
+      );
+
+    const vacationDays = new Set<string>();
+    for (const v of approvedVacations) {
+      const vStart = new Date(
+        Math.max(new Date(v.startDate).getTime(), new Date(periodStart).getTime()),
+      );
+      const vEnd = new Date(
+        Math.min(new Date(v.endDate).getTime(), new Date(periodEnd).getTime()),
+      );
+      for (let d = new Date(vStart); d <= vEnd; d.setDate(d.getDate() + 1)) {
+        vacationDays.add(d.toISOString().split('T')[0]);
+      }
+    }
+
+    // Check each day that has entries — must have at least 8 hours
+    // Days without any entries are allowed (employee can submit daily)
     const shortDays: { date: string; logged: number; required: number }[] = [];
-    const start = new Date(periodStart);
-    const end = new Date(periodEnd);
 
-    for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
-      const dateStr = d.toISOString().split('T')[0];
-
-      // Skip weekends (fallback check) and holidays from calendar
+    for (const [dateStr, logged] of hoursByDate) {
+      // Skip weekends, holidays, and approved vacation days
+      const d = new Date(dateStr + 'T00:00:00Z');
       const dayOfWeek = d.getUTCDay();
-      if (dayOfWeek === 0 || dayOfWeek === 6 || nonWorkingSet.has(dateStr)) {
+      if (dayOfWeek === 0 || dayOfWeek === 6 || nonWorkingSet.has(dateStr) || vacationDays.has(dateStr)) {
         continue;
       }
 
-      const logged = hoursByDate.get(dateStr) ?? 0;
       if (logged < 8) {
         shortDays.push({ date: dateStr, logged, required: 8 });
       }
@@ -315,8 +394,111 @@ export class TimesheetsService {
     }
   }
 
+  /**
+   * Auto-fill 8h leave entries for approved vacation days and public holidays
+   * within the timesheet period. Deletes and re-inserts to stay in sync.
+   */
+  private async autoFillLeaveEntries(
+    timesheetId: string,
+    userId: string,
+    periodStart: string,
+    periodEnd: string,
+  ): Promise<void> {
+    // Find approved vacations overlapping this period
+    const approvedVacations = await this.db
+      .select({
+        startDate: vacationRequests.startDate,
+        endDate: vacationRequests.endDate,
+      })
+      .from(vacationRequests)
+      .where(
+        and(
+          eq(vacationRequests.userId, userId),
+          eq(vacationRequests.status, 'approved'),
+          lte(vacationRequests.startDate, periodEnd),
+          gte(vacationRequests.endDate, periodStart),
+        ),
+      );
+
+    // Collect all vacation weekdays within the period
+    const leaveEntriesToInsert: { date: string; description: string }[] = [];
+    const coveredDates = new Set<string>();
+
+    for (const v of approvedVacations) {
+      const vStart = new Date(
+        Math.max(new Date(v.startDate).getTime(), new Date(periodStart).getTime()),
+      );
+      const vEnd = new Date(
+        Math.min(new Date(v.endDate).getTime(), new Date(periodEnd).getTime()),
+      );
+      for (let d = new Date(vStart); d <= vEnd; d.setDate(d.getDate() + 1)) {
+        const dayOfWeek = d.getUTCDay();
+        // Skip weekends
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          const dateStr = d.toISOString().split('T')[0];
+          if (!coveredDates.has(dateStr)) {
+            coveredDates.add(dateStr);
+            leaveEntriesToInsert.push({ date: dateStr, description: 'Annual Leave' });
+          }
+        }
+      }
+    }
+
+    // Find public holidays within the period
+    const holidays = await this.db
+      .select({
+        date: calendar.date,
+        holidayName: calendar.holidayName,
+      })
+      .from(calendar)
+      .where(
+        and(
+          gte(calendar.date, periodStart),
+          lte(calendar.date, periodEnd),
+          eq(calendar.isHoliday, true),
+        ),
+      );
+
+    for (const h of holidays) {
+      // Skip weekends and dates already covered by vacation
+      const hDate = new Date(h.date + 'T00:00:00Z');
+      const dayOfWeek = hDate.getUTCDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+      if (!coveredDates.has(h.date)) {
+        coveredDates.add(h.date);
+        leaveEntriesToInsert.push({
+          date: h.date,
+          description: h.holidayName || 'Public Holiday',
+        });
+      }
+    }
+
+    // Delete any existing LEAVE-001 entries for this timesheet first, then re-insert
+    await this.db
+      .delete(timesheetEntries)
+      .where(
+        and(
+          eq(timesheetEntries.timesheetId, timesheetId),
+          eq(timesheetEntries.chargeCodeId, 'LEAVE-001'),
+        ),
+      );
+
+    if (leaveEntriesToInsert.length === 0) return;
+
+    const values = leaveEntriesToInsert.map((entry) => ({
+      timesheetId,
+      chargeCodeId: 'LEAVE-001',
+      date: entry.date,
+      hours: '8',
+      description: entry.description,
+    }));
+
+    await this.db.insert(timesheetEntries).values(values);
+  }
+
   async getUserChargeCodes(userId: string) {
-    return this.db
+    // Get user's assigned charge codes
+    const userCodes = await this.db
       .select({
         chargeCodeId: chargeCodeUsers.chargeCodeId,
         name: chargeCodes.name,
@@ -330,5 +512,24 @@ export class TimesheetsService {
         eq(chargeCodeUsers.chargeCodeId, chargeCodes.id),
       )
       .where(eq(chargeCodeUsers.userId, userId));
+
+    // Always include the system LEAVE-001 charge code
+    const [leaveCode] = await this.db
+      .select({
+        chargeCodeId: chargeCodes.id,
+        name: chargeCodes.name,
+        isBillable: chargeCodes.isBillable,
+        programName: chargeCodes.programName,
+        activityCategory: chargeCodes.activityCategory,
+      })
+      .from(chargeCodes)
+      .where(eq(chargeCodes.id, 'LEAVE-001'))
+      .limit(1);
+
+    if (leaveCode && !userCodes.find((c) => c.chargeCodeId === 'LEAVE-001')) {
+      userCodes.push(leaveCode);
+    }
+
+    return userCodes;
   }
 }

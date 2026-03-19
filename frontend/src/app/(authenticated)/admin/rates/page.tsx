@@ -80,6 +80,11 @@ export default function AdminRatesPage() {
   const [formJobGrade, setFormJobGrade] = useState('');
   const [formHourlyRate, setFormHourlyRate] = useState('');
   const [formEffectiveFrom, setFormEffectiveFrom] = useState('');
+
+  // Company billing rate state
+  const [billingRatePerDay, setBillingRatePerDay] = useState('');
+  const [editingBillingRate, setEditingBillingRate] = useState(false);
+  const [billingRateLoading, setBillingRateLoading] = useState(false);
   const [formEffectiveTo, setFormEffectiveTo] = useState('');
 
   const fetchRates = useCallback(async () => {
@@ -94,9 +99,19 @@ export default function AdminRatesPage() {
     }
   }, []);
 
+  const fetchBillingRate = useCallback(async () => {
+    try {
+      const data = await api.get<{ key: string; value: string }>('/company-settings/billing_rate_per_day');
+      setBillingRatePerDay(data.value || '0');
+    } catch (e) {
+      console.error('Failed to fetch billing rate:', e);
+    }
+  }, []);
+
   useEffect(() => {
     fetchRates();
-  }, [fetchRates]);
+    fetchBillingRate();
+  }, [fetchRates, fetchBillingRate]);
 
   const ratesWithStatus = rates.map((r) => ({ ...r, status: getRateStatus(r) }));
   const filtered = ratesWithStatus.filter((r) => statusFilter === 'all' || r.status === statusFilter);
@@ -147,6 +162,18 @@ export default function AdminRatesPage() {
     }
   }
 
+  async function handleSaveBillingRate() {
+    setBillingRateLoading(true);
+    try {
+      await api.put('/company-settings/billing_rate_per_day', { value: billingRatePerDay });
+      setEditingBillingRate(false);
+    } catch (e) {
+      console.error('Failed to save billing rate:', e);
+    } finally {
+      setBillingRateLoading(false);
+    }
+  }
+
   async function handleDelete(id: number) {
     setActionLoading(true);
     try {
@@ -181,6 +208,55 @@ export default function AdminRatesPage() {
           icon={DollarSignIcon}
         />
       </div>
+
+      {/* Company Billing Rate */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Company Billing Rate</CardTitle>
+          {!editingBillingRate && (
+            <Button variant="ghost" size="icon-xs" onClick={() => setEditingBillingRate(true)}>
+              <PencilIcon className="w-3.5 h-3.5" />
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent>
+          {editingBillingRate ? (
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">
+                  Billing Rate per Day ({currency})
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={billingRatePerDay}
+                  onChange={(e) => setBillingRatePerDay(e.target.value)}
+                  className="font-[family-name:var(--font-mono)]"
+                />
+              </div>
+              <div className="text-sm text-[var(--text-muted)] pb-2">
+                = {formatCurrency(Number(billingRatePerDay || 0) / 8)}/hr
+              </div>
+              <Button size="sm" onClick={handleSaveBillingRate} disabled={billingRateLoading}>
+                {billingRateLoading && <Loader2Icon className="w-4 h-4 animate-spin mr-1" />}
+                Save
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => { setEditingBillingRate(false); fetchBillingRate(); }}>
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-baseline gap-4">
+              <span className="text-2xl font-bold font-[family-name:var(--font-mono)] text-[var(--text-primary)]">
+                {formatCurrency(Number(billingRatePerDay || 0))}/day
+              </span>
+              <span className="text-sm text-[var(--text-muted)]">
+                ({formatCurrency(Number(billingRatePerDay || 0) / 8)}/hr)
+              </span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Rate table */}
       <Card>

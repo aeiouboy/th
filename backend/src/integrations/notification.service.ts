@@ -9,6 +9,7 @@ import {
   budgets,
   calendar,
 } from '../database/schema';
+import { NotificationsService } from '../notifications/notifications.service';
 
 export interface Notification {
   id: string;
@@ -31,7 +32,10 @@ export class IntegrationNotificationService {
   private notifications: Notification[] = [];
   private notificationCounter = 0;
 
-  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: DrizzleDB,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   getNotifications(): Notification[] {
     return this.notifications;
@@ -396,7 +400,7 @@ export class IntegrationNotificationService {
           overruns
             .map(
               (r) =>
-                `- ${r.name} (${r.chargeCodeId}): $${Number(r.actualSpent ?? 0).toLocaleString()} / $${Number(r.budgetAmount ?? 0).toLocaleString()}`,
+                `- ${r.name} (${r.chargeCodeId}): ฿${Number(r.actualSpent ?? 0).toLocaleString()} / ฿${Number(r.budgetAmount ?? 0).toLocaleString()}`,
             )
             .join('\n')
         : '');
@@ -465,6 +469,13 @@ export class IntegrationNotificationService {
     };
 
     this.notifications.push(notification);
+
+    // Persist to database (fire-and-forget to avoid blocking the loop)
+    this.notificationsService
+      .create(type, recipient.id, subject, body)
+      .catch((err) =>
+        this.logger.error(`Failed to persist notification to DB: ${err.message}`),
+      );
 
     this.logger.log(
       `[${type}] To: ${recipient.fullName ?? recipient.email} — ${subject}`,

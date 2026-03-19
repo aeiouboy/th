@@ -18,7 +18,7 @@
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 1,
         "metadata": {
           "actualWorkers": 1
         },
@@ -34,7 +34,7 @@
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 1,
         "metadata": {
           "actualWorkers": 1
         },
@@ -50,7 +50,7 @@
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 1,
         "metadata": {
           "actualWorkers": 1
         },
@@ -118,12 +118,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 18606,
+                  "duration": 20211,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-18T01:40:05.569Z",
+                  "startTime": "2026-03-18T02:38:25.387Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -139,168 +139,161 @@
       ]
     },
     {
-      "title": "workflow-approval.spec.ts",
-      "file": "workflow-approval.spec.ts",
+      "title": "reports-consolidated.spec.ts",
+      "file": "reports-consolidated.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Workflow Approval Tests",
-          "file": "workflow-approval.spec.ts",
-          "line": 179,
-          "column": 15,
-          "specs": [],
-          "suites": [
+          "title": "E2E-RPT-CON: Consolidated Reports Layout",
+          "file": "reports-consolidated.spec.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [
             {
-              "title": "E2E-WF-07: Rejection flow",
-              "file": "workflow-approval.spec.ts",
-              "line": 440,
-              "column": 8,
-              "specs": [],
-              "suites": [
+              "title": "E2E-RPT-CON-01: Reports page shows consolidated layout",
+              "ok": true,
+              "tags": [],
+              "tests": [
                 {
-                  "title": "Wichai submits timesheet for next week",
-                  "file": "workflow-approval.spec.ts",
-                  "line": 442,
-                  "column": 10,
-                  "specs": [
+                  "timeout": 360000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
                     {
-                      "title": "submit timesheet for next week",
-                      "ok": true,
-                      "tags": [],
-                      "tests": [
-                        {
-                          "timeout": 360000,
-                          "annotations": [
-                            {
-                              "type": "skip",
-                              "location": {
-                                "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
-                                "line": 515,
-                                "column": 16
-                              }
-                            }
-                          ],
-                          "expectedStatus": "skipped",
-                          "projectId": "desktop",
-                          "projectName": "desktop",
-                          "results": [
-                            {
-                              "workerIndex": 1,
-                              "parallelIndex": 0,
-                              "status": "skipped",
-                              "duration": 59543,
-                              "errors": [],
-                              "stdout": [
-                                {
-                                  "text": "WF-07: No draft week found after 25 weeks — state exhausted, skipping submission.\n"
-                                }
-                              ],
-                              "stderr": [],
-                              "retry": 0,
-                              "startTime": "2026-03-18T01:40:25.377Z",
-                              "annotations": [
-                                {
-                                  "type": "skip",
-                                  "location": {
-                                    "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
-                                    "line": 515,
-                                    "column": 16
-                                  }
-                                }
-                              ],
-                              "attachments": []
-                            }
-                          ],
-                          "status": "skipped"
-                        }
-                      ],
-                      "id": "f3fbbcfd8414fe713405-e3e034ee2b93a24e5475",
-                      "file": "workflow-approval.spec.ts",
-                      "line": 446,
-                      "column": 11
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16698,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-18T02:38:47.617Z",
+                      "annotations": [],
+                      "attachments": []
                     }
-                  ]
-                },
-                {
-                  "title": "Nattaya rejects with comment",
-                  "file": "workflow-approval.spec.ts",
-                  "line": 530,
-                  "column": 10,
-                  "specs": [
-                    {
-                      "title": "reject timesheet with comment",
-                      "ok": false,
-                      "tags": [],
-                      "tests": [
-                        {
-                          "timeout": 120000,
-                          "annotations": [],
-                          "expectedStatus": "passed",
-                          "projectId": "desktop",
-                          "projectName": "desktop",
-                          "results": [
-                            {
-                              "workerIndex": 1,
-                              "parallelIndex": 0,
-                              "status": "failed",
-                              "duration": 18831,
-                              "error": {
-                                "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[title=\"Reject\"]').first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[title=\"Reject\"]').first()\u001b[22m\n",
-                                "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[title=\"Reject\"]').first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[title=\"Reject\"]').first()\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts:557:33",
-                                "location": {
-                                  "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
-                                  "column": 33,
-                                  "line": 557
-                                },
-                                "snippet": "  555 |         }\n  556 |\n> 557 |         await expect(rejectBtn).toBeVisible({ timeout: 15000 });\n      |                                 ^\n  558 |         await rejectBtn.click();\n  559 |\n  560 |         // Rejection dialog should open"
-                              },
-                              "errors": [
-                                {
-                                  "location": {
-                                    "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
-                                    "column": 33,
-                                    "line": 557
-                                  },
-                                  "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[title=\"Reject\"]').first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[title=\"Reject\"]').first()\u001b[22m\n\n\n  555 |         }\n  556 |\n> 557 |         await expect(rejectBtn).toBeVisible({ timeout: 15000 });\n      |                                 ^\n  558 |         await rejectBtn.click();\n  559 |\n  560 |         // Rejection dialog should open\n    at /Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts:557:33"
-                                }
-                              ],
-                              "stdout": [],
-                              "stderr": [],
-                              "retry": 0,
-                              "startTime": "2026-03-18T01:41:25.324Z",
-                              "annotations": [],
-                              "attachments": [
-                                {
-                                  "name": "screenshot",
-                                  "contentType": "image/png",
-                                  "path": "/Users/tachongrak/Projects/ts/frontend/test-results/workflow-approval-Workflow-09ca8-ject-timesheet-with-comment-desktop/test-failed-1.png"
-                                },
-                                {
-                                  "name": "error-context",
-                                  "contentType": "text/markdown",
-                                  "path": "/Users/tachongrak/Projects/ts/frontend/test-results/workflow-approval-Workflow-09ca8-ject-timesheet-with-comment-desktop/error-context.md"
-                                }
-                              ],
-                              "errorLocation": {
-                                "file": "/Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts",
-                                "column": 33,
-                                "line": 557
-                              }
-                            }
-                          ],
-                          "status": "unexpected"
-                        }
-                      ],
-                      "id": "f3fbbcfd8414fe713405-4aa6200af7a30b75fd9b",
-                      "file": "workflow-approval.spec.ts",
-                      "line": 533,
-                      "column": 11
-                    }
-                  ]
+                  ],
+                  "status": "expected"
                 }
-              ]
+              ],
+              "id": "b96347be2ab749fd1306-8ce8d5bc5c05c234c95e",
+              "file": "reports-consolidated.spec.ts",
+              "line": 19,
+              "column": 7
+            },
+            {
+              "title": "E2E-RPT-CON-02 (NEGATIVE): Old standalone Alerts section no longer exists",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 360000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3071,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-18T02:39:04.822Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b96347be2ab749fd1306-222c788deb219d3782a4",
+              "file": "reports-consolidated.spec.ts",
+              "line": 84,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "E2E-BELL: NotificationBell Component",
+          "file": "reports-consolidated.spec.ts",
+          "line": 108,
+          "column": 6,
+          "specs": [
+            {
+              "title": "E2E-BELL-01: Notification bell shows badge when alerts exist",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 360000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5910,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-18T02:39:07.898Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b96347be2ab749fd1306-43d3f4250d403508d097",
+              "file": "reports-consolidated.spec.ts",
+              "line": 111,
+              "column": 7
+            },
+            {
+              "title": "E2E-BELL-02 (NEGATIVE): Bell popover closes when clicking outside",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 360000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2552,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-18T02:39:13.813Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "b96347be2ab749fd1306-ca66ced833031bc93ac9",
+              "file": "reports-consolidated.spec.ts",
+              "line": 183,
+              "column": 7
             }
           ]
         }
@@ -309,11 +302,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-18T01:40:04.225Z",
-    "duration": 99971.651,
-    "expected": 1,
-    "skipped": 1,
-    "unexpected": 1,
+    "startTime": "2026-03-18T02:38:24.526Z",
+    "duration": 51874.898,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
     "flaky": 0
   }
 }

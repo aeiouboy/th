@@ -9,3 +9,5 @@ export * from './budgets';
 export * from './calendar';
 export * from './vacation-requests';
 export * from './system-settings';
+export * from './notifications';
+export * from './company-settings';

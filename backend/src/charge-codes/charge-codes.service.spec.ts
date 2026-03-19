@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { ChargeCodesService } from './charge-codes.service';
 import { DRIZZLE } from '../database/drizzle.provider';
 
@@ -136,12 +136,13 @@ describe('ChargeCodesService', () => {
     });
 
     it('should return charge code with assigned users', async () => {
-      const code = { id: 'PRG-001', name: 'Program', level: 'program' };
+      const code = { id: 'PRG-001', name: 'Program', level: 'program', ownerId: null, approverId: null };
       const users = [{ userId: 'u1', email: 'a@test.com', fullName: 'Alice' }];
 
       db.select
         .mockReturnValueOnce(buildLimitChain([code]))
-        .mockReturnValueOnce(buildJoinSelectChain(users));
+        .mockReturnValueOnce(buildJoinSelectChain(users))
+        .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])); // budget
 
       const result = await service.findById('PRG-001');
       expect(result.id).toBe('PRG-001');
@@ -172,39 +173,105 @@ describe('ChargeCodesService', () => {
     it('should throw NotFoundException when charge code does not exist', async () => {
       db.select.mockReturnValueOnce(buildLimitChain([]));
       await expect(
-        service.updateAccess('nonexistent', { addUserIds: ['u1'] })
+        service.updateAccess('nonexistent', { addUserIds: ['u1'] }, 'owner-1')
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should add users to a charge code', async () => {
-      const code = { id: 'PRG-001', name: 'Program', level: 'program' };
+    it('should add users to a charge code and cascade to descendants', async () => {
+      const code = { id: 'PRG-001', name: 'Program', level: 'program', ownerId: 'owner-1', approverId: null };
       const codeWithUsers = { ...code, assignedUsers: [{ userId: 'u1', email: 'a@test.com', fullName: 'Alice' }] };
 
       db.select
-        .mockReturnValueOnce(buildLimitChain([code]))  // findByIdRaw
+        .mockReturnValueOnce(buildLimitChain([code]))  // findByIdRaw (auth check)
+        .mockReturnValueOnce(buildSelectWhereChain([{ id: 'PRJ-001' }]))  // findDescendantIds: direct children of PRG-001
+        .mockReturnValueOnce(buildSelectWhereChain([]))  // findDescendantIds: children of PRJ-001 (none)
         .mockReturnValueOnce(buildLimitChain([code]))  // findById -> findByIdRaw
-        .mockReturnValueOnce(buildJoinSelectChain(codeWithUsers.assignedUsers)); // findById users
+        .mockReturnValueOnce(buildJoinSelectChain(codeWithUsers.assignedUsers)) // findById -> users
+        .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])) // findById -> budget
+        .mockReturnValueOnce(buildLimitChain([{ fullName: 'Owner' }])); // findById -> ownerName
 
       const insertChain = { values: jest.fn().mockReturnThis(), onConflictDoNothing: jest.fn().mockResolvedValue([]) };
       db.insert.mockReturnValueOnce(insertChain);
 
-      const result = await service.updateAccess('PRG-001', { addUserIds: ['u1'] });
+      const result = await service.updateAccess('PRG-001', { addUserIds: ['u1'] }, 'owner-1');
       expect(result.assignedUsers).toHaveLength(1);
+      // Verify insert was called with values for both PRG-001 and PRJ-001
+      expect(insertChain.values).toHaveBeenCalledWith([
+        { chargeCodeId: 'PRG-001', userId: 'u1' },
+        { chargeCodeId: 'PRJ-001', userId: 'u1' },
+      ]);
     });
 
-    it('should remove users from a charge code', async () => {
-      const code = { id: 'PRG-001', name: 'Program', level: 'program' };
+    it('should remove users from a charge code and cascade to descendants', async () => {
+      const code = { id: 'PRG-001', name: 'Program', level: 'program', ownerId: 'owner-1', approverId: null };
 
       db.select
-        .mockReturnValueOnce(buildLimitChain([code]))  // findByIdRaw
+        .mockReturnValueOnce(buildLimitChain([code]))  // findByIdRaw (auth check)
+        .mockReturnValueOnce(buildSelectWhereChain([]))  // findDescendantIds (no children)
         .mockReturnValueOnce(buildLimitChain([code]))  // findById -> findByIdRaw
-        .mockReturnValueOnce(buildJoinSelectChain([])); // findById users (now empty)
+        .mockReturnValueOnce(buildJoinSelectChain([])) // findById -> users (now empty)
+        .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])) // findById -> budget
+        .mockReturnValueOnce(buildLimitChain([{ fullName: 'Owner' }])); // findById -> ownerName
 
       const deleteChain = { from: jest.fn().mockReturnThis(), where: jest.fn().mockResolvedValue([]) };
       db.delete.mockReturnValueOnce(deleteChain);
 
-      const result = await service.updateAccess('PRG-001', { removeUserIds: ['u1'] });
+      const result = await service.updateAccess('PRG-001', { removeUserIds: ['u1'] }, 'owner-1');
       expect(result.assignedUsers).toHaveLength(0);
+    });
+
+    it('UNIT-CC-AUTH-01: should throw ForbiddenException when caller is a non-owner charge_manager', async () => {
+      const code = { id: 'PRG-001', name: 'Program', level: 'program', ownerId: 'owner-1', approverId: null };
+      const callerProfile = { role: 'charge_manager' };
+
+      db.select
+        .mockReturnValueOnce(buildLimitChain([code]))          // findByIdRaw
+        .mockReturnValueOnce(buildLimitChain([callerProfile])); // caller profile lookup
+
+      await expect(
+        service.updateAccess('PRG-001', { addUserIds: ['u1'] }, 'non-owner-id'),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('UNIT-CC-AUTH-02: should succeed when caller is admin (regardless of ownership)', async () => {
+      const code = { id: 'PRG-001', name: 'Program', level: 'program', ownerId: 'owner-1', approverId: null };
+      const adminProfile = { role: 'admin' };
+      const codeWithUsers = { ...code, assignedUsers: [{ userId: 'u1', email: 'a@test.com', fullName: 'Alice' }] };
+
+      db.select
+        .mockReturnValueOnce(buildLimitChain([code]))           // findByIdRaw
+        .mockReturnValueOnce(buildLimitChain([adminProfile]))   // caller profile lookup (not owner)
+        .mockReturnValueOnce(buildSelectWhereChain([]))          // findDescendantIds (no children)
+        .mockReturnValueOnce(buildLimitChain([code]))           // findById -> findByIdRaw
+        .mockReturnValueOnce(buildJoinSelectChain(codeWithUsers.assignedUsers)) // findById -> users
+        .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])) // findById -> budget
+        .mockReturnValueOnce(buildLimitChain([{ fullName: 'Owner' }])); // findById -> ownerName
+
+      const insertChain = { values: jest.fn().mockReturnThis(), onConflictDoNothing: jest.fn().mockResolvedValue([]) };
+      db.insert.mockReturnValueOnce(insertChain);
+
+      const result = await service.updateAccess('PRG-001', { addUserIds: ['u1'] }, 'admin-id');
+      expect(result.assignedUsers).toHaveLength(1);
+    });
+
+    it('UNIT-CC-AUTH-03: should succeed when caller is the charge code owner', async () => {
+      const code = { id: 'PRG-001', name: 'Program', level: 'program', ownerId: 'owner-1', approverId: null };
+      const codeWithUsers = { ...code, assignedUsers: [{ userId: 'u1', email: 'a@test.com', fullName: 'Alice' }] };
+
+      // owner-1 matches code.ownerId → profile lookup is skipped
+      db.select
+        .mockReturnValueOnce(buildLimitChain([code]))           // findByIdRaw
+        .mockReturnValueOnce(buildSelectWhereChain([]))          // findDescendantIds (no children)
+        .mockReturnValueOnce(buildLimitChain([code]))           // findById -> findByIdRaw
+        .mockReturnValueOnce(buildJoinSelectChain(codeWithUsers.assignedUsers)) // findById -> users
+        .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])) // findById -> budget
+        .mockReturnValueOnce(buildLimitChain([{ fullName: 'Owner' }])); // findById -> ownerName
+
+      const insertChain = { values: jest.fn().mockReturnThis(), onConflictDoNothing: jest.fn().mockResolvedValue([]) };
+      db.insert.mockReturnValueOnce(insertChain);
+
+      const result = await service.updateAccess('PRG-001', { addUserIds: ['u1'] }, 'owner-1');
+      expect(result.assignedUsers).toHaveLength(1);
     });
   });
 });

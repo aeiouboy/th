@@ -2,28 +2,7 @@
 
 import { useState, useMemo, Fragment } from 'react';
 import { formatCurrency } from '@/lib/utils';
-
-interface BudgetAlert {
-  chargeCodeId: string;
-  name: string;
-  budget: number;
-  actual: number;
-  forecast: number | null;
-  severity: string;
-  rootCauseActivity: string | null;
-}
-
-interface ChargeabilityAlert {
-  type: 'chargeability';
-  employeeId: string;
-  name: string;
-  billableHours: number;
-  totalHours: number;
-  chargeability: number;
-  target: number;
-  severity: string;
-  costImpact: number;
-}
+import { type BudgetAlert, type ChargeabilityAlert, severityColorClass, compareSeverity } from './types';
 
 type AlertFilter = 'all' | 'budget' | 'chargeability';
 
@@ -33,16 +12,7 @@ interface AlertListProps {
 }
 
 function SeverityDot({ severity }: { severity: string }) {
-  const colorClass =
-    severity === 'red'
-      ? 'bg-[var(--accent-red)]'
-      : severity === 'orange'
-        ? 'bg-[var(--accent-amber)]'
-        : severity === 'yellow'
-          ? 'bg-yellow-500'
-          : 'bg-[var(--accent-green)]';
-
-  return <span className={`inline-block w-2.5 h-2.5 rounded-full ${colorClass}`} />;
+  return <span className={`inline-block w-2.5 h-2.5 rounded-full ${severityColorClass(severity)}`} />;
 }
 
 export function AlertList({ alerts, chargeabilityAlerts = [] }: AlertListProps) {
@@ -55,8 +25,7 @@ export function AlertList({ alerts, chargeabilityAlerts = [] }: AlertListProps) 
   const sorted = useMemo(() => {
     return [...alerts].sort((a, b) => {
       if (sortBy === 'severity') {
-        const order: Record<string, number> = { red: 0, orange: 1, yellow: 2 };
-        return (order[a.severity] ?? 3) - (order[b.severity] ?? 3);
+        return compareSeverity(a.severity, b.severity);
       }
       const overrunA = Math.max(0, a.actual - a.budget);
       const overrunB = Math.max(0, b.actual - b.budget);
@@ -65,10 +34,7 @@ export function AlertList({ alerts, chargeabilityAlerts = [] }: AlertListProps) 
   }, [alerts, sortBy]);
 
   const sortedChargeability = useMemo(() => {
-    return [...chargeabilityAlerts].sort((a, b) => {
-      const order: Record<string, number> = { red: 0, orange: 1, yellow: 2 };
-      return (order[a.severity] ?? 3) - (order[b.severity] ?? 3);
-    });
+    return [...chargeabilityAlerts].sort((a, b) => compareSeverity(a.severity, b.severity));
   }, [chargeabilityAlerts]);
 
   const showBudget = filter === 'all' || filter === 'budget';

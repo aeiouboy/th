@@ -225,6 +225,127 @@ if (level !== 'program' && !parentId) {
 
 ---
 
+## Reports & Notification Bell Issues
+
+### Problem: Notification bell shows 0 / no badge even when alerts exist
+
+**Symptoms:**
+- The bell icon in the topbar has no badge
+- The popover shows "No alerts - everything is on track"
+- The Reports page Alerts tab also shows no alerts
+
+**Cause:**
+The bell fetches from two endpoints: `GET /reports/budget-alerts` and `GET /budgets/chargeability-alerts`. If either the backend is not running or no approved timesheet data exists, both return empty arrays.
+
+**Fix:**
+1. Confirm the backend is running on port 3001:
+   ```bash
+   curl http://localhost:3001/api/v1/reports/budget-alerts \
+     -H "Authorization: Bearer YOUR_JWT"
+   ```
+2. Alerts are computed from **approved** entries only (`cc_approved` or `locked` status). Ensure at least one timesheet has completed the full approval workflow.
+3. If entries exist but alerts do not appear, trigger a budget recalculation:
+   ```bash
+   curl -X POST http://localhost:3001/api/v1/budgets/recalculate \
+     -H "Authorization: Bearer YOUR_JWT"
+   ```
+4. Check the Admin → Rates page to confirm cost rates exist for the relevant job grades — chargeability cost impact will be zero without them.
+
+---
+
+### Problem: Notification bell popover does not close when clicking outside
+
+**Symptoms:**
+- Clicking outside the popover has no effect
+- The popover stays open until manually clicking the bell again
+
+**Cause:**
+The `mousedown` listener is attached only when `open === true` and removed via cleanup. If `open` state does not update (e.g., due to a React batching issue or SSR hydration mismatch), the listener may not fire.
+
+**Fix:**
+This is a client-side component (`'use client'`). Ensure the component is rendered inside the authenticated layout (client boundary). If the issue persists, hard-reload the page to clear any hydration state.
+
+---
+
+### Problem: Reports page Alerts tab shows alerts but bell shows 0
+
+**Symptoms:**
+- Opening `/reports` and clicking the "Alerts" tab shows alert rows
+- The bell in the topbar shows no badge
+
+**Cause:**
+The bell and the Reports page both make independent queries, but with different `staleTime` values. The bell uses 30-second stale time; the Reports page uses TanStack Query defaults. On first load, the bell's cache may not yet be populated.
+
+**Fix:**
+Wait a few seconds and reload — the bell re-fetches on a 30-second interval. Both components share the same TanStack Query keys (`['reports', 'budget-alerts']` and `['reports', 'chargeability-alerts']`), so once either component fetches, the cache is shared and the other will use the cached result.
+
+---
+
+## Notifications Issues
+
+### Problem: Notifications not appearing in /notifications page
+
+**Symptoms:**
+- The `/notifications` page shows an empty state
+- `GET /api/v1/notifications` returns an empty array
+- The notification bell badge shows 0
+
+**Cause:**
+Notifications are created by scheduled jobs (`IntegrationNotificationService`) or manually via `POST /integrations/notifications/send`. If neither has run, the `notifications` table will be empty.
+
+**Fix:**
+1. Confirm the backend is running on port 3001.
+2. Manually trigger all pending notifications (admin or pmo role required):
+   ```bash
+   curl -X POST http://localhost:3001/api/v1/integrations/notifications/send \
+     -H "Authorization: Bearer YOUR_JWT"
+   ```
+3. Reload the `/notifications` page — new notifications should now appear.
+4. If the table is still empty, check the backend logs for errors from `IntegrationNotificationService`.
+
+---
+
+### Problem: Teams webhook not delivering notifications
+
+**Symptoms:**
+- Notifications appear in the `/notifications` page (DB write succeeded)
+- No messages appear in the configured Microsoft Teams channel
+
+**Cause:**
+Teams delivery is fire-and-forget and silently disabled when `TEAMS_WEBHOOK_URL` is not set or is invalid.
+
+**Fix:**
+1. Verify `TEAMS_WEBHOOK_URL` is set in `backend/.env`:
+   ```
+   TEAMS_WEBHOOK_URL=https://your-org.webhook.office.com/webhookb2/...
+   ```
+2. Restart the backend after updating `.env`.
+3. Check backend logs for lines containing `Teams delivery failed` — these surface the raw HTTP error from the webhook endpoint.
+4. Test the webhook URL directly:
+   ```bash
+   curl -X POST "YOUR_TEAMS_WEBHOOK_URL" \
+     -H "Content-Type: application/json" \
+     -d '{"text":"Test message"}'
+   ```
+   A `1` response body confirms the webhook is active.
+
+---
+
+### Problem: 403 on PUT /charge-codes/:id/access
+
+**Symptoms:**
+- `PUT /api/v1/charge-codes/:id/access` returns `403 Forbidden`
+- The response body contains: `Only the charge code owner, approver, or admin can modify access`
+
+**Cause:**
+As of AC10, this endpoint enforces owner/approver/admin authorization. A user with the `charge_manager` role can only modify access for charge codes where they are listed as `ownerId` or `approverId`. Having the `charge_manager` role alone is no longer sufficient.
+
+**Fix:**
+- Use an admin account, or
+- Ensure the `charge_manager` calling the endpoint is set as the `ownerId` or `approverId` on the target charge code (via the charge code edit form or `PUT /charge-codes/:id`).
+
+---
+
 ## Timesheet Submission Issues
 
 ### Problem: Submit returns 400 "Minimum 8 hours required on weekdays"

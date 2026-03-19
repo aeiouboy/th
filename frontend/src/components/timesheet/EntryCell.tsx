@@ -90,16 +90,21 @@ export function EntryCell({ value, onChange, disabled, isBillable, onNavigate, d
       >
         {value > 0 ? value.toFixed(2) : ''}
       </button>
-      {/* Note icon — always visible when description exists, on hover otherwise */}
-      {value > 0 && (hovered || !!description) && (
+      {/* Note indicator — colored corner triangle when has note, subtle icon on hover */}
+      {value > 0 && description && (
         <button
           type="button"
-          className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-white flex items-center justify-center text-[8px] shadow-sm transition-opacity ${
-            description
-              ? 'bg-[var(--accent-amber)] opacity-100'
-              : 'bg-[var(--accent-teal)] opacity-70 hover:opacity-100'
-          }`}
-          title={description ? 'Edit note' : 'Add note'}
+          className="absolute top-0 right-0 w-0 h-0 border-t-[10px] border-r-[10px] border-b-0 border-l-0 border-t-[var(--accent-amber)] border-r-[var(--accent-amber)] border-b-transparent border-l-transparent rounded-tr cursor-pointer"
+          style={{ borderStyle: 'solid' }}
+          title="Edit note"
+          onClick={(e) => { e.stopPropagation(); onNoteClick?.(); }}
+        />
+      )}
+      {value > 0 && !description && hovered && (
+        <button
+          type="button"
+          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--accent-teal)] text-white flex items-center justify-center shadow-sm opacity-80 hover:opacity-100 transition-opacity"
+          title="Add note"
           onClick={(e) => { e.stopPropagation(); onNoteClick?.(); }}
         >
           <NoteIcon />

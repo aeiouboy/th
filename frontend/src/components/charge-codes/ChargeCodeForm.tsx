@@ -25,6 +25,12 @@ interface ParentOption {
   level: string;
 }
 
+interface UserOption {
+  id: string;
+  email: string;
+  fullName: string | null;
+}
+
 interface ChargeCodeFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -39,6 +45,9 @@ interface ChargeCodeFormProps {
     validFrom: string | null;
     validTo: string | null;
     isBillable: boolean | null;
+    activityCategory: string | null;
+    ownerId?: string | null;
+    approverId?: string | null;
   };
   parentId?: string;
   defaultLevel?: string;
@@ -51,7 +60,18 @@ const LEVELS = [
   { value: 'task', label: 'Task' },
 ];
 
-// Which parent level is required for each child level
+const ACTIVITY_CATEGORIES = [
+  'Development',
+  'Testing',
+  'Design',
+  'Meeting',
+  'Training',
+  'Support',
+  'Management',
+  'Infrastructure',
+  'Other',
+];
+
 const PARENT_LEVEL: Record<string, string> = {
   project: 'program',
   activity: 'project',
@@ -69,24 +89,24 @@ export function ChargeCodeForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [parentOptions, setParentOptions] = useState<ParentOption[]>([]);
+  const [userOptions, setUserOptions] = useState<UserOption[]>([]);
   const [selectedParentId, setSelectedParentId] = useState(parentIdProp || '');
 
+  const [chargeCodeId, setChargeCodeId] = useState(editData?.id || '');
   const [name, setName] = useState(editData?.name || '');
   const [level, setLevel] = useState(editData?.level || defaultLevel || 'program');
   const [programName, setProgramName] = useState(editData?.programName || '');
   const [costCenter, setCostCenter] = useState(editData?.costCenter || '');
-  const [budgetAmount, setBudgetAmount] = useState(
-    editData?.budgetAmount || '',
-  );
+  const [budgetAmount, setBudgetAmount] = useState(editData?.budgetAmount || '');
   const [validFrom, setValidFrom] = useState(editData?.validFrom || '');
   const [validTo, setValidTo] = useState(editData?.validTo || '');
-  const [isBillable, setIsBillable] = useState<boolean>(
-    editData?.isBillable ?? true,
-  );
+  const [isBillable, setIsBillable] = useState<boolean>(editData?.isBillable ?? true);
+  const [activityCategory, setActivityCategory] = useState(editData?.activityCategory || '');
+  const [ownerId, setOwnerId] = useState(editData?.ownerId || '');
+  const [approverId, setApproverId] = useState(editData?.approverId || '');
 
   const needsParent = !editData && level !== 'program';
 
-  // Fetch potential parents when level changes
   useEffect(() => {
     if (!needsParent) {
       setParentOptions([]);
@@ -101,15 +121,77 @@ export function ChargeCodeForm({
       .catch(() => setParentOptions([]));
   }, [level, needsParent]);
 
+  useEffect(() => {
+    if (!open) return;
+    api
+      .get<UserOption[]>('/users')
+      .then((data) => setUserOptions(data))
+      .catch(() => setUserOptions([]));
+  }, [open]);
+
+  // Find user name by id for display
+  const getUserLabel = (uid: string) => {
+    const u = userOptions.find((o) => o.id === uid);
+    return u ? (u.fullName || u.email) : '';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    const resolvedParentId = parentIdProp || selectedParentId;
+    // Validation
+    if (!editData && !chargeCodeId.trim()) {
+      setError('Charge Code ID is required');
+      setLoading(false);
+      return;
+    }
 
+    if (!name.trim()) {
+      setError('Name is required');
+      setLoading(false);
+      return;
+    }
+
+    const resolvedParentId = parentIdProp || selectedParentId;
     if (needsParent && !resolvedParentId) {
       setError(`A ${level} must have a parent`);
+      setLoading(false);
+      return;
+    }
+
+    if (!ownerId) {
+      setError('Owner is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!costCenter.trim()) {
+      setError('Cost Center is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!budgetAmount || parseFloat(budgetAmount) < 0) {
+      setError('Budget is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!validFrom) {
+      setError('Valid From date is required');
+      setLoading(false);
+      return;
+    }
+
+    if (!validTo) {
+      setError('Valid To date is required');
+      setLoading(false);
+      return;
+    }
+
+    if (validFrom && validTo && validFrom > validTo) {
+      setError('Valid From must be before Valid To');
       setLoading(false);
       return;
     }
@@ -118,13 +200,17 @@ export function ChargeCodeForm({
       name,
       level,
       isBillable,
+      ownerId,
+      costCenter,
+      budgetAmount: parseFloat(budgetAmount),
+      validFrom,
+      validTo,
     };
+    if (!editData) body.id = chargeCodeId.trim();
     if (resolvedParentId) body.parentId = resolvedParentId;
     if (programName) body.programName = programName;
-    if (costCenter) body.costCenter = costCenter;
-    if (budgetAmount) body.budgetAmount = parseFloat(budgetAmount);
-    if (validFrom) body.validFrom = validFrom;
-    if (validTo) body.validTo = validTo;
+    if (activityCategory) body.activityCategory = activityCategory;
+    if (approverId) body.approverId = approverId;
 
     try {
       if (editData) {
@@ -143,7 +229,7 @@ export function ChargeCodeForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-[family-name:var(--font-heading)]">
             {editData ? 'Edit Charge Code' : 'Create Charge Code'}
@@ -156,9 +242,23 @@ export function ChargeCodeForm({
             </div>
           )}
 
+          {!editData && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
+                Charge Code ID <span className="text-[var(--accent-red)]">*</span>
+              </label>
+              <Input
+                value={chargeCodeId}
+                onChange={(e) => setChargeCodeId(e.target.value)}
+                placeholder="e.g. PRG-001, FY260001"
+                required
+              />
+            </div>
+          )}
+
           <div>
             <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
-              Name
+              Name <span className="text-[var(--accent-red)]">*</span>
             </label>
             <Input
               value={name}
@@ -171,7 +271,7 @@ export function ChargeCodeForm({
           {!editData && (
             <div>
               <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
-                Level
+                Level <span className="text-[var(--accent-red)]">*</span>
               </label>
               <Select value={level} onValueChange={(v) => { setLevel(v ?? 'program'); setSelectedParentId(''); }}>
                 <SelectTrigger className="w-full">
@@ -191,7 +291,7 @@ export function ChargeCodeForm({
           {needsParent && !parentIdProp && (
             <div>
               <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
-                Parent ({PARENT_LEVEL[level]?.charAt(0).toUpperCase() + PARENT_LEVEL[level]?.slice(1)})
+                Parent ({PARENT_LEVEL[level]?.charAt(0).toUpperCase() + PARENT_LEVEL[level]?.slice(1)}) <span className="text-[var(--accent-red)]">*</span>
               </label>
               <Select value={selectedParentId} onValueChange={(v) => setSelectedParentId(v ?? '')}>
                 <SelectTrigger className="w-full">
@@ -213,6 +313,63 @@ export function ChargeCodeForm({
             </div>
           )}
 
+          {/* Owner & Approver */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
+                Owner <span className="text-[var(--accent-red)]">*</span>
+              </label>
+              <select
+                value={ownerId}
+                onChange={(e) => setOwnerId(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                <option value="">Select owner...</option>
+                {userOptions.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.fullName || u.email}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
+                Approver
+              </label>
+              <select
+                value={approverId}
+                onChange={(e) => setApproverId(e.target.value)}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              >
+                <option value="">Default to Owner</option>
+                {userOptions.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.fullName || u.email}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Activity Category */}
+          <div>
+            <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
+              Activity Category
+            </label>
+            <select
+              value={activityCategory}
+              onChange={(e) => setActivityCategory(e.target.value)}
+              className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              <option value="">Select category...</option>
+              {ACTIVITY_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
               Program Name
@@ -227,23 +384,25 @@ export function ChargeCodeForm({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
-                Cost Center
+                Cost Center <span className="text-[var(--accent-red)]">*</span>
               </label>
               <Input
                 value={costCenter}
                 onChange={(e) => setCostCenter(e.target.value)}
                 placeholder="e.g. CC-100"
+                required
               />
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
-                Budget
+                Budget <span className="text-[var(--accent-red)]">*</span>
               </label>
               <Input
                 type="number"
                 value={budgetAmount}
                 onChange={(e) => setBudgetAmount(e.target.value)}
                 placeholder="0.00"
+                required
               />
             </div>
           </div>
@@ -251,22 +410,24 @@ export function ChargeCodeForm({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
-                Valid From
+                Valid From <span className="text-[var(--accent-red)]">*</span>
               </label>
               <Input
                 type="date"
                 value={validFrom}
                 onChange={(e) => setValidFrom(e.target.value)}
+                required
               />
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-[var(--text-secondary)]">
-                Valid To
+                Valid To <span className="text-[var(--accent-red)]">*</span>
               </label>
               <Input
                 type="date"
                 value={validTo}
                 onChange={(e) => setValidTo(e.target.value)}
+                required
               />
             </div>
           </div>

@@ -18,6 +18,12 @@ export enum ChargeCodeLevel {
 }
 
 export class CreateChargeCodeDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  id?: string;
+
   @ApiProperty()
   @IsString()
   @MaxLength(255)

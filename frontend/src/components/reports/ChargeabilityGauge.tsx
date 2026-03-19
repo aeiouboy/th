@@ -42,7 +42,7 @@ export function ChargeabilityGauge({ members, target }: ChargeabilityGaugeProps)
       <BarChart
         data={chartData}
         layout="vertical"
-        margin={{ top: 10, right: 30, left: 80, bottom: 5 }}
+        margin={{ top: 25, right: 20, left: 10, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" horizontal={false} />
         <XAxis
@@ -77,7 +77,7 @@ export function ChargeabilityGauge({ members, target }: ChargeabilityGaugeProps)
           stroke="var(--text-muted)"
           strokeDasharray="4 4"
           strokeWidth={2}
-          label={{ value: `${target}% Target`, position: 'top', fontSize: 11, fill: 'var(--text-muted)' }}
+          label={{ value: `${target}% Target`, position: 'insideTopRight', fontSize: 11, fill: 'var(--text-muted)', dy: -15 }}
         />
         <Bar dataKey="rate" radius={[0, 4, 4, 0]} animationDuration={800}>
           {chartData.map((entry, index) => (

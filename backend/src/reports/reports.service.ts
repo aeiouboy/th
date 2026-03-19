@@ -21,12 +21,15 @@ import {
   BudgetAlertItemDto,
 } from './dto/report-response.dto';
 import { BudgetsService } from '../budgets/budgets.service';
+import { CompanySettingsService } from '../company-settings/company-settings.service';
+import { companySettings } from '../database/schema';
 
 @Injectable()
 export class ReportsService {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDB,
     private readonly budgetsService: BudgetsService,
+    private readonly companySettingsService: CompanySettingsService,
   ) {}
 
   async getProjectCostReport(chargeCodeId: string): Promise<ProjectCostReportDto> {
@@ -228,29 +231,42 @@ export class ReportsService {
   async getChargeabilityReport(team?: string): Promise<ChargeabilityReportDto> {
     const target = 80; // 80% target
 
-    // Build the query - get hours per employee, split by billable
+    // Build the query - get hours per employee per charge code, split by billable
     const query = this.db
       .select({
         userId: timesheets.userId,
+        chargeCodeId: timesheetEntries.chargeCodeId,
         isBillable: chargeCodes.isBillable,
         totalHours: sum(timesheetEntries.hours).as('total_hours'),
       })
       .from(timesheetEntries)
       .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
       .innerJoin(chargeCodes, eq(timesheetEntries.chargeCodeId, chargeCodes.id))
-      .groupBy(timesheets.userId, chargeCodes.isBillable);
+      .groupBy(timesheets.userId, timesheetEntries.chargeCodeId, chargeCodes.isBillable);
 
     const rows = await query;
+
+    // Build charge code -> root program map for filtering
+    const allChargeCodes = await this.db.select().from(chargeCodes);
+    const ccMap = new Map(allChargeCodes.map((cc) => [cc.id, cc]));
+    const getRootId = (chargeCodeId: string): string => {
+      const cc = ccMap.get(chargeCodeId);
+      if (!cc) return chargeCodeId;
+      return cc.path ? cc.path.split('/')[0] : cc.id;
+    };
 
     // Get profiles
     const allProfiles = await this.db.select().from(profiles);
     const profileMap = new Map(allProfiles.map((p) => [p.id, p]));
 
-    // Aggregate per employee
+    // Aggregate per employee (filter by charge code root program if team is set)
     const employeeMap = new Map<string, { billable: number; total: number }>();
     for (const row of rows) {
-      const profile = profileMap.get(row.userId);
-      if (team && profile?.department !== team) continue;
+      // Filter by root program ID
+      if (team && team !== 'all') {
+        const rootId = getRootId(row.chargeCodeId);
+        if (rootId !== team) continue;
+      }
 
       if (!employeeMap.has(row.userId)) {
         employeeMap.set(row.userId, { billable: 0, total: 0 });
@@ -343,17 +359,37 @@ export class ReportsService {
       .from(costRates);
     const avgCostRate = Number(rateResult[0]?.avgRate ?? 0);
 
+    // Company-level billing rate (from company_settings)
+    const [billingSetting] = await this.db
+      .select()
+      .from(companySettings)
+      .where(eq(companySettings.key, 'billing_rate_per_day'));
+    const billingRatePerHour = Number(billingSetting?.value ?? 0) / 8;
+
     // Low chargeability cost
     const gapRate = Math.max(0, targetChargeability - actualRate);
     const lowChargeabilityCost = gapRate * chargeability.overallTotalHours * avgCostRate;
 
-    // byTeam: group by department
+    // byTeam: group by charge code's root program (top-level parent)
     const teamEntryConditions = dateConditions.length > 0
       ? and(...dateConditions)
       : undefined;
 
+    // Build a map of charge code ID -> root program name
+    // Root program = first segment of the `path` column (e.g., "PRG-001/PRJ-001/ACT-001" → "PRG-001")
+    const allChargeCodes = await this.db.select().from(chargeCodes);
+    const ccMap = new Map(allChargeCodes.map((cc) => [cc.id, cc]));
+    const getRootProgram = (chargeCodeId: string): { id: string; name: string } => {
+      const cc = ccMap.get(chargeCodeId);
+      if (!cc) return { id: chargeCodeId, name: chargeCodeId };
+      const rootId = cc.path ? cc.path.split('/')[0] : cc.id;
+      const root = ccMap.get(rootId);
+      return { id: rootId, name: root?.name ?? rootId };
+    };
+
     const teamRows = await this.db
       .select({
+        chargeCodeId: timesheetEntries.chargeCodeId,
         userId: timesheets.userId,
         isBillable: chargeCodes.isBillable,
         totalHours: sum(timesheetEntries.hours).as('total_hours'),
@@ -363,10 +399,21 @@ export class ReportsService {
       .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
       .innerJoin(chargeCodes, eq(timesheetEntries.chargeCodeId, chargeCodes.id))
       .where(teamEntryConditions)
-      .groupBy(timesheets.userId, chargeCodes.isBillable);
+      .groupBy(timesheetEntries.chargeCodeId, timesheets.userId, chargeCodes.isBillable);
 
-    // Aggregate by department
-    const deptMap = new Map<string, {
+    // Build a map of root program -> total budget (sum of all child charge code budgets)
+    const programBudgetMap = new Map<string, number>();
+    for (const cc of allChargeCodes) {
+      const budget = Number(cc.budgetAmount ?? 0);
+      if (budget <= 0) continue;
+      const root = getRootProgram(cc.id);
+      programBudgetMap.set(root.id, (programBudgetMap.get(root.id) ?? 0) + budget);
+    }
+
+    // Aggregate by root program
+    const programMap = new Map<string, {
+      name: string;
+      totalBudget: number;
       totalHours: number;
       billableHours: number;
       totalCost: number;
@@ -388,28 +435,26 @@ export class ReportsService {
     }
 
     for (const row of teamRows) {
-      const profile = profileMap.get(row.userId);
-      if (team && profile?.department !== team) continue;
+      const root = getRootProgram(row.chargeCodeId);
+      if (team && team !== 'all' && root.id !== team) continue;
 
-      const dept = profile?.department ?? 'Unassigned';
-      if (!deptMap.has(dept)) {
-        deptMap.set(dept, { totalHours: 0, billableHours: 0, totalCost: 0, billableRevenue: 0 });
+      if (!programMap.has(root.id)) {
+        programMap.set(root.id, { name: root.name, totalBudget: programBudgetMap.get(root.id) ?? 0, totalHours: 0, billableHours: 0, totalCost: 0, billableRevenue: 0 });
       }
-      const d = deptMap.get(dept)!;
+      const d = programMap.get(root.id)!;
       const hours = Number(row.totalHours ?? 0);
       const cost = Number(row.totalCost ?? 0);
-      const rate = userRates.get(row.userId) ?? avgCostRate;
-
       d.totalHours += hours;
       d.totalCost += cost;
       if (row.isBillable) {
         d.billableHours += hours;
-        d.billableRevenue += hours * rate;
+        d.billableRevenue += hours * billingRatePerHour;
       }
     }
 
-    const byTeam = Array.from(deptMap.entries()).map(([department, d]) => ({
-      department,
+    const byTeam = Array.from(programMap.entries()).map(([id, d]) => ({
+      department: d.name,
+      totalBudget: Math.round(d.totalBudget * 100) / 100,
       totalHours: Math.round(d.totalHours * 100) / 100,
       billableHours: Math.round(d.billableHours * 100) / 100,
       chargeability: d.totalHours > 0 ? Math.round((d.billableHours / d.totalHours) * 10000) / 100 : 0,

@@ -182,4 +182,11 @@ INSERT INTO cost_rates (job_grade, hourly_rate, effective_from, effective_to) VA
   ('L5', 1500.00, '2026-01-01', NULL)
 ON CONFLICT DO NOTHING;
 
+-- ============================================================
+-- COMPANY SETTINGS (billing rate)
+-- ============================================================
+INSERT INTO company_settings (key, value, description) VALUES
+  ('billing_rate_per_day', '6500', 'Standard billing rate per day (THB)')
+ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
+
 COMMIT;

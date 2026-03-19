@@ -93,6 +93,35 @@ When invoked, you must follow these steps:
 
    d2. **Core actions must assert, not guard** — If an action is the PURPOSE of the test (the thing described in the test name), it MUST use an assertion that fails when the precondition is not met. It MUST NOT be wrapped in a conditional that silently skips the action. A test that passes without performing its core action is worse than a failing test — it hides bugs. Conditional guards are only acceptable for optional UI variations (e.g., dismissing an optional dialog), never for the action being tested.
 
+   d3. **Step-by-step narration (MANDATORY)** — Every E2E test MUST include numbered `// Step N:` comments that read like a manual QA script. Each step comment must describe:
+      - **Where**: which page, menu, or tab the user navigates to
+      - **Pre-check**: what should be visible/enabled/disabled BEFORE acting
+      - **Action**: what the user does (click, fill, select, submit)
+      - **Post-check**: the expected UI state AFTER the action (element appears, value changes, button disables, toast shows, etc.)
+
+      For **state transitions** (e.g., draft→submitted→approved→locked), explicitly describe the expected UI change at each stage.
+      For **role switches** (e.g., user A submits, user B approves), clearly state which user is logged in and why.
+      For **business rules** (e.g., field becomes read-only after approval), assert the specific state — don't just check visibility, check enabled/disabled/readonly.
+
+      ```typescript
+      // Step 1: Navigate to [page] via sidebar menu "[Menu Name]"
+      // Pre-check: [element] should be visible and show [expected value]
+      await page.goto('/target-page');
+      await expect(page.locator('h1')).toContainText('Page Title');
+
+      // Step 2: Click "[Button]" to open the form dialog
+      // Pre-check: button should be enabled (not yet submitted)
+      const btn = page.locator('button:has-text("Action")');
+      await expect(btn).toBeEnabled();
+      await btn.click();
+
+      // Step 3: Fill form fields and submit
+      // Post-check: success message appears, status changes to "pending"
+      await page.fill('[name="field"]', 'value');
+      await page.click('button:has-text("Submit")');
+      await expect(page.locator('[data-testid="status"]')).toContainText('Pending');
+      ```
+
    e. **Evidence screenshots (snap)** — CRITICAL: screenshots are EVIDENCE that actions happened, not just page captures.
 
    The test helper must include a reusable `snap()` function:
@@ -147,23 +176,28 @@ docs/test-results/
 
 ### test-cases.csv format (MANDATORY — primary deliverable)
 
-Engineers validate test cases in spreadsheets. CSV is the primary format.
+Engineers and QA validate test cases in spreadsheets. CSV format follows the team's QA structure.
 
 ```csv
-ID,Test Name,Type,Category,File,Status,Notes
-TC-001,Create order validates required fields,unit,Server Actions — Orders,tests/orders/create.test.ts,pass,
-TC-002,Dashboard loads within 3s,e2e,E2E — Dashboard,tests/e2e/dashboard.spec.ts,pass,
-TC-003,Returns 400 on missing email,unit,Server Actions — Users,tests/users/validate.test.ts,pass,Edge case
+ID,Title,Type,Section,Priority,Preconditions,Steps,Expected Result,Test Data,File,Status,Notes
+TC-001,"Create project under program",e2e,E2E > Charge Codes,High,"Admin logged in, Program exists","1. Navigate to /charge-codes 2. Click Create New 3. Select level=Project 4. Select parent 5. Click Create","New project appears in tree, API returns node with correct parentId","Role: admin, Code: PRJ-PAY-001",frontend/e2e/charge-codes.spec.ts,pass,
+TC-002,"Submit blocked when hours < 8h",e2e,E2E > Time Entry,High,"Employee logged in, Monday has 4h","1. Fill Mon=4h 2. Click Submit","Validation dialog shows 'Incomplete Hours' with '4.0h / 8h', status remains Draft","Role: employee, Hours: 4h on Monday",frontend/e2e/time-entry.spec.ts,pass,Negative case
+TC-003,"Timesheets service creates entry",unit,Backend > Timesheets,Medium,"Mocked DB and auth","Call createEntry with valid payload","Returns entry with id and calculated_cost","hours: 8, chargeCodeId: uuid",backend/src/timesheets/timesheets.service.spec.ts,pass,
 ```
 
-**CSV columns (7 columns, this exact order):**
+**CSV columns (12 columns, this exact order):**
 - **ID**: Sequential `TC-001`, `TC-002`, etc.
-- **Test Name**: Human-readable description of what is being tested
+- **Title**: Human-readable description of what is being tested
 - **Type**: `unit`, `e2e`, `integration`, or `snapshot`
-- **Category**: Group label for filtering (e.g. `Server Actions — Tasks`, `Components — BoardCard`, `E2E — Calendar`)
+- **Section**: Hierarchical group for filtering (e.g. `E2E > Time Entry`, `Backend > Timesheets`, `Frontend > Components > ApprovalQueue`)
+- **Priority**: `High`, `Medium`, or `Low`
+- **Preconditions**: What must be true before the test runs (logged-in user, existing data, role)
+- **Steps**: Numbered step-by-step actions (condensed to single line, separated by numbered steps)
+- **Expected Result**: What should happen after the steps complete (UI state + API state)
+- **Test Data**: Specific data values used in the test (role, IDs, amounts, dates)
 - **File**: Relative path to the test file
 - **Status**: `pass`, `fail`, or `skip`
-- **Notes**: Empty unless notable. Wrap in quotes if contains commas.
+- **Notes**: Empty unless notable (e.g. "Negative case", "Multi-role workflow"). Wrap in quotes if contains commas.
 
 ### test-cases.md format (MANDATORY — same data as CSV, for git review)
 
@@ -172,11 +206,29 @@ TC-003,Returns 400 on missing email,unit,Server Actions — Users,tests/users/va
 
 > Generated: YYYY-MM-DD | Runner: <vitest|jest|pytest|etc> | Total: N | Pass: N | Fail: N
 
-| ID     | Test Name                              | Type | Category                    | File                          | Status | Notes |
-|--------|----------------------------------------|------|-----------------------------|-------------------------------|--------|-------|
-| TC-001 | Create order validates required fields  | unit | Server Actions — Orders      | tests/orders/create.test.ts   | pass   |       |
-| TC-002 | Dashboard loads within 3s               | e2e  | E2E — Dashboard              | tests/e2e/dashboard.spec.ts   | pass   |       |
+## E2E > Charge Codes
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-001 | Create project under program | High | Admin logged in, Program exists | 1. Navigate to /charge-codes 2. Click Create New 3. Select level=Project 4. Select parent 5. Click Create | New project in tree, API returns correct parentId | Role: admin, Code: PRJ-PAY-001 | frontend/e2e/charge-codes.spec.ts | pass |
+
+## E2E > Time Entry
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-002 | Submit blocked when hours < 8h | High | Employee logged in, Monday has 4h | 1. Fill Mon=4h 2. Click Submit | Dialog: 'Incomplete Hours', status remains Draft | Role: employee, Hours: 4h | frontend/e2e/time-entry.spec.ts | pass |
+
+## Backend > Timesheets
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-003 | Creates entry with cost | Medium | Mocked DB | Call createEntry | Returns entry with calculated_cost | hours: 8 | backend/src/timesheets/timesheets.service.spec.ts | pass |
 ```
+
+**Markdown grouping rules:**
+- Group test cases by **Section** as `## Section Name` headers
+- Within each section, render one table with all test cases for that section
+- This mirrors the Section Hierarchy used by the QA team's test management tools
 
 ### summary.md format
 
@@ -225,8 +277,8 @@ TC-003,Returns 400 on missing email,unit,Server Actions — Users,tests/users/va
 7. **Self-validate before completing.** Before calling TaskUpdate with status=completed, verify:
 
    ### File existence checks
-   - [ ] `docs/test-results/test-cases.csv` exists with header row and all 7 columns (ID,Test Name,Type,Category,File,Status,Notes)
-   - [ ] `docs/test-results/test-cases.md` exists and has the same data as CSV in markdown table
+   - [ ] `docs/test-results/test-cases.csv` exists with header row and all 12 columns (ID,Title,Type,Section,Priority,Preconditions,Steps,Expected Result,Test Data,File,Status,Notes)
+   - [ ] `docs/test-results/test-cases.md` exists with same data grouped by Section in markdown tables
    - [ ] `docs/test-results/summary.md` exists with date, pass/fail counts, AND separate backend/frontend breakdown
    - [ ] `docs/test-results/backend/unit-results.json` exists (if backend exists)
    - [ ] `docs/test-results/backend/unit-results.md` exists (if backend exists)

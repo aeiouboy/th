@@ -9,6 +9,7 @@ import {
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ApprovalsService } from './approvals.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Roles } from '../common/decorators/roles.decorator';
 import { ApproveDto, RejectDto, BulkApproveDto } from './dto';
 
 @ApiTags('Approvals')
@@ -16,6 +17,12 @@ import { ApproveDto, RejectDto, BulkApproveDto } from './dto';
 @Controller('approvals')
 export class ApprovalsController {
   constructor(private readonly approvalsService: ApprovalsService) {}
+
+  @Get('team-status')
+  @Roles('admin', 'charge_manager')
+  getTeamStatus(@CurrentUser() user: any) {
+    return this.approvalsService.getTeamStatus(user.id, user.role);
+  }
 
   @Get('pending')
   getPending(@CurrentUser() user: any) {

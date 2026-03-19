@@ -17,6 +17,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { NotificationBell } from '@/components/layout/NotificationBell';
 import {
   LayoutDashboard,
   Clock,
@@ -28,19 +29,22 @@ import {
   CalendarDays,
   Settings,
   Menu,
-  Bell,
   ChevronRight,
 } from 'lucide-react';
 
 const baseNavItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/time-entry', label: 'Time Entry', icon: Clock },
-  { href: '/charge-codes', label: 'Charge Codes', icon: Tag },
+  { href: '/calendar', label: 'Calendar', icon: CalendarDays },
 ];
+
+const chargeCodesNavItem = { href: '/charge-codes', label: 'Charge Codes', icon: Tag };
+const CHARGE_CODES_ROLES = ['admin', 'charge_manager', 'pmo', 'finance'];
 
 const approvalsNavItem = { href: '/approvals', label: 'Approvals', icon: CheckCircle };
 
-const APPROVALS_ROLES = ['admin', 'charge_manager', 'pmo'];
+const APPROVALS_ROLES = ['admin', 'charge_manager'];
+const INSIGHT_ROLES = ['admin', 'pmo', 'finance'];
 
 const insightNavItems = [
   { href: '/reports', label: 'Reports', icon: BarChart3 },
@@ -56,8 +60,9 @@ const adminNavItems = [
 const baseMobileNavItems = [
   { href: '/', label: 'Home', icon: LayoutDashboard },
   { href: '/time-entry', label: 'Time', icon: Clock },
-  { href: '/charge-codes', label: 'Codes', icon: Tag },
 ];
+
+const chargeCodesMobileNavItem = { href: '/charge-codes', label: 'Codes', icon: Tag };
 
 const approvalsMobileNavItem = { href: '/approvals', label: 'Approve', icon: CheckCircle };
 
@@ -95,15 +100,18 @@ export default function AuthenticatedLayout({
 
   const mainNavItems = [
     ...baseNavItems,
+    ...(userRole && CHARGE_CODES_ROLES.includes(userRole) ? [chargeCodesNavItem] : []),
     ...(userRole && APPROVALS_ROLES.includes(userRole) ? [approvalsNavItem] : []),
   ];
 
+  const showInsightNav = userRole != null && INSIGHT_ROLES.includes(userRole);
   const showAdminNav = userRole === 'admin';
 
   const mobileNavItems = [
     ...baseMobileNavItems,
+    ...(userRole && CHARGE_CODES_ROLES.includes(userRole) ? [chargeCodesMobileNavItem] : []),
     ...(userRole && APPROVALS_ROLES.includes(userRole) ? [approvalsMobileNavItem] : []),
-    reportsMobileNavItem,
+    ...(showInsightNav ? [reportsMobileNavItem] : []),
   ];
 
   useEffect(() => {
@@ -193,21 +201,25 @@ export default function AuthenticatedLayout({
               />
             ))}
 
-            <Separator className="my-3 bg-slate-700/50" />
+            {showInsightNav && (
+              <>
+                <Separator className="my-3 bg-slate-700/50" />
 
-            {!collapsed && (
-              <p className="px-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">
-                Insight
-              </p>
+                {!collapsed && (
+                  <p className="px-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-2">
+                    Insight
+                  </p>
+                )}
+                {insightNavItems.map((item) => (
+                  <NavItem
+                    key={item.href}
+                    {...item}
+                    active={isActive(item.href)}
+                    collapsed={collapsed}
+                  />
+                ))}
+              </>
             )}
-            {insightNavItems.map((item) => (
-              <NavItem
-                key={item.href}
-                {...item}
-                active={isActive(item.href)}
-                collapsed={collapsed}
-              />
-            ))}
 
             {showAdminNav && (
               <>
@@ -278,9 +290,7 @@ export default function AuthenticatedLayout({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="p-1.5 rounded-md hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 relative transition-colors" aria-label="Notifications">
-              <Bell className="w-5 h-5" />
-            </button>
+            <NotificationBell />
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer" suppressHydrationWarning>
                 <Avatar className="h-8 w-8">

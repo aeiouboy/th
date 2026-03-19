@@ -38,6 +38,7 @@ File: `backend/.env`
 | `SUPABASE_JWT_SECRET` | No | _(empty)_ | JWT shared secret for HS256 verification. **Must be left empty** for ECC P-256 (ES256) keys — see note below. |
 | `PORT` | No | `3001` | Port the NestJS server listens on. |
 | `FRONTEND_URL` | No | `http://localhost:3000` | Allowed CORS origin. Must match the URL where the frontend is served. |
+| `TEAMS_WEBHOOK_URL` | No | _(empty)_ | Microsoft Teams Incoming Webhook URL for notification delivery. If not set, Teams delivery is silently disabled and notifications are only persisted to the database. |
 
 ### Example `backend/.env`
 
@@ -50,6 +51,7 @@ SUPABASE_DIRECT_URL=
 SUPABASE_JWT_SECRET=
 PORT=3001
 FRONTEND_URL=http://localhost:3000
+TEAMS_WEBHOOK_URL=https://your-org.webhook.office.com/webhookb2/...
 ```
 
 ### Why `SUPABASE_JWT_SECRET` Must Be Empty

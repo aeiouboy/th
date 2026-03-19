@@ -65,7 +65,7 @@ export class ChargeCodesController {
 
   @Put(':id/access')
   @Roles('admin', 'charge_manager')
-  updateAccess(@Param('id') id: string, @Body() dto: UpdateAccessDto) {
-    return this.chargeCodesService.updateAccess(id, dto);
+  updateAccess(@Param('id') id: string, @Body() dto: UpdateAccessDto, @CurrentUser() user: any) {
+    return this.chargeCodesService.updateAccess(id, dto, user.id);
   }
 }

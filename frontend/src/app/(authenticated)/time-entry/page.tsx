@@ -52,10 +52,28 @@ interface ChargeCode {
   activityCategory: string | null;
 }
 
+interface VacationRequest {
+  id: number;
+  userId: string;
+  startDate: string;
+  endDate: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
+interface CalendarDay {
+  id: number;
+  date: string;
+  isWeekend: boolean;
+  isHoliday: boolean;
+  holidayName: string | null;
+  countryCode: string;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-stone-100 text-stone-600',
   submitted: 'bg-blue-100 text-blue-700',
-  manager_approved: 'bg-[var(--accent-teal-light)] text-[var(--accent-teal)]',
+  approved: 'bg-[var(--accent-green-light)] text-[var(--accent-green)]',
+  manager_approved: 'bg-[var(--accent-green-light)] text-[var(--accent-green)]',
   cc_approved: 'bg-[var(--accent-green-light)] text-[var(--accent-green)]',
   locked: 'bg-purple-100 text-purple-700',
   rejected: 'bg-[var(--accent-red-light)] text-[var(--accent-red)]',
@@ -64,8 +82,9 @@ const STATUS_COLORS: Record<string, string> = {
 const STATUS_LABELS: Record<string, string> = {
   draft: 'Draft',
   submitted: 'Submitted',
-  manager_approved: 'Manager Approved',
-  cc_approved: 'CC Approved',
+  approved: 'Approved',
+  manager_approved: 'Approved',
+  cc_approved: 'Approved',
   locked: 'Locked',
   rejected: 'Rejected',
 };
@@ -82,7 +101,6 @@ export default function TimeEntryPage() {
   >([]);
   const [descriptions, setDescriptions] = useState<DescriptionData>({});
   const [isDirty, setIsDirty] = useState(false);
-  const [viewMode, setViewMode] = useState<'week' | 'biweek'>('week');
   const [minHoursWarning, setMinHoursWarning] = useState<{ day: string; hours: number }[] | null>(null);
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -95,6 +113,47 @@ export default function TimeEntryPage() {
   });
 
   const chargeCodes = rawChargeCodes;
+
+  // Fetch user's approved vacations
+  const { data: vacations = [] } = useQuery<VacationRequest[]>({
+    queryKey: ['my-vacations'],
+    queryFn: ({ signal }) => api.get('/vacations/me', signal),
+  });
+
+  // Fetch holidays from calendar API for the year of the current week
+  const calendarYear = weekStart.getFullYear();
+  const { data: calendarDays = [] } = useQuery<CalendarDay[]>({
+    queryKey: ['calendar', calendarYear],
+    queryFn: ({ signal }) => api.get(`/calendar?year=${calendarYear}`, signal),
+  });
+
+  // Build a set of vacation dates for the current week
+  const vacationDates = useMemo(() => {
+    const set = new Set<string>();
+    const weekEndDate = addDays(weekStart, 6);
+    for (const v of vacations) {
+      if (v.status !== 'approved') continue;
+      const vStart = new Date(Math.max(new Date(v.startDate).getTime(), weekStart.getTime()));
+      const vEnd = new Date(Math.min(new Date(v.endDate).getTime(), weekEndDate.getTime()));
+      for (let d = new Date(vStart); d <= vEnd; d.setDate(d.getDate() + 1)) {
+        set.add(format(d, 'yyyy-MM-dd'));
+      }
+    }
+    return set;
+  }, [vacations, weekStart]);
+
+  // Build a set of holiday dates for the current week
+  const holidayDates = useMemo(() => {
+    const set = new Set<string>();
+    const weekEndStr = format(addDays(weekStart, 6), 'yyyy-MM-dd');
+    const weekStartStr = format(weekStart, 'yyyy-MM-dd');
+    for (const day of calendarDays) {
+      if (day.isHoliday && day.date >= weekStartStr && day.date <= weekEndStr) {
+        set.add(day.date);
+      }
+    }
+    return set;
+  }, [calendarDays, weekStart]);
 
   // Fetch or create timesheet for the period
   const { data: rawTimesheet, isLoading: timesheetLoading } = useQuery<Timesheet | null>({
@@ -172,6 +231,8 @@ export default function TimeEntryPage() {
       }[] = [];
 
       for (const row of activeRows) {
+        // Skip system charge codes — they are managed by the backend
+        if (row.chargeCodeId === 'LEAVE-001') continue;
         const rowData = gridData[row.chargeCodeId] || {};
         for (const [date, hours] of Object.entries(rowData)) {
           if (hours > 0) {
@@ -228,12 +289,15 @@ export default function TimeEntryPage() {
 
     for (let i = 0; i < 5; i++) {
       const date = format(addDays(weekStart, i), 'yyyy-MM-dd');
+      // Skip approved vacation days and holidays
+      if (vacationDates.has(date) || holidayDates.has(date)) continue;
       let total = 0;
       for (const row of activeRows) {
         total += gridData[row.chargeCodeId]?.[date] || 0;
       }
       total = Math.round(total * 100) / 100;
-      if (total < 8) {
+      // Only validate days that have entries — allow submitting without filling every day
+      if (total > 0 && total < 8) {
         incompleteDays.push({ day: `${DAYS[i]} (${format(addDays(weekStart, i), 'MMM d')})`, hours: total });
       }
     }
@@ -243,10 +307,10 @@ export default function TimeEntryPage() {
     } else {
       submitMutation.mutate();
     }
-  }, [weekStart, activeRows, gridData, submitMutation]);
+  }, [weekStart, activeRows, gridData, submitMutation, vacationDates, holidayDates]);
 
   const canEdit =
-    !timesheet?.status || timesheet.status === 'draft' || timesheet.status === 'rejected';
+    !timesheet?.status || ['draft', 'rejected', 'submitted', 'approved'].includes(timesheet.status);
 
   // Auto-save every 30 seconds
   useEffect(() => {
@@ -268,6 +332,8 @@ export default function TimeEntryPage() {
 
   const handleCellChange = useCallback(
     (chargeCodeId: string, date: string, hours: number) => {
+      // Prevent editing system charge codes
+      if (chargeCodeId === 'LEAVE-001') return;
       setGridData((prev) => ({
         ...prev,
         [chargeCodeId]: {
@@ -305,6 +371,8 @@ export default function TimeEntryPage() {
   );
 
   const handleRemoveRow = useCallback((chargeCodeId: string) => {
+    // Prevent removing system charge codes like LEAVE-001
+    if (chargeCodeId === 'LEAVE-001') return;
     setActiveRows((prev) => prev.filter((r) => r.chargeCodeId !== chargeCodeId));
     setGridData((prev) => {
       const next = { ...prev };
@@ -320,6 +388,30 @@ export default function TimeEntryPage() {
   );
 
   const weekEnd = addDays(weekStart, 6);
+  const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const isCurrentOrFutureWeek = weekStart >= currentWeekStart;
+
+  // Cutoff warning: 3 day grace period after period end
+  // Cutoff: 15th or end of month (per PRD)
+  const cutoffInfo = useMemo(() => {
+    if (!timesheet?.periodEnd) return null;
+    const periodEnd = new Date(timesheet.periodEnd + 'T00:00:00Z');
+    const year = periodEnd.getUTCFullYear();
+    const month = periodEnd.getUTCMonth();
+    const day = periodEnd.getUTCDate();
+    const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    const cutoff = day <= 15
+      ? new Date(Date.UTC(year, month, 15))
+      : new Date(Date.UTC(year, month, lastDay));
+
+    const today = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00Z');
+    const diffMs = cutoff.getTime() - today.getTime();
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return { status: 'closed' as const, cutoffDate: format(cutoff, 'MMM d, yyyy'), daysLeft: 0 };
+    if (diffDays <= 3) return { status: 'warning' as const, cutoffDate: format(cutoff, 'MMM d, yyyy'), daysLeft: diffDays };
+    return null;
+  }, [timesheet?.periodEnd]);
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-4">
@@ -348,7 +440,9 @@ export default function TimeEntryPage() {
               variant="outline"
               size="sm"
               onClick={() => setWeekStart(addDays(weekStart, 7))}
+              disabled={isCurrentOrFutureWeek}
               className="h-8 w-8 p-0"
+              title={isCurrentOrFutureWeek ? 'Cannot navigate to future weeks' : undefined}
             >
               <ChevronRightIcon />
             </Button>
@@ -364,32 +458,32 @@ export default function TimeEntryPage() {
                 Unsaved
               </span>
             )}
-            {/* Week/Bi-week toggle */}
-            <div className="flex rounded-md border border-[var(--border-default)] overflow-hidden">
-              <button
-                onClick={() => setViewMode('week')}
-                className={`px-3 py-1 text-xs font-medium transition-colors ${
-                  viewMode === 'week'
-                    ? 'bg-[var(--accent-teal)] text-white'
-                    : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-stone-50 dark:hover:bg-stone-800'
-                }`}
-              >
-                Week
-              </button>
-              <button
-                onClick={() => setViewMode('biweek')}
-                className={`px-3 py-1 text-xs font-medium transition-colors ${
-                  viewMode === 'biweek'
-                    ? 'bg-[var(--accent-teal)] text-white'
-                    : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-stone-50 dark:hover:bg-stone-800'
-                }`}
-              >
-                Bi-week
-              </button>
-            </div>
           </div>
         </div>
       </div>
+
+      {/* Cutoff warning banner */}
+      {cutoffInfo?.status === 'warning' && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-200">
+          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+            <path d="M12 9v4" /><path d="M12 17h.01" />
+          </svg>
+          <span>
+            Submission closes in <strong>{cutoffInfo.daysLeft} day{cutoffInfo.daysLeft !== 1 ? 's' : ''}</strong> (cutoff: {cutoffInfo.cutoffDate})
+          </span>
+        </div>
+      )}
+      {cutoffInfo?.status === 'closed' && (
+        <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm dark:bg-red-950/30 dark:border-red-800 dark:text-red-200">
+          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" />
+          </svg>
+          <span>
+            Submission period closed (cutoff was {cutoffInfo.cutoffDate}). Contact your manager for late submission.
+          </span>
+        </div>
+      )}
 
       {/* Grid card */}
       <Card className="p-0 overflow-hidden border border-[var(--border-default)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
@@ -410,6 +504,8 @@ export default function TimeEntryPage() {
             onDescriptionChange={handleDescriptionChange}
             disabled={!canEdit}
             onRemoveRow={handleRemoveRow}
+            vacationDates={vacationDates}
+            holidayDates={holidayDates}
           />
         )}
       </Card>
@@ -441,7 +537,8 @@ export default function TimeEntryPage() {
               <Button
                 className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white"
                 onClick={checkMinHoursAndSubmit}
-                disabled={submitMutation.isPending || !timesheet?.id}
+                disabled={submitMutation.isPending || !timesheet?.id || cutoffInfo?.status === 'closed'}
+                title={cutoffInfo?.status === 'closed' ? 'Submission period closed' : undefined}
               >
                 {submitMutation.isPending ? 'Submitting...' : 'Submit'}
                 {!submitMutation.isPending && <span className="ml-1">&rarr;</span>}

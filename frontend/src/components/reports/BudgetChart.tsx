@@ -27,7 +27,8 @@ interface BudgetChartProps {
 
 export function BudgetChart({ data }: BudgetChartProps) {
   const chartData = data.map((d, i) => ({
-    name: d.chargeCodeName.length > 15 ? d.chargeCodeName.substring(0, 15) + '...' : d.chargeCodeName,
+    name: d.chargeCodeName.length > 25 ? d.chargeCodeName.substring(0, 25) + '…' : d.chargeCodeName,
+    fullName: d.chargeCodeName,
     Budget: d.budgetAmount,
     Actual: d.actualSpent,
     Remaining: Math.max(0, d.budgetAmount - d.actualSpent),
@@ -49,9 +50,13 @@ export function BudgetChart({ data }: BudgetChartProps) {
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" />
         <XAxis
           dataKey="name"
-          tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+          tick={{ fontSize: 11, fill: 'var(--text-secondary)' }}
           tickLine={{ stroke: 'var(--border-default)' }}
           axisLine={{ stroke: 'var(--border-default)' }}
+          angle={chartData.length > 3 ? -20 : 0}
+          textAnchor={chartData.length > 3 ? 'end' : 'middle'}
+          height={chartData.length > 3 ? 60 : 30}
+          interval={0}
         />
         <YAxis
           tickFormatter={(value) => formatCurrency(value)}
@@ -61,6 +66,7 @@ export function BudgetChart({ data }: BudgetChartProps) {
         />
         <Tooltip
           formatter={(value, name) => [formatCurrency(Number(value)), String(name)]}
+          labelFormatter={(label, payload) => payload?.[0]?.payload?.fullName ?? label}
           contentStyle={{
             backgroundColor: 'var(--bg-card)',
             border: '1px solid var(--border-default)',
@@ -82,7 +88,7 @@ export function BudgetChart({ data }: BudgetChartProps) {
         />
         <Bar
           dataKey="Budget"
-          fill="var(--border-default)"
+          fill="#94a3b8"
           radius={[4, 4, 0, 0]}
           animationDuration={800}
           animationBegin={600}

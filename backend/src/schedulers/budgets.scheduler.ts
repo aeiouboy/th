@@ -4,6 +4,7 @@ import { eq, sql } from 'drizzle-orm';
 import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
 import { budgets, chargeCodes, profiles } from '../database/schema';
 import { BudgetsService } from '../budgets/budgets.service';
+import { TeamsWebhookService } from '../integrations/teams-webhook.service';
 
 @Injectable()
 export class BudgetsScheduler {
@@ -12,6 +13,7 @@ export class BudgetsScheduler {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDB,
     private readonly budgetsService: BudgetsService,
+    private readonly teamsWebhook: TeamsWebhookService,
   ) {}
 
   /**
@@ -68,6 +70,38 @@ export class BudgetsScheduler {
           );
         }
       }
+
+      // Send summary to Teams (top 5 most critical)
+      const redCount = alerts.filter((a) => a.severity === 'red').length;
+      const orangeCount = alerts.filter((a) => a.severity === 'orange').length;
+      const yellowCount = alerts.filter((a) => a.severity === 'yellow').length;
+
+      const topAlerts = alerts.slice(0, 5);
+      const facts = [
+        { name: 'Total Alerts', value: `🔴 ${redCount}  🟠 ${orangeCount}  🟡 ${yellowCount}` },
+        { name: '---', value: '**Top Alerts**' },
+        ...topAlerts.map((a) => {
+          const pct = a.budget > 0 ? Math.round((a.actual / a.budget) * 100) : 0;
+          const icon = a.severity === 'red' ? '🔴' : a.severity === 'orange' ? '🟠' : '🟡';
+          return {
+            name: `${icon} ${a.chargeCodeId}`,
+            value: `${pct}% (฿${a.actual.toLocaleString()} / ฿${a.budget.toLocaleString()})`,
+          };
+        }),
+      ];
+
+      if (alerts.length > 5) {
+        facts.push({ name: `+${alerts.length - 5} more`, value: 'View in system →' });
+      }
+
+      const color = redCount > 0 ? 'ff0000' : 'ff9800';
+
+      await this.teamsWebhook.sendCard(
+        `⚠️ Budget Alerts (${alerts.length})`,
+        '',
+        facts,
+        color,
+      );
     } catch (error) {
       this.logger.error('Failed to run budget alert check', error);
     }

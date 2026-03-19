@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { ApprovalsService } from './approvals.service';
+import { TeamsWebhookService } from '../integrations/teams-webhook.service';
 import { DRIZZLE } from '../database/drizzle.provider';
 
 describe('ApprovalsService', () => {
@@ -20,6 +21,7 @@ describe('ApprovalsService', () => {
       providers: [
         ApprovalsService,
         { provide: DRIZZLE, useValue: db },
+        { provide: TeamsWebhookService, useValue: { sendCard: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 
@@ -30,17 +32,16 @@ describe('ApprovalsService', () => {
 
   describe('getPending', () => {
     it('should return empty results when no pending approvals exist', async () => {
-      // managerPending and ccPending queries use .where().groupBy() chain
+      // managerPending and ccPending queries
       db.select
         .mockReturnValueOnce(buildWhereResolveChain([]))  // managerPending
         .mockReturnValueOnce(buildWhereGroupByChain([])); // ccPending
 
       const result = await service.getPending('manager-1');
-      expect(result.asManager).toHaveLength(0);
-      expect(result.asCCOwner).toHaveLength(0);
+      expect(result.pending).toHaveLength(0);
     });
 
-    it('should return timesheets pending manager approval', async () => {
+    it('should return timesheets pending approval', async () => {
       const managerPendingRows = [
         {
           timesheet: { id: 'ts-1', userId: 'emp-1', periodStart: '2026-03-09', periodEnd: '2026-03-15', status: 'submitted' },
@@ -54,9 +55,9 @@ describe('ApprovalsService', () => {
         .mockReturnValueOnce(buildGroupByChain([{ timesheetId: 'ts-1', totalHours: '40' }])); // hours
 
       const result = await service.getPending('manager-1');
-      expect(result.asManager).toHaveLength(1);
-      expect(result.asManager[0].id).toBe('ts-1');
-      expect(result.asManager[0].totalHours).toBe(40);
+      expect(result.pending).toHaveLength(1);
+      expect(result.pending[0].id).toBe('ts-1');
+      expect(result.pending[0].totalHours).toBe(40);
     });
   });
 
@@ -72,34 +73,31 @@ describe('ApprovalsService', () => {
       await expect(service.approve('ts-1', 'manager-1')).rejects.toThrow(BadRequestException);
     });
 
-    it('should throw ForbiddenException when approver is not the employee manager', async () => {
+    it('should throw ForbiddenException when approver is not the employee manager and not a CC approver', async () => {
       const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted' };
       const employee = { id: 'emp-1', managerId: 'other-manager' };
 
       db.select
         .mockReturnValueOnce(buildLimitChain([ts]))
-        .mockReturnValueOnce(buildLimitChain([employee]));
+        .mockReturnValueOnce(buildLimitChain([employee]))
+        .mockReturnValueOnce(buildLimitChain([])); // no CC match either
 
       await expect(service.approve('ts-1', 'wrong-manager')).rejects.toThrow(ForbiddenException);
     });
 
-    it('should transition timesheet from submitted to manager_approved', async () => {
+    it('should transition timesheet from submitted to locked', async () => {
       const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted' };
       const employee = { id: 'emp-1', managerId: 'manager-1' };
 
       db.select
         .mockReturnValueOnce(buildLimitChain([ts]))       // find timesheet
-        .mockReturnValueOnce(buildLimitChain([employee])) // find employee
-        .mockReturnValueOnce(buildLimitChain([]));         // ccApproversNeeded (none needed -> auto-lock path)
+        .mockReturnValueOnce(buildLimitChain([employee])); // find employee (is manager)
 
-      db.update.mockReturnValueOnce(buildUpdateChain([]));
+      db.update.mockReturnValueOnce(buildUpdateChain([])); // locked
       db.insert.mockReturnValueOnce(buildInsertChain([])); // approval log
 
-      // Auto-lock since no CC approvers
-      db.update.mockReturnValueOnce(buildUpdateChain([]));
-
       const result = await service.approve('ts-1', 'manager-1');
-      expect(result.status).toBe('manager_approved');
+      expect(result.status).toBe('locked');
     });
 
     it('should create an audit log entry when approving', async () => {
@@ -108,45 +106,21 @@ describe('ApprovalsService', () => {
 
       db.select
         .mockReturnValueOnce(buildLimitChain([ts]))
-        .mockReturnValueOnce(buildLimitChain([employee]))
-        .mockReturnValueOnce(buildLimitChain([]));
+        .mockReturnValueOnce(buildLimitChain([employee]));
 
       db.update.mockReturnValueOnce(buildUpdateChain([]));
-      const insertChain = buildInsertChain([]);
-      db.insert.mockReturnValueOnce(insertChain);
-      db.update.mockReturnValueOnce(buildUpdateChain([]));
+      db.insert.mockReturnValueOnce(buildInsertChain([]));
 
       await service.approve('ts-1', 'manager-1');
       expect(db.insert).toHaveBeenCalled();
     });
 
-    it('should auto-lock when no CC approvers are needed', async () => {
-      const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted' };
-      const employee = { id: 'emp-1', managerId: 'manager-1' };
-
-      db.select
-        .mockReturnValueOnce(buildLimitChain([ts]))
-        .mockReturnValueOnce(buildLimitChain([employee]))
-        .mockReturnValueOnce(buildLimitChain([])); // no CC approvers
-
-      db.update.mockReturnValueOnce(buildUpdateChain([])); // manager_approved
-      db.insert.mockReturnValueOnce(buildInsertChain([])); // log
-      db.update.mockReturnValueOnce(buildUpdateChain([])); // locked
-
-      const result = await service.approve('ts-1', 'manager-1');
-      // Status returned is 'manager_approved'; locking happens as side effect
-      expect(result.status).toBe('manager_approved');
-      expect(db.update).toHaveBeenCalledTimes(2); // manager_approved + locked
-    });
-
-    it('should throw ForbiddenException when CC approver does not own any charge code on the timesheet', async () => {
+    it('should throw BadRequestException when timesheet is manager_approved (no longer valid)', async () => {
       const ts = { id: 'ts-1', userId: 'emp-1', status: 'manager_approved' };
 
-      db.select
-        .mockReturnValueOnce(buildLimitChain([ts]))
-        .mockReturnValueOnce(buildLimitChain([])); // no CC match
+      db.select.mockReturnValueOnce(buildLimitChain([ts]));
 
-      await expect(service.approve('ts-1', 'cc-approver')).rejects.toThrow(ForbiddenException);
+      await expect(service.approve('ts-1', 'cc-approver')).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -163,12 +137,14 @@ describe('ApprovalsService', () => {
     });
 
     it('should reject a submitted timesheet and set status to rejected', async () => {
-      const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted' };
+      const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
       const employee = { id: 'emp-1', managerId: 'manager-1' };
+      const employeeProfile = { fullName: 'Alice', email: 'alice@test.com' };
 
       db.select
         .mockReturnValueOnce(buildLimitChain([ts]))
-        .mockReturnValueOnce(buildLimitChain([employee]));
+        .mockReturnValueOnce(buildLimitChain([employee]))
+        .mockReturnValueOnce(buildLimitChain([employeeProfile]));
 
       db.update.mockReturnValueOnce(buildUpdateChain([{ ...ts, status: 'rejected' }]));
       db.insert.mockReturnValueOnce(buildInsertChain([]));
@@ -178,12 +154,14 @@ describe('ApprovalsService', () => {
     });
 
     it('should create audit log with reject action', async () => {
-      const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted' };
+      const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
       const employee = { id: 'emp-1', managerId: 'manager-1' };
+      const employeeProfile = { fullName: 'Alice', email: 'alice@test.com' };
 
       db.select
         .mockReturnValueOnce(buildLimitChain([ts]))
-        .mockReturnValueOnce(buildLimitChain([employee]));
+        .mockReturnValueOnce(buildLimitChain([employee]))
+        .mockReturnValueOnce(buildLimitChain([employeeProfile]));
 
       db.update.mockReturnValueOnce(buildUpdateChain([]));
       db.insert.mockReturnValueOnce(buildInsertChain([]));
@@ -195,15 +173,13 @@ describe('ApprovalsService', () => {
 
   describe('bulkApprove', () => {
     it('should approve multiple timesheets and return results', async () => {
-      // Each approve call needs: ts lookup, employee lookup, ccApprovers check, update, insert, update
+      // Each approve call needs: ts lookup, employee lookup, update (locked), insert (log)
       const makeApproveSequence = () => {
         db.select
           .mockReturnValueOnce(buildLimitChain([{ id: 'ts-x', userId: 'emp-1', status: 'submitted' }]))
-          .mockReturnValueOnce(buildLimitChain([{ id: 'emp-1', managerId: 'manager-1' }]))
-          .mockReturnValueOnce(buildLimitChain([]));
+          .mockReturnValueOnce(buildLimitChain([{ id: 'emp-1', managerId: 'manager-1' }]));
         db.update.mockReturnValueOnce(buildUpdateChain([]));
         db.insert.mockReturnValueOnce(buildInsertChain([]));
-        db.update.mockReturnValueOnce(buildUpdateChain([]));
       };
 
       makeApproveSequence();

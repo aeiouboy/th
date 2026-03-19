@@ -36,9 +36,11 @@ interface ChargeCodeDetail {
   path: string | null;
   activityCategory: string | null;
   ownerId?: string | null;
+  approverId?: string | null;
   ownerName?: string | null;
   approverName?: string | null;
   actualSpent?: number;
+  forecastAtCompletion?: number | null;
   assignedUsers: { userId: string; email: string; fullName: string | null }[];
 }
 
@@ -49,6 +51,8 @@ const LEVEL_BADGE: Record<string, { label: string; className: string }> = {
   task: { label: 'Task', className: 'bg-[var(--accent-purple)] text-white' },
 };
 
+
+const CAN_MANAGE_ROLES = ['admin', 'charge_manager'];
 
 export default function ChargeCodesPage() {
   const { formatCurrency, symbol } = useCurrency();
@@ -65,6 +69,23 @@ export default function ChargeCodesPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [billableFilter, setBillableFilter] = useState('all');
   const [myCodesOnly, setMyCodesOnly] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  const canManage = userRole != null && CAN_MANAGE_ROLES.includes(userRole);
+  const [myCodeIds, setMyCodeIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    api.get<{ role: string }>('/users/me').then((p) => {
+      setUserRole(p.role);
+      // Employees default to "My Codes" only
+      if (!CAN_MANAGE_ROLES.includes(p.role)) {
+        setMyCodesOnly(true);
+      }
+    }).catch(() => {});
+    api.get<{ chargeCodeId: string }[]>('/timesheets/charge-codes').then((codes) => {
+      setMyCodeIds(new Set(codes.map((c) => c.chargeCodeId)));
+    }).catch(() => {});
+  }, []);
 
   const loadTree = useCallback(async () => {
     try {
@@ -117,7 +138,8 @@ export default function ChargeCodesPage() {
           billableFilter === 'all' ||
           (billableFilter === 'true' && node.isBillable) ||
           (billableFilter === 'false' && !node.isBillable);
-        const selfMatch = matchesSearch && matchesLevel && matchesBillable;
+        const matchesMyCodes = !myCodesOnly || myCodeIds.has(node.id);
+        const selfMatch = matchesSearch && matchesLevel && matchesBillable && matchesMyCodes;
 
         if (selfMatch || children.length > 0) {
           return { ...node, children };
@@ -150,14 +172,16 @@ export default function ChargeCodesPage() {
                 className="pl-7 h-8 text-sm"
               />
             </div>
-            <Button
-              size="sm"
-              className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white h-8"
-              onClick={() => setShowCreate(true)}
-            >
-              <Plus className="h-3.5 w-3.5 mr-1" />
-              Create New
-            </Button>
+            {canManage && (
+              <Button
+                size="sm"
+                className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white h-8"
+                onClick={() => setShowCreate(true)}
+              >
+                <Plus className="h-3.5 w-3.5 mr-1" />
+                Create New
+              </Button>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Select value={levelFilter} onValueChange={(v) => setLevelFilter(v ?? 'all')}>
@@ -192,15 +216,19 @@ export default function ChargeCodesPage() {
                 <SelectItem value="false">Non-Billable</SelectItem>
               </SelectContent>
             </Select>
-            <label className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
-              <input
-                type="checkbox"
-                checked={myCodesOnly}
-                onChange={(e) => setMyCodesOnly(e.target.checked)}
-                className="h-3.5 w-3.5 rounded border-stone-300 text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]"
-              />
-              My Codes
-            </label>
+            {canManage ? (
+              <label className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+                <input
+                  type="checkbox"
+                  checked={myCodesOnly}
+                  onChange={(e) => setMyCodesOnly(e.target.checked)}
+                  className="h-3.5 w-3.5 rounded border-stone-300 text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]"
+                />
+                My Codes
+              </label>
+            ) : (
+              <span className="text-xs text-[var(--text-muted)]">My Codes</span>
+            )}
           </div>
         </div>
 
@@ -217,7 +245,7 @@ export default function ChargeCodesPage() {
               tree={filteredTree}
               selectedId={selectedId}
               onSelect={setSelectedId}
-              onAddChild={(parentId, parentLevel) => {
+              onAddChild={canManage ? (parentId, parentLevel) => {
                 const childLevelMap: Record<string, string> = {
                   program: 'project',
                   project: 'activity',
@@ -226,7 +254,7 @@ export default function ChargeCodesPage() {
                 setCreateParentId(parentId);
                 setCreateChildLevel(childLevelMap[parentLevel]);
                 setShowCreate(true);
-              }}
+              } : undefined}
             />
           )}
         </div>
@@ -263,17 +291,21 @@ export default function ChargeCodesPage() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowEdit(true)}
-                >
-                  Edit
-                </Button>
-                <Button size="sm" variant="ghost" className="text-[var(--text-secondary)]">
-                  <Archive className="h-3.5 w-3.5 mr-1" />
-                  Archive
-                </Button>
+                {canManage && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setShowEdit(true)}
+                    >
+                      Edit
+                    </Button>
+                    <Button size="sm" variant="ghost" className="text-[var(--text-secondary)]">
+                      <Archive className="h-3.5 w-3.5 mr-1" />
+                      Archive
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -343,6 +375,7 @@ export default function ChargeCodesPage() {
                   chargeCodeId={selected.id}
                   assignedUsers={selected.assignedUsers || []}
                   onUpdate={handleRefresh}
+                  readOnly={!canManage}
                 />
               </TabsContent>
 

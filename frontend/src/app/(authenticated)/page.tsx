@@ -66,8 +66,7 @@ interface PendingTimesheet {
 }
 
 interface PendingResponse {
-  asManager: PendingTimesheet[];
-  asCCOwner: PendingTimesheet[];
+  pending: PendingTimesheet[];
 }
 
 interface BudgetAlert {
@@ -85,7 +84,8 @@ interface BudgetAlert {
 const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-stone-100 text-stone-600',
   submitted: 'bg-blue-100 text-blue-700',
-  manager_approved: 'bg-teal-100 text-teal-700',
+  approved: 'bg-emerald-100 text-emerald-700',
+  manager_approved: 'bg-emerald-100 text-emerald-700',
   cc_approved: 'bg-emerald-100 text-emerald-700',
   locked: 'bg-purple-100 text-purple-700',
   rejected: 'bg-red-100 text-red-700',
@@ -94,8 +94,9 @@ const STATUS_COLORS: Record<string, string> = {
 const STATUS_LABELS: Record<string, string> = {
   draft: 'Draft',
   submitted: 'Submitted',
-  manager_approved: 'Manager Approved',
-  cc_approved: 'CC Approved',
+  approved: 'Approved',
+  manager_approved: 'Approved',
+  cc_approved: 'Approved',
   locked: 'Locked',
   rejected: 'Rejected',
 };
@@ -157,10 +158,12 @@ export default function DashboardPage() {
     enabled: isManager,
   });
 
+  const hasBudgetAccess = canViewBudgets(user?.role);
+
   const { data: budgetAlerts = [] } = useQuery<BudgetAlert[]>({
     queryKey: ['budget-alerts'],
     queryFn: () => api.get('/budgets/alerts'),
-    enabled: isManager,
+    enabled: hasBudgetAccess,
   });
 
   // Compute metrics
@@ -184,7 +187,7 @@ export default function DashboardPage() {
   const chargeability =
     weeklyHours > 0 ? Math.round((billableHours / weeklyHours) * 100) : 0;
   const pendingCount = pending
-    ? pending.asManager.length + pending.asCCOwner.length
+    ? pending.pending.length
     : 0;
   const prevWeeklyHours = prevEntries.reduce((s, e) => s + parseFloat(e.hours), 0);
   const prevBillableHours = prevEntries
@@ -298,12 +301,33 @@ export default function DashboardPage() {
               weeklyHours > 0 && (
                 <p className="text-xs text-[var(--accent-amber)] mt-1 flex items-center gap-1">
                   <WarningIcon />
-                  {DAYS[dailyHours.findIndex(h => h === 0)] ? `${DAYS[dailyHours.findIndex(h => h === 0)]} missing` : ''} &mdash; {missingHours.toFixed(1)}h required
+                  {missingHours.toFixed(1)}h remaining this week &mdash; {dailyHours.filter(h => h === 0).length > 0 ? `${dailyHours.filter((h, i) => h === 0 && i < 5).length} weekday(s) with no entries` : 'some days incomplete'}
                 </p>
               )}
           </div>
         </div>
       )}
+
+      {/* Quick Actions */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Link href="/charge-codes">
+          <Button variant="outline" className="gap-1.5">
+            <TagIcon /> My Codes
+          </Button>
+        </Link>
+        {isManager && (
+          <Link href="/approvals">
+            <Button variant="outline" className="gap-1.5">
+              <CheckIcon /> Approvals
+              {pendingCount > 0 && (
+                <Badge className="ml-1 bg-[var(--accent-amber-light)] text-[var(--accent-amber)] text-[10px]">
+                  {pendingCount}
+                </Badge>
+              )}
+            </Button>
+          </Link>
+        )}
+      </div>
 
       {/* ROW 2: Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -445,38 +469,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* ROW 4: Quick Actions */}
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <Link href="/time-entry">
-          <Button className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white gap-1.5">
-            <PlusIcon /> Log Time
-          </Button>
-        </Link>
-        {timesheet?.status === 'draft' && timesheet?.id && (
-          <Link href="/time-entry">
-            <Button variant="outline" className="gap-1.5">
-              <SendIcon /> Submit Sheet
-            </Button>
-          </Link>
-        )}
-        <Link href="/charge-codes">
-          <Button variant="outline" className="gap-1.5">
-            <TagIcon /> My Codes
-          </Button>
-        </Link>
-        {isManager && (
-          <Link href="/approvals">
-            <Button variant="outline" className="gap-1.5">
-              <CheckIcon /> Approvals
-              {pendingCount > 0 && (
-                <Badge className="ml-1 bg-[var(--accent-amber-light)] text-[var(--accent-amber)] text-[10px]">
-                  {pendingCount}
-                </Badge>
-              )}
-            </Button>
-          </Link>
-        )}
-      </div>
     </div>
   );
 }
@@ -496,10 +488,7 @@ function ManagerRow3({
 }) {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const allPending = [
-    ...(pending?.asManager || []),
-    ...(pending?.asCCOwner || []),
-  ];
+  const allPending = pending?.pending || [];
 
   const bulkApproveMutation = useMutation({
     mutationFn: (ids: string[]) =>
@@ -773,14 +762,38 @@ function EmployeeAlerts({
   }
 
   if (timesheetStatus === 'draft' && periodEnd) {
-    const daysUntilDue = differenceInDays(new Date(periodEnd + 'T00:00:00'), new Date());
-    const dueText = daysUntilDue <= 0 ? 'Timesheet due today' : `Timesheet due in ${daysUntilDue} day${daysUntilDue === 1 ? '' : 's'}`;
-    const closeText = `Period closes ${format(new Date(periodEnd + 'T00:00:00'), 'MMM d')}`;
-    alerts.push({
-      level: 'info',
-      title: dueText,
-      detail: closeText,
-    });
+    // Cutoff: 15th or end of month (per PRD)
+    const pe = new Date(periodEnd + 'T00:00:00Z');
+    const peDay = pe.getUTCDate();
+    const peMonth = pe.getUTCMonth();
+    const peYear = pe.getUTCFullYear();
+    const lastDay = new Date(Date.UTC(peYear, peMonth + 1, 0)).getUTCDate();
+    const cutoffDate = peDay <= 15
+      ? new Date(Date.UTC(peYear, peMonth, 15))
+      : new Date(Date.UTC(peYear, peMonth, lastDay));
+    const today = new Date(new Date().toISOString().split('T')[0] + 'T00:00:00');
+    const daysUntilCutoff = differenceInDays(cutoffDate, today);
+    const cutoffLabel = format(cutoffDate, 'MMM d');
+
+    if (daysUntilCutoff < 0) {
+      alerts.push({
+        level: 'critical',
+        title: 'Submission period closed',
+        detail: `Cutoff was ${cutoffLabel}. Contact your manager for late submission.`,
+      });
+    } else if (daysUntilCutoff === 0) {
+      alerts.push({
+        level: 'critical',
+        title: 'Timesheet due today',
+        detail: `Cutoff is today (${cutoffLabel})`,
+      });
+    } else {
+      alerts.push({
+        level: daysUntilCutoff <= 2 ? 'warning' : 'info',
+        title: `Timesheet due in ${daysUntilCutoff} day${daysUntilCutoff === 1 ? '' : 's'}`,
+        detail: `Cutoff: ${cutoffLabel}`,
+      });
+    }
   }
 
   if (alerts.length === 0) {
@@ -855,6 +868,10 @@ function Skeleton({ className }: { className?: string }) {
 }
 
 // --- Utilities ---
+
+function canViewBudgets(role?: string) {
+  return role === 'admin' || role === 'pmo' || role === 'finance';
+}
 
 function isManagerRole(role?: string) {
   return (

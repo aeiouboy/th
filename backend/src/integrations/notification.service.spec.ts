@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { IntegrationNotificationService } from './notification.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { DRIZZLE } from '../database/drizzle.provider';
 
 /**
@@ -54,6 +55,10 @@ describe('IntegrationNotificationService', () => {
       providers: [
         IntegrationNotificationService,
         { provide: DRIZZLE, useValue: db },
+        {
+          provide: NotificationsService,
+          useValue: { create: jest.fn().mockResolvedValue({}) },
+        },
       ],
     }).compile();
 

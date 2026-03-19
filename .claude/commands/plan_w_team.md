@@ -449,13 +449,21 @@ Use these files to complete the task:
   - Always include both `.json` (machine-readable) and `.md` (human-readable) for each test type
 - Configure the test runner to output JSON results (e.g. `vitest run --reporter=json --outputFile=docs/test-results/unit/unit-results.json`)
 - If the project has UI pages, use Playwright to capture screenshots of each key page and save to `docs/test-results/screenshots/` following the naming convention above
-- Write `docs/test-results/test-cases.md` with a table of all test cases:
+- Write `docs/test-results/test-cases.csv` (CSV — primary format for QA review in spreadsheets):
+  ```csv
+  ID,Title,Type,Section,Priority,Preconditions,Steps,Expected Result,Test Data,File,Status,Notes
+  TC-001,"Create project under program",e2e,E2E > Charge Codes,High,"Admin logged in","1. Navigate 2. Click Create 3. Fill form","Project appears in tree","Role: admin",frontend/e2e/cc.spec.ts,pass,
+  ```
+  Columns: ID, Title, Type, Section (hierarchical group), Priority, Preconditions, Steps, Expected Result, Test Data, File, Status, Notes
+- Write `docs/test-results/test-cases.md` (same data grouped by Section for git review):
   ```markdown
   # Test Cases
-  | ID | Test Name | Type | File | Status | Notes |
-  |----|-----------|------|------|--------|-------|
-  | TC-001 | Create order validates required fields | unit | tests/orders/create.test.ts | pass | |
-  | TC-002 | Dashboard loads within 3s | e2e | tests/e2e/dashboard.spec.ts | pass | |
+  > Generated: YYYY-MM-DD | Total: N | Pass: N | Fail: N
+
+  ## E2E > Charge Codes
+  | ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+  |----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+  | TC-001 | Create project under program | High | Admin logged in | 1. Navigate 2. Click Create | Project in tree | Role: admin | frontend/e2e/cc.spec.ts | pass |
   ```
 - Write `docs/test-results/summary.md` with: date, total tests, passed/failed counts, list of test files, coverage areas, and any notable findings
 - Report coverage areas and results
@@ -560,25 +568,79 @@ Example:
 
 ### E2E Test Specifications (MANDATORY for UI projects)
 
-Every E2E test case MUST be written in Given-When-Then format with:
-1. **Preconditions** (Given) — what state must exist before the test
-2. **Actions** (When) — exact user steps (click, fill, select, submit)
-3. **Assertions** (Then) — what the test verifies (UI state AND backend state)
-4. **Negative case** — at least 1 negative scenario per feature (invalid input, missing required field, unauthorized access)
-5. **Evidence snapshots** (Snap) — screenshots at key state changes to prove the action happened
+Every E2E test case MUST be written as a **step-by-step test script** that reads like a manual QA procedure. Each step must specify WHERE the user is, WHAT they check before acting, WHAT they do, and WHAT should happen after.
 
 Format:
 ```
 E2E-<MODULE>-<NUM>: <test name>
-  Given: <preconditions — logged-in user, existing data, role>
-  When: <step 1 — e.g., Click "Create New" button>
-  Snap: <what to capture — e.g., "dialog-open" — dialog visible with empty form>
-  When: <step 2 — e.g., Fill name="New OMS", budget=2000000, click Create>
-  Snap: <what to capture — e.g., "after-create" — tree shows new item>
-  Then: <UI assertion — e.g., Tree shows "New OMS" nested under parent>
-  Then: <API assertion — e.g., GET /charge-codes/tree returns node with parentId>
-  Negative: <what happens when input is invalid — e.g., Submit without parent → error>
-  Snap: <what to capture — e.g., "error-shown" — error message visible in dialog>
+  Role: <which test user and role — e.g., employee (wichai.s@central.co.th)>
+  Page: <starting page — e.g., /time-entry>
+
+  Step 1: <Navigate to [page] via [menu/URL]>
+    Pre-check: <what should be visible/enabled before acting>
+    Action: <what the user does — click, fill, select>
+    Post-check: <expected UI state after the action>
+    Snap: <screenshot name — e.g., "page-loaded">
+
+  Step 2: <Perform the core action>
+    Pre-check: <e.g., button should be enabled, form should be empty>
+    Action: <e.g., fill field X with "value", click Submit>
+    Post-check: <e.g., toast appears, status badge changes, row appears in table>
+    Snap: <screenshot name — e.g., "after-submit">
+
+  Step 3: <Verify backend state>
+    Action: <API call — e.g., GET /api/v1/resource>
+    Post-check: <e.g., response contains status='submitted', entries.length > 0>
+
+  [If multi-role workflow — add role switch steps:]
+  Step N: <Switch to [role] ([email])>
+    Pre-check: <what the new role should see on their page>
+    Action: <what the new role does>
+    Post-check: <expected outcome>
+    Snap: <screenshot name>
+
+  Negative: <describe the negative scenario>
+    Step: <what invalid action the user takes>
+    Post-check: <error message, validation dialog, or access denied>
+    Snap: <screenshot name — e.g., "error-shown">
+```
+
+**Example:**
+```
+E2E-CC-01: Admin creates Project under existing Program
+  Role: admin (tachongrak@central.co.th)
+  Page: /charge-codes
+
+  Step 1: Navigate to Charge Codes page
+    Pre-check: tree view shows existing Programs in left panel
+    Action: (page load)
+    Post-check: tree is visible with expandable nodes
+    Snap: "tree-loaded"
+
+  Step 2: Open create dialog
+    Pre-check: "+ Create New" button is visible at top of left panel
+    Action: click "+ Create New"
+    Post-check: dialog opens with empty form, Level dropdown defaults to "program"
+    Snap: "dialog-open"
+
+  Step 3: Select level and fill form
+    Pre-check: when Level = "Project" is selected, Parent dropdown appears and is REQUIRED
+    Action: select Level = "Project", select Parent = "Digital Transformation", fill Name = "Payment Gateway", fill Code = "PRJ-PAY-001"
+    Post-check: all fields populated, Create button is enabled
+
+  Step 4: Submit and verify
+    Action: click "Create"
+    Post-check: dialog closes, success toast appears, "PRJ-PAY-001" appears in tree under parent
+    Snap: "after-create"
+
+  Step 5: Verify API state
+    Action: GET /api/v1/charge-codes/tree
+    Post-check: response contains node with code="PRJ-PAY-001", level="project", parentId matches program
+
+  Negative: Create Project without selecting parent
+    Step: select Level = "Project", leave Parent empty, click "Create"
+    Post-check: validation error "Parent is required" appears, dialog stays open
+    Snap: "error-shown"
 ```
 
 **Snap rules:**
@@ -623,8 +685,8 @@ E2E-<MODULE>-<NUM>: <test name>
 - If project has a dev server: all routes return HTTP 200 at runtime (not just build-time)
 - At least one authenticated API call returns real data from the database (not mock/empty)
 - Auth flow works end-to-end: obtain token → call protected endpoint → receive valid response
-- Test case CSV saved to `docs/test-results/test-cases.csv` with columns: ID, Test Name, Type, Category, File, Status, Notes
-- Test case markdown saved to `docs/test-results/test-cases.md` (same data for git review)
+- Test case CSV saved to `docs/test-results/test-cases.csv` with 12 columns: ID, Title, Type, Section, Priority, Preconditions, Steps, Expected Result, Test Data, File, Status, Notes
+- Test case markdown saved to `docs/test-results/test-cases.md` (same data grouped by Section for git review)
 - Test results summary saved to `docs/test-results/summary.md` with pass/fail counts and date
 - Unit test JSON output saved to `docs/test-results/unit/unit-results.json`
 - Unit test human-readable report saved to `docs/test-results/unit/unit-results.md`

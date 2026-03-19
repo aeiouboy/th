@@ -121,6 +121,47 @@ export class BudgetsService {
     };
   }
 
+  async findAll() {
+    const rows = await this.db
+      .select({
+        chargeCodeId: budgets.chargeCodeId,
+        name: chargeCodes.name,
+        budgetAmount: budgets.budgetAmount,
+        actualSpent: budgets.actualSpent,
+        forecastAtCompletion: budgets.forecastAtCompletion,
+      })
+      .from(budgets)
+      .innerJoin(chargeCodes, eq(budgets.chargeCodeId, chargeCodes.id));
+
+    return rows
+      .filter((row) => Number(row.budgetAmount ?? 0) > 0)
+      .map((row) => {
+        const budget = Number(row.budgetAmount ?? 0);
+        const actual = Number(row.actualSpent ?? 0);
+        const forecast = row.forecastAtCompletion ? Number(row.forecastAtCompletion) : null;
+        const ratio = budget > 0 ? actual / budget : 0;
+
+        let severity: 'red' | 'orange' | 'yellow' | 'green' = 'green';
+        if (ratio > 1) severity = 'red';
+        else if (ratio > 0.9) severity = 'orange';
+        else if (ratio > 0.8) severity = 'yellow';
+        else if (forecast !== null && forecast > budget) severity = 'yellow';
+
+        return {
+          chargeCodeId: row.chargeCodeId,
+          name: row.name,
+          budget,
+          actual,
+          forecast,
+          severity,
+        };
+      })
+      .sort((a, b) => {
+        const order = { red: 0, orange: 1, yellow: 2, green: 3 };
+        return order[a.severity] - order[b.severity];
+      });
+  }
+
   async getAlerts(): Promise<BudgetAlertDto[]> {
     const rows = await this.db
       .select({
@@ -369,9 +410,16 @@ export class BudgetsService {
           })
           .where(eq(budgets.chargeCodeId, chargeCodeId));
       } else {
+        // Use budget_amount from charge_codes table as default
+        const [ccRow] = await this.db
+          .select({ budgetAmount: chargeCodes.budgetAmount })
+          .from(chargeCodes)
+          .where(eq(chargeCodes.id, chargeCodeId))
+          .limit(1);
+
         await this.db.insert(budgets).values({
           chargeCodeId,
-          budgetAmount: '0',
+          budgetAmount: ccRow?.budgetAmount ?? '0',
           actualSpent: actualSpent.toFixed(2),
           forecastAtCompletion,
           lastUpdated: new Date(),

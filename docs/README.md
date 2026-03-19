@@ -155,9 +155,16 @@ PRG-001 New OMS (budget: ฿5M)
 - Root-cause activity badge highlights the specific activity driving an overrun
 
 ### Reports & Analytics
-- Utilization, chargeability, activity distribution, and budget charts
-- **Financial P/L report** — dedicated section showing over-budget cost, low-chargeability gap, and net P/L impact; includes a team-by-team breakdown table with cost, billable revenue, margin, and chargeability
-- **Chargeability alerts** — employees below the chargeability target surface as alerts alongside budget overrun alerts; includes cost impact estimate
+
+The Reports page is organized into three rows:
+
+1. **KPI Cards row** — four stat cards: Total Budget, Actual Spent, Utilization, and Overrun Count.
+2. **Charts row** — three equal-width charts side by side: Budget vs Actual (bar), Chargeability by Team (gauge), and Activity Distribution (pie). All three charts share the same row on `lg` screens.
+3. **Financial P/L row** — a tabbed panel with two tabs:
+   - **P/L Summary** — three stat cards (Over-budget cost, Low chargeability gap, Net P/L impact) plus a Team P/L Breakdown table showing cost, billable revenue, margin, margin %, and chargeability per department.
+   - **Alerts (N)** — consolidated list of budget overrun alerts and chargeability alerts. The tab badge shows the live alert count.
+
+**Notification Bell** — a bell icon in the app topbar shows the total alert count as a badge. Clicking it opens a popover with the top 5 highest-severity alerts (budget + chargeability combined). Each alert item navigates to the Reports page on click.
 
 ## Tech Stack
 

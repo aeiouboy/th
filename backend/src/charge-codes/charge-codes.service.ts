@@ -3,10 +3,11 @@ import {
   Inject,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { eq, and, like, ilike, sql, inArray } from 'drizzle-orm';
 import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
-import { chargeCodes, chargeCodeUsers, profiles } from '../database/schema';
+import { chargeCodes, chargeCodeUsers, profiles, budgets } from '../database/schema';
 import { CreateChargeCodeDto, ChargeCodeLevel } from './dto/create-charge-code.dto';
 import { UpdateChargeCodeDto } from './dto/update-charge-code.dto';
 import { UpdateAccessDto } from './dto/update-access.dto';
@@ -108,7 +109,31 @@ export class ChargeCodesService {
       .innerJoin(profiles, eq(chargeCodeUsers.userId, profiles.id))
       .where(eq(chargeCodeUsers.chargeCodeId, id));
 
-    return { ...code, assignedUsers: users };
+    // Fetch actual spent from budgets table
+    const [budget] = await this.db
+      .select({
+        actualSpent: budgets.actualSpent,
+        forecastAtCompletion: budgets.forecastAtCompletion,
+      })
+      .from(budgets)
+      .where(eq(budgets.chargeCodeId, id))
+      .limit(1);
+
+    const ownerName = code.ownerId
+      ? (await this.db.select({ fullName: profiles.fullName }).from(profiles).where(eq(profiles.id, code.ownerId)).limit(1))[0]?.fullName
+      : null;
+    const approverName = code.approverId
+      ? (await this.db.select({ fullName: profiles.fullName }).from(profiles).where(eq(profiles.id, code.approverId)).limit(1))[0]?.fullName
+      : null;
+
+    return {
+      ...code,
+      actualSpent: Number(budget?.actualSpent ?? 0),
+      forecastAtCompletion: budget?.forecastAtCompletion ? Number(budget.forecastAtCompletion) : null,
+      ownerName,
+      approverName,
+      assignedUsers: users,
+    };
   }
 
   async findChildren(id: string) {
@@ -137,7 +162,7 @@ export class ChargeCodesService {
       );
     }
 
-    const id = await this.generateId(dto.level);
+    const id = dto.id?.trim() || await this.generateId(dto.level);
     const path = dto.parentId
       ? await this.buildPath(dto.parentId, id)
       : id;
@@ -190,27 +215,44 @@ export class ChargeCodesService {
     return updated;
   }
 
-  async updateAccess(chargeCodeId: string, dto: UpdateAccessDto) {
-    await this.findByIdRaw(chargeCodeId);
+  async updateAccess(chargeCodeId: string, dto: UpdateAccessDto, callerId: string) {
+    const code = await this.findByIdRaw(chargeCodeId);
 
-    if (dto.removeUserIds?.length) {
-      for (const userId of dto.removeUserIds) {
-        await this.db
-          .delete(chargeCodeUsers)
-          .where(
-            and(
-              eq(chargeCodeUsers.chargeCodeId, chargeCodeId),
-              eq(chargeCodeUsers.userId, userId),
-            ),
-          );
+    if (code.ownerId !== callerId && code.approverId !== callerId) {
+      const [caller] = await this.db
+        .select({ role: profiles.role })
+        .from(profiles)
+        .where(eq(profiles.id, callerId))
+        .limit(1);
+      if (caller?.role !== 'admin') {
+        throw new ForbiddenException(
+          'Only the charge code owner, approver, or admin can modify access',
+        );
       }
     }
 
+    // Collect this charge code + all descendant IDs for cascading
+    const descendantIds = await this.findDescendantIds(chargeCodeId);
+    const allChargeCodeIds = [chargeCodeId, ...descendantIds];
+
+    if (dto.removeUserIds?.length) {
+      await this.db
+        .delete(chargeCodeUsers)
+        .where(
+          and(
+            inArray(chargeCodeUsers.chargeCodeId, allChargeCodeIds),
+            inArray(chargeCodeUsers.userId, dto.removeUserIds),
+          ),
+        );
+    }
+
     if (dto.addUserIds?.length) {
-      const values = dto.addUserIds.map((userId) => ({
-        chargeCodeId,
-        userId,
-      }));
+      const values = allChargeCodeIds.flatMap((ccId) =>
+        dto.addUserIds!.map((userId) => ({
+          chargeCodeId: ccId,
+          userId,
+        })),
+      );
       await this.db
         .insert(chargeCodeUsers)
         .values(values)
@@ -232,6 +274,24 @@ export class ChargeCodesService {
         ...item,
         children: this.buildTree(items, item.id),
       }));
+  }
+
+  /**
+   * Recursively find all descendant charge code IDs for a given parent.
+   * Traverses the hierarchy using the parentId field.
+   */
+  private async findDescendantIds(parentId: string): Promise<string[]> {
+    const children = await this.db
+      .select({ id: chargeCodes.id })
+      .from(chargeCodes)
+      .where(eq(chargeCodes.parentId, parentId));
+
+    const childIds = children.map((c) => c.id);
+    const grandchildIds = await Promise.all(
+      childIds.map((childId) => this.findDescendantIds(childId)),
+    );
+
+    return [...childIds, ...grandchildIds.flat()];
   }
 
   private async findByIdRaw(id: string) {

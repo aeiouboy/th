@@ -90,7 +90,7 @@ export class CalendarController {
   }
 
   @Get('vacations/pending')
-  @Roles('charge_manager', 'admin')
+  @Roles('charge_manager', 'admin', 'pmo')
   getPendingVacations(@CurrentUser() user: any) {
     return this.calendarService.getPendingVacationsForManager(user.id);
   }
