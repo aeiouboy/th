@@ -3,6 +3,9 @@ import { authFile } from './e2e/helpers';
 
 const defaultAuthFile = authFile('user');
 
+const FRONTEND_PORT = process.env.E2E_FRONTEND_PORT || '3002';
+const FRONTEND_URL = `http://localhost:${FRONTEND_PORT}`;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
@@ -15,13 +18,13 @@ export default defineConfig({
     ['list'],
   ],
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: FRONTEND_URL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
   webServer: {
-    command: 'pnpm dev --turbopack',
-    url: 'http://localhost:3000',
+    command: `pnpm dev --port ${FRONTEND_PORT}`,
+    url: FRONTEND_URL,
     reuseExistingServer: true,
     timeout: 120000,
   },
@@ -42,7 +45,7 @@ export default defineConfig({
     {
       name: 'mobile',
       use: {
-        ...devices['iPhone SE'],
+        ...devices['Pixel 5'],
         viewport: { width: 375, height: 667 },
         storageState: defaultAuthFile,
       },

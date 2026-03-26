@@ -36,6 +36,22 @@ This automatically:
 ## Workflow
 
 1. **Understand the Task** — Read task description via `TaskGet` if task ID provided.
+1b. **Start Servers for E2E** (MANDATORY for UI projects) — Before running validation:
+   ```bash
+   # Start backend in background
+   cd backend && pnpm start:dev &
+   BACKEND_PID=$!
+   # Wait for backend health
+   for i in {1..30}; do curl -sf http://localhost:3001/api/v1 && break || sleep 2; done
+
+   # Start frontend in background
+   cd frontend && pnpm dev &
+   FRONTEND_PID=$!
+   # Wait for frontend health
+   for i in {1..30}; do curl -sf http://localhost:${E2E_FRONTEND_PORT:-3002} && break || sleep 2; done
+   ```
+   If either server fails to start, report as a BUILD FAILURE (not "servers unavailable").
+   After all validation is done, kill both: `kill $BACKEND_PID $FRONTEND_PID`
 2. **Run Validation** — Execute `python3 .claude/skills/validate/validate.py --json {plan-name}`.
 3. **Parse Results** — Read the JSON output to understand what passed and failed.
 4. **Validate E2E Test Quality** (MANDATORY for UI projects) — This step prevents shallow tests from passing validation:
@@ -63,7 +79,21 @@ This automatically:
    b. For each criterion with a `Verified by: TEST-ID` line, READ the actual test code for TEST-ID
    c. Verify the test actually asserts the criterion described (not just renders a related page)
    d. If a test doesn't meaningfully assert its linked criterion, mark as **FAIL**
-6. **Report** — Use `TaskUpdate` to mark complete with pass/fail status and healing recommendations.
+7. **Visual Screenshot Inspection** (MANDATORY) — Screenshots are EVIDENCE. You must READ every screenshot image in `docs/test-results/screenshots/` and check for:
+   - **Error toasts** (red/pink banner at bottom of page saying "Failed to load..." or similar)
+   - **Runtime TypeError / Error overlay** (Next.js error overlay with stack trace)
+   - **Blank pages** (only loading spinner, no content loaded)
+   - **Wrong page** (test claims to be on /profile but screenshot shows /dashboard)
+   - **Missing UI elements** (test claims filter is visible but screenshot shows no filter)
+   If ANY screenshot shows an error state but the test reported "pass", mark the ENTIRE test suite as **FAIL** with healing instruction: "test-writer used test.fail() or conditional guards to hide failures — rewrite tests to fail honestly when errors occur"
+
+8. **Server Health Pre-check** (MANDATORY) — Before running any validation:
+   - Use `BACKEND_URL` and `FRONTEND_URL` from `frontend/e2e/helpers.ts` (env-configurable, defaults 3001/3002)
+   - Verify backend: `curl -sf ${BACKEND_URL}/api/v1` returns non-5xx
+   - Verify frontend: `curl -sf ${FRONTEND_URL}` returns non-5xx
+   - If either is down, report as INFRASTRUCTURE FAILURE — do not proceed with E2E validation
+
+9. **Report** — Use `TaskUpdate` to mark complete with pass/fail status and healing recommendations.
 
 ## Report Format
 

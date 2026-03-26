@@ -5,6 +5,7 @@ import {
   timestamp,
   text,
   pgEnum,
+  index,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { profiles } from './profiles';
@@ -34,4 +35,7 @@ export const timesheets = pgTable('timesheets', {
   rejectionComment: text('rejection_comment'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_timesheets_period').on(table.periodStart, table.periodEnd),
+  index('idx_timesheets_user_status').on(table.userId, table.status),
+]);

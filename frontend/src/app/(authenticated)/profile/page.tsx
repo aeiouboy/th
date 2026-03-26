@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { createClient } from '@/lib/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import {
   UserIcon,
@@ -20,6 +21,7 @@ import {
   Loader2Icon,
   EyeIcon,
   EyeOffIcon,
+  CameraIcon,
 } from 'lucide-react';
 import { formatRole } from '@/lib/utils';
 
@@ -30,6 +32,7 @@ interface UserProfile {
   role: string;
   department: string | null;
   jobGrade: string | null;
+  avatarUrl: string | null;
 }
 
 const ROLE_COLORS: Record<string, string> = {
@@ -49,6 +52,7 @@ function getInitials(name: string | null, email: string) {
       .toUpperCase()
       .slice(0, 2);
   }
+  if (!email || email.length === 0) return '?';
   return email[0].toUpperCase();
 }
 
@@ -58,6 +62,9 @@ export default function ProfilePage() {
   const [editName, setEditName] = useState('');
   const [editDepartment, setEditDepartment] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   const { data: user, isLoading } = useQuery<UserProfile>({
@@ -79,6 +86,41 @@ export default function ProfilePage() {
     setIsEditing(true);
   }
 
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setAvatarError(null);
+
+    if (!file.type.startsWith('image/')) {
+      setAvatarError('Please select an image file.');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError('Image must be under 2MB.');
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const supabase = createClient();
+      const path = `${user.id}/${Date.now()}-${file.name}`;
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true });
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(data.path);
+      await api.put('/users/me/avatar', { avatarUrl: urlData.publicUrl });
+      await queryClient.invalidateQueries({ queryKey: ['me'] });
+    } catch (err) {
+      console.error('Avatar upload failed:', err);
+      setAvatarError('Upload failed. Please try again.');
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Profile Info Card */}
@@ -86,11 +128,39 @@ export default function ProfilePage() {
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             {/* Avatar */}
-            <Avatar className="h-20 w-20 shrink-0">
-              <AvatarFallback className="bg-[var(--accent-teal)] text-white text-2xl font-semibold font-[family-name:var(--font-heading)]">
-                {getInitials(user?.fullName || null, user?.email || '')}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative shrink-0 group">
+              <Avatar className="h-20 w-20">
+                {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.fullName || 'Avatar'} />}
+                <AvatarFallback className="bg-[var(--accent-teal)] text-white text-2xl font-semibold font-[family-name:var(--font-heading)]">
+                  {getInitials(user?.fullName || null, user?.email || '')}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                aria-label="Change photo"
+              >
+                {uploadingAvatar ? (
+                  <Loader2Icon className="w-5 h-5 text-white animate-spin" />
+                ) : (
+                  <CameraIcon className="w-5 h-5 text-white" />
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+              {avatarError && (
+                <p className="absolute -bottom-6 left-0 right-0 text-xs text-red-500 text-center whitespace-nowrap">
+                  {avatarError}
+                </p>
+              )}
+            </div>
 
             {/* User info */}
             <div className="flex-1 space-y-1.5">

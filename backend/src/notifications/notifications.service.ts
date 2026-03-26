@@ -59,7 +59,7 @@ export class NotificationsService {
     userId: string,
     options?: { limit?: number; offset?: number; unreadOnly?: boolean },
   ) {
-    const limit = options?.limit ?? 20;
+    const limit = Math.min(options?.limit ?? 20, 500);
     const offset = options?.offset ?? 0;
 
     const conditions = [eq(notifications.recipientId, userId)];

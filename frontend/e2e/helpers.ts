@@ -1,6 +1,11 @@
 import { Page } from '@playwright/test';
 import path from 'path';
 
+export const FRONTEND_PORT = process.env.E2E_FRONTEND_PORT || '3002';
+export const BACKEND_PORT = process.env.E2E_BACKEND_PORT || '3001';
+export const FRONTEND_URL = `http://localhost:${FRONTEND_PORT}`;
+export const BACKEND_URL = `http://localhost:${BACKEND_PORT}`;
+
 export const SCREENSHOTS_DIR = path.resolve(__dirname, '../../docs/test-results/screenshots');
 
 export const AUTH_DIR = path.join(__dirname, '.auth');
@@ -56,7 +61,7 @@ export async function apiRequest(
   apiPath: string,
   body?: unknown,
 ) {
-  const baseUrl = 'http://127.0.0.1:3001/api/v1';
+  const baseUrl = `${BACKEND_URL}/api/v1`;
   const url = `${baseUrl}${apiPath}`;
 
   // Extract the access token from cookies

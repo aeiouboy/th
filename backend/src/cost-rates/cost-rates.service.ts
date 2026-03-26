@@ -8,7 +8,7 @@ export class CostRatesService {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
   async findAll() {
-    return this.db.select().from(costRates).orderBy(costRates.jobGrade, costRates.effectiveFrom);
+    return this.db.select().from(costRates).orderBy(costRates.jobGrade, costRates.effectiveFrom).limit(500);
   }
 
   async create(data: {

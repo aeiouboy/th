@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
 import { profiles } from '../database/schema';
@@ -8,8 +8,10 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 export class UsersService {
   constructor(@Inject(DRIZZLE) private readonly db: DrizzleDB) {}
 
-  async findAll() {
-    return this.db.select().from(profiles);
+  async findAll(pagination?: { limit?: number; offset?: number }) {
+    const limit = Math.min(pagination?.limit ?? 100, 500);
+    const offset = pagination?.offset ?? 0;
+    return this.db.select().from(profiles).limit(limit).offset(offset);
   }
 
   async findById(id: string) {
@@ -36,6 +38,25 @@ export class UsersService {
     const [updated] = await this.db
       .update(profiles)
       .set({ role: role as any, updatedAt: new Date() })
+      .where(eq(profiles.id, id))
+      .returning();
+    if (!updated) throw new NotFoundException('User not found');
+    return updated;
+  }
+
+  async updateAvatar(id: string, avatarUrl: string) {
+    try {
+      const parsed = new URL(avatarUrl);
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        throw new Error('Invalid protocol');
+      }
+    } catch {
+      throw new BadRequestException('avatarUrl must be a valid HTTP(S) URL');
+    }
+
+    const [updated] = await this.db
+      .update(profiles)
+      .set({ avatarUrl, updatedAt: new Date() })
       .where(eq(profiles.id, id))
       .returning();
     if (!updated) throw new NotFoundException('User not found');

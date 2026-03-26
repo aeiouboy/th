@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { DRIZZLE } from '../database/drizzle.provider';
 
@@ -110,13 +110,97 @@ describe('UsersService', () => {
       await expect(service.updateJobGrade('nonexistent', 'L5')).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('updateAvatar', () => {
+    it('should update avatarUrl with a valid https URL', async () => {
+      const updated = { id: 'u1', email: 'alice@test.com', avatarUrl: 'https://cdn.example.com/avatar.png' };
+      db.update.mockReturnValueOnce(buildUpdateChain([updated]));
+
+      const result = await service.updateAvatar('u1', 'https://cdn.example.com/avatar.png');
+      expect(result.avatarUrl).toBe('https://cdn.example.com/avatar.png');
+    });
+
+    it('should update avatarUrl with a valid http URL', async () => {
+      const updated = { id: 'u1', email: 'alice@test.com', avatarUrl: 'http://cdn.example.com/avatar.png' };
+      db.update.mockReturnValueOnce(buildUpdateChain([updated]));
+
+      const result = await service.updateAvatar('u1', 'http://cdn.example.com/avatar.png');
+      expect(result.avatarUrl).toBe('http://cdn.example.com/avatar.png');
+    });
+
+    it('should throw BadRequestException when avatarUrl is not a valid URL', async () => {
+      await expect(service.updateAvatar('u1', 'not-a-url')).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException when avatarUrl uses non-http protocol', async () => {
+      await expect(service.updateAvatar('u1', 'ftp://cdn.example.com/avatar.png')).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException for empty avatarUrl', async () => {
+      await expect(service.updateAvatar('u1', '')).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw NotFoundException when user does not exist', async () => {
+      db.update.mockReturnValueOnce(buildUpdateChain([]));
+
+      await expect(service.updateAvatar('nonexistent', 'https://cdn.example.com/avatar.png')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should update the correct user ID', async () => {
+      const updated = { id: 'u2', email: 'bob@test.com', avatarUrl: 'https://cdn.example.com/bob.png' };
+      db.update.mockReturnValueOnce(buildUpdateChain([updated]));
+
+      const result = await service.updateAvatar('u2', 'https://cdn.example.com/bob.png');
+      expect(result.id).toBe('u2');
+    });
+  });
+
+  describe('findAll pagination', () => {
+    it('should default limit to 100 when not provided', async () => {
+      db.select.mockReturnValueOnce(buildFromChain([]));
+      await service.findAll();
+      const chain = db.select.mock.results[0].value;
+      expect(chain.limit).toHaveBeenCalledWith(100);
+    });
+
+    it('should cap limit at 500 when limit exceeds 500', async () => {
+      db.select.mockReturnValueOnce(buildFromChain([]));
+      await service.findAll({ limit: 9999 });
+      const chain = db.select.mock.results[0].value;
+      expect(chain.limit).toHaveBeenCalledWith(500);
+    });
+
+    it('should use provided limit when within bounds', async () => {
+      db.select.mockReturnValueOnce(buildFromChain([]));
+      await service.findAll({ limit: 50 });
+      const chain = db.select.mock.results[0].value;
+      expect(chain.limit).toHaveBeenCalledWith(50);
+    });
+
+    it('should default offset to 0 when not provided', async () => {
+      db.select.mockReturnValueOnce(buildFromChain([]));
+      await service.findAll();
+      const chain = db.select.mock.results[0].value;
+      expect(chain.offset).toHaveBeenCalledWith(0);
+    });
+
+    it('should use provided offset', async () => {
+      db.select.mockReturnValueOnce(buildFromChain([]));
+      await service.findAll({ offset: 50 });
+      const chain = db.select.mock.results[0].value;
+      expect(chain.offset).toHaveBeenCalledWith(50);
+    });
+  });
 });
 
 // Helpers
 function buildFromChain(resolveValue: any[]) {
-  return {
-    from: jest.fn().mockResolvedValue(resolveValue),
+  const chain: any = {
+    from: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+    offset: jest.fn().mockResolvedValue(resolveValue),
   };
+  return chain;
 }
 
 function buildLimitChain(resolveValue: any[]) {

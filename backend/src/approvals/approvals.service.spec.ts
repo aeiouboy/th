@@ -54,10 +54,14 @@ describe('ApprovalsService', () => {
         .mockReturnValueOnce(buildWhereGroupByChain([]))                  // ccPending
         .mockReturnValueOnce(buildGroupByChain([{ timesheetId: 'ts-1', totalHours: '40' }])); // hours
 
+      db.selectDistinct
+        .mockReturnValueOnce(buildWhereResolveChain([{ timesheetId: 'ts-1', programName: 'Program A' }])); // programs
+
       const result = await service.getPending('manager-1');
       expect(result.pending).toHaveLength(1);
       expect(result.pending[0].id).toBe('ts-1');
       expect(result.pending[0].totalHours).toBe(40);
+      expect(result.pending[0].programs).toEqual(['Program A']);
     });
   });
 
@@ -85,19 +89,21 @@ describe('ApprovalsService', () => {
       await expect(service.approve('ts-1', 'wrong-manager')).rejects.toThrow(ForbiddenException);
     });
 
-    it('should transition timesheet from submitted to locked', async () => {
-      const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted' };
+    it('should transition timesheet from submitted to approved (period not yet ended)', async () => {
+      // Use a future period so it becomes 'approved' not 'locked'
+      const ts = { id: 'ts-1', userId: 'emp-1', status: 'submitted', periodStart: '2027-01-06', periodEnd: '2027-01-12' };
       const employee = { id: 'emp-1', managerId: 'manager-1' };
+      const updated = { ...ts, status: 'approved' };
 
       db.select
         .mockReturnValueOnce(buildLimitChain([ts]))       // find timesheet
         .mockReturnValueOnce(buildLimitChain([employee])); // find employee (is manager)
 
-      db.update.mockReturnValueOnce(buildUpdateChain([])); // locked
-      db.insert.mockReturnValueOnce(buildInsertChain([])); // approval log
+      db.update.mockReturnValueOnce(buildUpdateChain([updated])); // approved
+      db.insert.mockReturnValueOnce(buildInsertChain([]));        // approval log
 
       const result = await service.approve('ts-1', 'manager-1');
-      expect(result.status).toBe('locked');
+      expect(result.status).toBe('approved');
     });
 
     it('should create an audit log entry when approving', async () => {
@@ -173,12 +179,12 @@ describe('ApprovalsService', () => {
 
   describe('bulkApprove', () => {
     it('should approve multiple timesheets and return results', async () => {
-      // Each approve call needs: ts lookup, employee lookup, update (locked), insert (log)
+      // Each approve call needs: ts lookup, employee lookup, update, insert (log)
       const makeApproveSequence = () => {
         db.select
-          .mockReturnValueOnce(buildLimitChain([{ id: 'ts-x', userId: 'emp-1', status: 'submitted' }]))
+          .mockReturnValueOnce(buildLimitChain([{ id: 'ts-x', userId: 'emp-1', status: 'submitted', periodStart: '2027-01-06', periodEnd: '2027-01-12' }]))
           .mockReturnValueOnce(buildLimitChain([{ id: 'emp-1', managerId: 'manager-1' }]));
-        db.update.mockReturnValueOnce(buildUpdateChain([]));
+        db.update.mockReturnValueOnce(buildUpdateChain([{ status: 'approved' }]));
         db.insert.mockReturnValueOnce(buildInsertChain([]));
       };
 

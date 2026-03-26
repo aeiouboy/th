@@ -91,6 +91,35 @@ Available at `http://localhost:3001/api/docs` when backend is running.
 | ploy.r@central.co.th | employee | Frontend team |
 | somchai.p@central.co.th | pmo | Infrastructure & QA |
 
+## Production Deployment
+
+### Hosting
+| Service | Platform | URL | Auto-deploy |
+|---------|----------|-----|-------------|
+| Backend (NestJS) | Railway | `https://precious-growth-production-d6b9.up.railway.app` | ✅ push to `main` |
+| Frontend (Next.js) | Vercel | `https://frontend-omega-mocha-yrgrud53s2.vercel.app` | ✅ push to `main` |
+| Database | Supabase | `lchxtkiceeyqjksganwr` (Tokyo) | N/A |
+
+### GitHub Repo
+- **Repo**: `aeiouboy/th` (monorepo)
+- **Railway root directory**: `/backend` — Watch paths: `/backend/**`
+- **Vercel root directory**: `frontend/`
+- **Branch**: `main` — both platforms auto-deploy on push
+
+### Railway Project
+- **Project**: `precious-growth` (ID: `53723575-8c76-4eb0-b672-f05a7d324cc5`)
+- **Service**: `precious-growth`
+- **Region**: `asia-southeast1`
+
+### Deploy Skill
+Use `/deploy` skill for manual deployment. Supports: `all`, `backend`, `frontend`, `supabase`, `env`, `status`
+
+### Deployment Notes
+- Railway CLI ไม่รองรับ `connect GitHub` — ต้องเชื่อมผ่าน Dashboard
+- Vercel เชื่อมผ่าน `vercel git connect <repo-url>`
+- Supabase Auth redirect URLs อัพเดทผ่าน Management API (script อยู่ใน `~/.claude/skills/deploy/scripts/supabase-auth.sh`)
+- เมื่อ push to `main` ทั้ง backend + frontend จะ auto deploy — ไม่ต้องรัน CLI
+
 ## Reinforcement Learning — Past Mistakes (DO NOT REPEAT)
 
 ข้อผิดพลาดทั้งหมดที่เคยเกิดขึ้นในโปรเจคนี้ จัดเป็นหมวดหมู่ตาม pattern เพื่อป้องกันไม่ให้เกิดซ้ำ
@@ -210,6 +239,27 @@ https://centralgroup.webhook.office.com/webhookb2/8a66c931-96fd-4e87-962f-a29275
 
 **Rule: In TanStack Query, build all dynamic URL params inside `queryFn`. Never rely on closure variables from render scope — they become stale.**
 
+### Category 12: Pipeline & Validation Gaps
+
+| # | Mistake | Root Cause | Correct Behavior |
+|---|---------|-----------|-----------------|
+| 35 | E2E tests "compile-verified" but never run against real servers | Validator didn't start backend+frontend, accepted compile-only as sufficient | Validator MUST start both servers (`pnpm start:dev` + `pnpm dev`), wait for health check, then run `npx playwright test`. "Compile-verified" is NOT validation — E2E must run against real servers |
+| 36 | Team lead accepted "servers not available" excuse from tester | Tester reported E2E specs compile but no servers → team lead moved on | Team lead MUST push back when E2E is skipped. If servers can't start, that's a blocker — fix it, don't skip it |
+| 37 | Unit tests all pass but E2E never ran — declared "done" | Optimized for pipeline throughput over correctness | Never declare done without E2E passing against real servers. Unit tests validate logic only (Category 5 lesson repeated) |
+
+**Rule: The Validate step in any pipeline MUST start real servers and run E2E tests. "Compile-verified" E2E is NOT validation. If servers can't start, that's a build failure — not an excuse to skip E2E.**
+
+### Category 13: E2E Test Integrity
+
+| # | Mistake | Root Cause | Correct Behavior |
+|---|---------|-----------|-----------------|
+| 38 | Tester used `test.fail()` to make broken tests report "pass" | No explicit ban on `test.fail()` in pipeline rules | **`test.fail()` is BANNED**. Use `test.skip('BUG: ...')` instead. `test.fail()` inverts pass/fail — a crashing test becomes "pass", hiding bugs from team lead and validators |
+| 39 | Screenshots showed error toasts / crash screens but validation reported "pass" | No one read the screenshot images — only checked file existence | Validator MUST visually READ screenshot images. If any screenshot shows error state (red toast, TypeError overlay, blank page), mark as FAIL regardless of test runner output |
+| 40 | E2E ports hardcoded as 3000, 3002, 3307 across many files | No single source of truth for ports | Use `E2E_FRONTEND_PORT` / `E2E_BACKEND_PORT` env vars → `FRONTEND_URL` / `BACKEND_URL` from `frontend/e2e/helpers.ts`. NEVER hardcode ports in test files |
+| 41 | Backend crashed mid-E2E (DB connection timeout) → all API calls fail → tests still "pass" | No server health check before/during E2E | E2E tests MUST include `test.beforeAll` health check. If backend returns 5xx or connection refused, fail immediately — don't screenshot error pages |
+
+**Rule: `test.fail()` is BANNED. Screenshots are EVIDENCE — validators must READ them. Ports come from env vars. Health check servers before every E2E run.**
+
 ### Quick Checklist Before Declaring Done
 
 ```
@@ -227,4 +277,8 @@ https://centralgroup.webhook.office.com/webhookb2/8a66c931-96fd-4e87-962f-a29275
 [ ] Notification badge counts only dismissable items
 [ ] TanStack Query params built inside queryFn, not outside
 [ ] Backend restart uses SIGTERM, not kill -9
+[ ] No `test.fail()` in any E2E test file (use `test.skip` for known bugs)
+[ ] E2E screenshots visually inspected — no error toasts, crash screens, or blank pages
+[ ] E2E ports use env vars (E2E_FRONTEND_PORT / E2E_BACKEND_PORT), not hardcoded
+[ ] E2E health check exists in test.beforeAll — fails fast if servers are down
 ```

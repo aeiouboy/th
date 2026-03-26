@@ -1,6 +1,6 @@
 import { test as setup } from '@playwright/test';
 import fs from 'fs';
-import { AUTH_DIR, USERS, authFile } from './helpers';
+import { AUTH_DIR, USERS, authFile, FRONTEND_URL, BACKEND_URL } from './helpers';
 
 const SUPABASE_URL = 'https://lchxtkiceeyqjksganwr.supabase.co';
 const SUPABASE_ANON_KEY =
@@ -37,7 +37,7 @@ setup('authenticate all users', async ({ page }) => {
     }
 
     // Navigate to the app so we can set cookies on the correct domain
-    await page.goto('http://localhost:3000/login');
+    await page.goto(`${FRONTEND_URL}/login`);
 
     const sessionData = {
       access_token: session.access_token,
@@ -86,7 +86,7 @@ setup('authenticate all users', async ({ page }) => {
     );
 
     // Verify auth works
-    await page.goto('http://localhost:3000/');
+    await page.goto(`${FRONTEND_URL}/`);
     await page.waitForTimeout(2000);
 
     // Save per-user storage state

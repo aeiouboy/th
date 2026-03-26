@@ -79,6 +79,9 @@ export class UtilizationReportDto {
   @ApiProperty()
   overallUtilization: number;
 
+  @ApiProperty()
+  totalEmployees: number;
+
   @ApiProperty({ type: [EmployeeUtilizationDto] })
   employees: EmployeeUtilizationDto[];
 
@@ -115,6 +118,9 @@ export class ChargeabilityReportDto {
 
   @ApiProperty()
   overallChargeabilityRate: number;
+
+  @ApiProperty()
+  totalMembers: number;
 
   @ApiProperty({ type: [TeamChargeabilityDto] })
   members: TeamChargeabilityDto[];

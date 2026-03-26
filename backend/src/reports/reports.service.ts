@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { eq, sql, and, gte, lte, sum, count } from 'drizzle-orm';
+import { eq, sql, and, gte, lte, sum, count, inArray } from 'drizzle-orm';
 import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
 import {
   budgets,
@@ -9,6 +9,7 @@ import {
   profiles,
   costRates,
   calendar,
+  vacationRequests,
 } from '../database/schema';
 import {
   ProjectCostReportDto,
@@ -131,7 +132,7 @@ export class ReportsService {
     };
   }
 
-  async getUtilizationReport(period: string): Promise<UtilizationReportDto> {
+  async getUtilizationReport(period: string, pagination?: { limit?: number; offset?: number }): Promise<UtilizationReportDto> {
     // period format: "2026-03"
     const [year, month] = period.split('-').map(Number);
     const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
@@ -219,16 +220,21 @@ export class ReportsService {
       d.rate = d.availableHours > 0 ? Math.round((d.loggedHours / d.availableHours) * 10000) / 100 : 0;
     }
 
+    const sortedEmployees = employees.sort((a, b) => b.utilizationRate - a.utilizationRate);
+    const pLimit = Math.min(pagination?.limit ?? 100, 500);
+    const pOffset = pagination?.offset ?? 0;
+
     return {
       period,
       workingDays,
       overallUtilization: totalAvailable > 0 ? Math.round((totalLogged / totalAvailable) * 10000) / 100 : 0,
-      employees: employees.sort((a, b) => b.utilizationRate - a.utilizationRate),
+      totalEmployees: sortedEmployees.length,
+      employees: sortedEmployees.slice(pOffset, pOffset + pLimit),
       byDepartment,
     };
   }
 
-  async getChargeabilityReport(team?: string): Promise<ChargeabilityReportDto> {
+  async getChargeabilityReport(team?: string, pagination?: { limit?: number; offset?: number }): Promise<ChargeabilityReportDto> {
     const target = 80; // 80% target
 
     // Build the query - get hours per employee per charge code, split by billable
@@ -293,12 +299,17 @@ export class ReportsService {
     const overallBillable = members.reduce((s, m) => s + m.billableHours, 0);
     const overallTotal = members.reduce((s, m) => s + m.totalHours, 0);
 
+    const cLimit = Math.min(pagination?.limit ?? 100, 500);
+    const cOffset = pagination?.offset ?? 0;
+    const sortedMembers = members.sort((a, b) => b.chargeabilityRate - a.chargeabilityRate);
+
     return {
       target,
       overallBillableHours: Math.round(overallBillable * 100) / 100,
       overallTotalHours: Math.round(overallTotal * 100) / 100,
       overallChargeabilityRate: overallTotal > 0 ? Math.round((overallBillable / overallTotal) * 10000) / 100 : 0,
-      members: members.sort((a, b) => b.chargeabilityRate - a.chargeabilityRate),
+      totalMembers: sortedMembers.length,
+      members: sortedMembers.slice(cOffset, cOffset + cLimit),
     };
   }
 
@@ -420,17 +431,20 @@ export class ReportsService {
       billableRevenue: number;
     }>();
 
-    // Build a map of user -> cost rate
+    // Build a map of user -> cost rate (pre-load all rates to avoid N+1)
+    const allRates = await this.db.select().from(costRates);
+    const rateByGrade = new Map<string, number>();
+    for (const rate of allRates) {
+      if (!rateByGrade.has(rate.jobGrade)) {
+        rateByGrade.set(rate.jobGrade, Number(rate.hourlyRate));
+      }
+    }
     const userRates = new Map<string, number>();
     for (const profile of allProfiles) {
       if (!profile.jobGrade) continue;
-      const [rate] = await this.db
-        .select({ hourlyRate: costRates.hourlyRate })
-        .from(costRates)
-        .where(eq(costRates.jobGrade, profile.jobGrade))
-        .limit(1);
-      if (rate) {
-        userRates.set(profile.id, Number(rate.hourlyRate));
+      const hourlyRate = rateByGrade.get(profile.jobGrade);
+      if (hourlyRate !== undefined) {
+        userRates.set(profile.id, hourlyRate);
       }
     }
 
@@ -532,6 +546,346 @@ export class ReportsService {
       period,
       totalHours: Math.round(totalHours * 100) / 100,
       distribution,
+    };
+  }
+
+  async getReportByProgram(programId: string, period?: string) {
+    // Get the program charge code and its subtree
+    const allCodes = await this.db.select().from(chargeCodes);
+    const ccMap = new Map(allCodes.map((cc) => [cc.id, cc]));
+
+    const program = ccMap.get(programId);
+    if (!program) {
+      return { program: null, budgetVsActual: { budget: 0, actual: 0, variance: 0 }, taskDistribution: [], teamDistribution: [] };
+    }
+
+    // Find all descendants
+    const subtreeIds = new Set<string>([programId]);
+    const collectDescendants = (parentId: string) => {
+      for (const cc of allCodes) {
+        if (cc.parentId === parentId && !subtreeIds.has(cc.id)) {
+          subtreeIds.add(cc.id);
+          collectDescendants(cc.id);
+        }
+      }
+    };
+    collectDescendants(programId);
+
+    // Budget from the budgets table
+    const allBudgets = await this.db.select().from(budgets);
+    let totalBudget = 0;
+    let totalActual = 0;
+    for (const b of allBudgets) {
+      if (subtreeIds.has(b.chargeCodeId)) {
+        totalBudget += Number(b.budgetAmount ?? 0);
+        totalActual += Number(b.actualSpent ?? 0);
+      }
+    }
+    // Fallback: use charge code budgetAmount if no budgets table entry
+    if (totalBudget === 0) {
+      for (const id of subtreeIds) {
+        const cc = ccMap.get(id);
+        if (cc) totalBudget += Number(cc.budgetAmount ?? 0);
+      }
+    }
+
+    // Build date conditions
+    const dateConditions: any[] = [];
+    if (period) {
+      const [year, month] = period.split('-').map(Number);
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const lastDay = new Date(year, month, 0).getDate();
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      dateConditions.push(gte(timesheetEntries.date, startDate));
+      dateConditions.push(lte(timesheetEntries.date, endDate));
+    }
+
+    // Get timesheet entries for subtree
+    const subtreeArray = Array.from(subtreeIds);
+    const entryRows = await this.db
+      .select({
+        chargeCodeId: timesheetEntries.chargeCodeId,
+        userId: timesheets.userId,
+        totalHours: sum(timesheetEntries.hours).as('total_hours'),
+        totalCost: sum(timesheetEntries.calculatedCost).as('total_cost'),
+      })
+      .from(timesheetEntries)
+      .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
+      .where(
+        dateConditions.length > 0
+          ? and(inArray(timesheetEntries.chargeCodeId, subtreeArray), ...dateConditions)
+          : inArray(timesheetEntries.chargeCodeId, subtreeArray),
+      )
+      .groupBy(timesheetEntries.chargeCodeId, timesheets.userId);
+
+    // Task distribution
+    const taskMap = new Map<string, { name: string; hours: number; cost: number }>();
+    for (const row of entryRows) {
+      const cc = ccMap.get(row.chargeCodeId);
+      const name = cc?.name ?? row.chargeCodeId;
+      if (!taskMap.has(row.chargeCodeId)) taskMap.set(row.chargeCodeId, { name, hours: 0, cost: 0 });
+      const t = taskMap.get(row.chargeCodeId)!;
+      t.hours += Number(row.totalHours ?? 0);
+      t.cost += Number(row.totalCost ?? 0);
+    }
+    const totalHours = Array.from(taskMap.values()).reduce((s, t) => s + t.hours, 0);
+    const taskDistribution = Array.from(taskMap.entries()).map(([id, t]) => ({
+      taskName: t.name,
+      hours: Math.round(t.hours * 100) / 100,
+      cost: Math.round(t.cost * 100) / 100,
+      percentage: totalHours > 0 ? Math.round((t.hours / totalHours) * 10000) / 100 : 0,
+    })).sort((a, b) => b.hours - a.hours);
+
+    // Team distribution
+    const allProfiles = await this.db.select().from(profiles);
+    const profileMap = new Map(allProfiles.map((p) => [p.id, p]));
+    const teamMap = new Map<string, { hours: number; cost: number }>();
+    for (const row of entryRows) {
+      const profile = profileMap.get(row.userId);
+      const team = profile?.department ?? 'Unassigned';
+      if (!teamMap.has(team)) teamMap.set(team, { hours: 0, cost: 0 });
+      const t = teamMap.get(team)!;
+      t.hours += Number(row.totalHours ?? 0);
+      t.cost += Number(row.totalCost ?? 0);
+    }
+    const teamDistribution = Array.from(teamMap.entries()).map(([team, t]) => ({
+      team,
+      hours: Math.round(t.hours * 100) / 100,
+      cost: Math.round(t.cost * 100) / 100,
+      percentage: totalHours > 0 ? Math.round((t.hours / totalHours) * 10000) / 100 : 0,
+    })).sort((a, b) => b.hours - a.hours);
+
+    return {
+      program: { id: program.id, name: program.name },
+      budgetVsActual: {
+        budget: Math.round(totalBudget * 100) / 100,
+        actual: Math.round(totalActual * 100) / 100,
+        variance: Math.round((totalBudget - totalActual) * 100) / 100,
+      },
+      taskDistribution,
+      teamDistribution,
+    };
+  }
+
+  async getReportByCostCenter(costCenter: string, period?: string) {
+    // Get profiles in this cost center (department)
+    const allProfiles = await this.db.select().from(profiles);
+    const centerProfiles = allProfiles.filter((p) => p.department === costCenter);
+    const centerUserIds = centerProfiles.map((p) => p.id);
+
+    if (centerUserIds.length === 0) {
+      return {
+        costCenter,
+        chargeability: 0,
+        chargeDistribution: [],
+        teamMembers: [],
+      };
+    }
+
+    // Build date conditions
+    const dateConditions: any[] = [];
+    if (period) {
+      const [year, month] = period.split('-').map(Number);
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const lastDay = new Date(year, month, 0).getDate();
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      dateConditions.push(gte(timesheetEntries.date, startDate));
+      dateConditions.push(lte(timesheetEntries.date, endDate));
+    }
+
+    // Get timesheet entries for these users
+    const entryRows = await this.db
+      .select({
+        userId: timesheets.userId,
+        chargeCodeId: timesheetEntries.chargeCodeId,
+        isBillable: chargeCodes.isBillable,
+        totalHours: sum(timesheetEntries.hours).as('total_hours'),
+      })
+      .from(timesheetEntries)
+      .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
+      .innerJoin(chargeCodes, eq(timesheetEntries.chargeCodeId, chargeCodes.id))
+      .where(
+        dateConditions.length > 0
+          ? and(inArray(timesheets.userId, centerUserIds), ...dateConditions)
+          : inArray(timesheets.userId, centerUserIds),
+      )
+      .groupBy(timesheets.userId, timesheetEntries.chargeCodeId, chargeCodes.isBillable);
+
+    // Get root program for each charge code
+    const allCodes = await this.db.select().from(chargeCodes);
+    const ccMap = new Map(allCodes.map((cc) => [cc.id, cc]));
+    const getRootProgram = (chargeCodeId: string): string => {
+      const cc = ccMap.get(chargeCodeId);
+      if (!cc) return chargeCodeId;
+      const rootId = cc.path ? cc.path.split('/')[0] : cc.id;
+      return ccMap.get(rootId)?.name ?? rootId;
+    };
+
+    // Charge distribution by program
+    const programMap = new Map<string, { chargeableHours: number; nonChargeableHours: number }>();
+    const memberMap = new Map<string, { billableHours: number; totalHours: number }>();
+
+    let totalBillable = 0;
+    let totalAll = 0;
+
+    for (const row of entryRows) {
+      const hours = Number(row.totalHours ?? 0);
+      const programName = getRootProgram(row.chargeCodeId);
+
+      if (!programMap.has(programName)) programMap.set(programName, { chargeableHours: 0, nonChargeableHours: 0 });
+      const p = programMap.get(programName)!;
+      if (row.isBillable) {
+        p.chargeableHours += hours;
+        totalBillable += hours;
+      } else {
+        p.nonChargeableHours += hours;
+      }
+      totalAll += hours;
+
+      if (!memberMap.has(row.userId)) memberMap.set(row.userId, { billableHours: 0, totalHours: 0 });
+      const m = memberMap.get(row.userId)!;
+      m.totalHours += hours;
+      if (row.isBillable) m.billableHours += hours;
+    }
+
+    const profileMap = new Map(allProfiles.map((p) => [p.id, p]));
+
+    return {
+      costCenter,
+      chargeability: totalAll > 0 ? Math.round((totalBillable / totalAll) * 10000) / 100 : 0,
+      chargeDistribution: Array.from(programMap.entries()).map(([programName, d]) => ({
+        programName,
+        chargeableHours: Math.round(d.chargeableHours * 100) / 100,
+        nonChargeableHours: Math.round(d.nonChargeableHours * 100) / 100,
+      })).sort((a, b) => (b.chargeableHours + b.nonChargeableHours) - (a.chargeableHours + a.nonChargeableHours)),
+      teamMembers: Array.from(memberMap.entries()).map(([userId, m]) => {
+        const profile = profileMap.get(userId);
+        return {
+          name: profile?.fullName ?? profile?.email ?? 'Unknown',
+          billableHours: Math.round(m.billableHours * 100) / 100,
+          totalHours: Math.round(m.totalHours * 100) / 100,
+          chargeability: m.totalHours > 0 ? Math.round((m.billableHours / m.totalHours) * 10000) / 100 : 0,
+        };
+      }).sort((a, b) => b.chargeability - a.chargeability),
+    };
+  }
+
+  async getReportByPerson(userId: string, periodFrom?: string, periodTo?: string) {
+    const allProfiles = await this.db.select().from(profiles);
+    const profile = allProfiles.find((p) => p.id === userId);
+    if (!profile) {
+      return { person: null, history: [], projectSummary: [], vacationDays: 0, totalHours: 0 };
+    }
+
+    // Build date conditions
+    const dateConditions: any[] = [];
+    if (periodFrom) {
+      const [year, month] = periodFrom.split('-').map(Number);
+      dateConditions.push(gte(timesheetEntries.date, `${year}-${String(month).padStart(2, '0')}-01`));
+    }
+    if (periodTo) {
+      const [year, month] = periodTo.split('-').map(Number);
+      const lastDay = new Date(year, month, 0).getDate();
+      dateConditions.push(lte(timesheetEntries.date, `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`));
+    }
+
+    // Get entries for this user
+    const entryRows = await this.db
+      .select({
+        chargeCodeId: timesheetEntries.chargeCodeId,
+        date: timesheetEntries.date,
+        totalHours: sum(timesheetEntries.hours).as('total_hours'),
+        totalCost: sum(timesheetEntries.calculatedCost).as('total_cost'),
+      })
+      .from(timesheetEntries)
+      .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
+      .where(
+        dateConditions.length > 0
+          ? and(eq(timesheets.userId, userId), ...dateConditions)
+          : eq(timesheets.userId, userId),
+      )
+      .groupBy(timesheetEntries.chargeCodeId, timesheetEntries.date);
+
+    const allCodes = await this.db.select().from(chargeCodes);
+    const ccMap = new Map(allCodes.map((cc) => [cc.id, cc]));
+    const getRootProgram = (chargeCodeId: string): { id: string; name: string } => {
+      const cc = ccMap.get(chargeCodeId);
+      if (!cc) return { id: chargeCodeId, name: chargeCodeId };
+      const rootId = cc.path ? cc.path.split('/')[0] : cc.id;
+      const root = ccMap.get(rootId);
+      return { id: rootId, name: root?.name ?? rootId };
+    };
+
+    // History: group by month then by program
+    const monthMap = new Map<string, Map<string, number>>();
+    const projectTotals = new Map<string, { name: string; hours: number; cost: number }>();
+    let totalHours = 0;
+
+    for (const row of entryRows) {
+      const hours = Number(row.totalHours ?? 0);
+      const cost = Number(row.totalCost ?? 0);
+      const month = row.date.substring(0, 7); // YYYY-MM
+      const program = getRootProgram(row.chargeCodeId);
+
+      if (!monthMap.has(month)) monthMap.set(month, new Map());
+      const monthPrograms = monthMap.get(month)!;
+      monthPrograms.set(program.name, (monthPrograms.get(program.name) ?? 0) + hours);
+
+      if (!projectTotals.has(program.id)) projectTotals.set(program.id, { name: program.name, hours: 0, cost: 0 });
+      const p = projectTotals.get(program.id)!;
+      p.hours += hours;
+      p.cost += cost;
+      totalHours += hours;
+    }
+
+    const history = Array.from(monthMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([month, programs]) => ({
+        month,
+        programs: Array.from(programs.entries()).map(([name, hours]) => ({
+          name,
+          hours: Math.round(hours * 100) / 100,
+        })),
+      }));
+
+    const projectSummary = Array.from(projectTotals.entries()).map(([id, p]) => ({
+      name: p.name,
+      hoursYtd: Math.round(p.hours * 100) / 100,
+      costYtd: Math.round(p.cost * 100) / 100,
+      percentage: totalHours > 0 ? Math.round((p.hours / totalHours) * 10000) / 100 : 0,
+    })).sort((a, b) => b.hoursYtd - a.hoursYtd);
+
+    // Vacation days count
+    const vacationDateConditions: any[] = [eq(vacationRequests.userId, userId), eq(vacationRequests.status, 'approved' as any)];
+    if (periodFrom) {
+      const [year, month] = periodFrom.split('-').map(Number);
+      vacationDateConditions.push(gte(vacationRequests.startDate, `${year}-${String(month).padStart(2, '0')}-01`));
+    }
+    if (periodTo) {
+      const [year, month] = periodTo.split('-').map(Number);
+      const lastDay = new Date(year, month, 0).getDate();
+      vacationDateConditions.push(lte(vacationRequests.endDate, `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`));
+    }
+    const vacations = await this.db.select().from(vacationRequests).where(and(...vacationDateConditions));
+
+    let vacationDays = 0;
+    for (const v of vacations) {
+      const start = new Date(v.startDate + 'T00:00:00');
+      const end = new Date(v.endDate + 'T00:00:00');
+      const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      if (v.leaveType === 'half_am' || v.leaveType === 'half_pm') {
+        vacationDays += diff * 0.5;
+      } else {
+        vacationDays += diff;
+      }
+    }
+
+    return {
+      person: { id: profile.id, name: profile.fullName ?? profile.email, department: profile.department },
+      history,
+      projectSummary,
+      vacationDays,
+      totalHours: Math.round(totalHours * 100) / 100,
     };
   }
 

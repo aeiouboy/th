@@ -72,6 +72,31 @@ File changed: `backend/src/common/guards/supabase-auth.guard.ts`
 
 ---
 
+### Issue: Use `inArray()` Instead of `sql\`ANY()\`` with Supabase Pooler
+
+**Symptoms:**
+- Drizzle queries using `sql\`${column} = ANY(${values})\`` fail at runtime with a prepared statement error
+- Error message contains: `cannot use a non-constant parameter in PREPARE` or similar
+
+**Root Cause:**
+The Supabase transaction pooler (PgBouncer in transaction mode, port 6543) does not support PostgreSQL extended query protocol with parameter binding in the same way as a direct connection. Raw `sql` template tag expressions with array parameters can trigger this limitation.
+
+**Fix:**
+Replace raw `sql ANY()` calls with Drizzle's `inArray()` helper, which generates compatible SQL:
+
+```typescript
+// Wrong — may fail on Supabase pooler
+.where(sql`${budgets.chargeCodeId} = ANY(${chargeCodeIds})`)
+
+// Correct — use Drizzle inArray helper
+import { inArray } from 'drizzle-orm';
+.where(inArray(budgets.chargeCodeId, chargeCodeIds))
+```
+
+Also ensure `prepare: false` is set in the postgres-js driver config (see `backend/src/database/database.module.ts`) — this disables client-side prepared statements entirely and is required for pooler compatibility.
+
+---
+
 ### Issue: Pooler Region Wrong in .env.sample
 
 **Symptoms:**
@@ -433,6 +458,70 @@ if (timesheet.id === 'mock-ts-1') return; // skip save for mock
 
 **Fix:**
 Remove the mock guard. All save operations should call the real API regardless of the timesheet ID.
+
+---
+
+## Avatar Upload Issues
+
+### Problem: Avatar upload fails
+
+**Symptoms:**
+- Selecting an image on the Profile page shows an error toast
+- The avatar preview does not update after selecting a file
+- The Supabase Storage upload call returns a 4xx error
+
+**Cause and Fix:**
+
+| Cause | Fix |
+|-------|-----|
+| File exceeds 2 MB | Resize or compress the image before uploading. The `avatars` bucket enforces a 2 MB hard limit. |
+| Unsupported file type | Only `image/jpeg`, `image/png`, `image/gif`, and `image/webp` are accepted. Convert the file to one of these formats before uploading. |
+| Supabase Storage bucket policy not configured | Confirm the `avatars` bucket exists and has a public read policy. Create it via the Supabase dashboard under Storage if it is missing. |
+| `PUT /users/me/avatar` returns 400 | The URL produced by Storage must be a valid HTTP/HTTPS URL. If the upload returns a malformed URL, check the Supabase project URL in `NEXT_PUBLIC_SUPABASE_URL`. |
+
+---
+
+### Problem: Avatar doesn't update in the header after upload
+
+**Symptoms:**
+- The Profile page shows the new avatar correctly
+- The topbar in the layout still shows the old avatar or the initials fallback
+
+**Cause:**
+The avatar displayed in the layout topbar is fetched once on load and cached by TanStack Query. A successful `PUT /users/me/avatar` call does not automatically invalidate the profile cache used by the layout.
+
+**Fix:**
+- **Hard refresh** the page (`Cmd+Shift+R` on macOS / `Ctrl+Shift+R` on Windows/Linux) to force TanStack Query to evict its cache and re-fetch the profile.
+- If the issue persists after a hard refresh, clear browser storage (`Application → Local Storage → Clear All` in Chrome DevTools) and reload.
+
+---
+
+## Auth & Session Issues
+
+### Problem: After logout + re-login, profile data doesn't update (CR-18)
+
+**Symptoms:**
+- After logging out and signing back in as a different user (or the same user with a changed role), the UI still shows the old user's name, avatar initials, or role-gated navigation items.
+- The notification bell or sidebar reflects the previous session's data.
+
+**Root Cause:**
+TanStack Query caches query results by key. When Supabase Auth signs out and a new session starts, the query cache from the previous session remains in memory. The React Query client never knows a different user is now authenticated, so stale data is served from cache.
+
+**Fix:**
+Added an `onAuthStateChange` listener in the authenticated layout (`(authenticated)/layout.tsx`) that calls `queryClient.invalidateQueries()` (or `queryClient.clear()`) whenever the Supabase auth state changes:
+
+```typescript
+useEffect(() => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+      queryClient.clear();
+    }
+  });
+  return () => subscription.unsubscribe();
+}, [queryClient]);
+```
+
+This ensures all cached data is evicted on auth state transitions, forcing fresh fetches with the new session token.
 
 ---
 

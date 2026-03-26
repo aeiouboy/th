@@ -6,6 +6,7 @@ import {
   numeric,
   text,
   timestamp,
+  index,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { timesheets } from './timesheets';
@@ -26,4 +27,8 @@ export const timesheetEntries = pgTable('timesheet_entries', {
   description: text('description'),
   calculatedCost: numeric('calculated_cost', { precision: 10, scale: 2 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_timesheet_entries_user_date').on(table.timesheetId, table.date),
+  index('idx_timesheet_entries_charge_code').on(table.chargeCodeId),
+  index('idx_timesheet_entries_date').on(table.date),
+]);

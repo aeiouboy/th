@@ -7,6 +7,7 @@ import {
   boolean,
   timestamp,
   pgEnum,
+  index,
 } from 'drizzle-orm/pg-core';
 import { profiles } from './profiles';
 
@@ -36,4 +37,9 @@ export const chargeCodes = pgTable('charge_codes', {
   isBillable: boolean('is_billable').default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_charge_codes_parent').on(table.parentId),
+  index('idx_charge_codes_level').on(table.level),
+  index('idx_charge_codes_owner').on(table.ownerId),
+  index('idx_charge_codes_approver').on(table.approverId),
+]);

@@ -4,8 +4,9 @@ import {
   Put,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -29,10 +30,23 @@ export class UsersController {
     return this.usersService.updateProfile(user.id, dto);
   }
 
+  @Put('me/avatar')
+  updateAvatar(@CurrentUser() user: any, @Body() body: { avatarUrl: string }) {
+    return this.usersService.updateAvatar(user.id, body.avatarUrl);
+  }
+
   @Get()
   @Roles('admin', 'charge_manager')
-  findAll() {
-    return this.usersService.findAll();
+  @ApiQuery({ name: 'limit', required: false, description: 'Max results (default 100, max 500)' })
+  @ApiQuery({ name: 'offset', required: false, description: 'Offset for pagination (default 0)' })
+  findAll(
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.usersService.findAll({
+      limit: limit ? Math.min(parseInt(limit, 10) || 100, 500) : 100,
+      offset: offset ? parseInt(offset, 10) || 0 : 0,
+    });
   }
 
   @Put(':id/role')

@@ -149,6 +149,35 @@ When invoked, you must follow these steps:
    - **Workflow step evidence**: `snap(page, 'e2e-wf-01', 'after-submit')` — per action, taken at key moments
 
    f. **Tests must NOT mock the backend** — E2E tests run against real running servers. If tests need auth, obtain a real token via Supabase auth API or use storageState from a global setup that logs in once.
+
+   g. **NEVER use `test.fail()` to hide failures** — `test.fail()` is BANNED. If a test fails because of an implementation bug:
+      - Report the bug in your completion message with file, line, and fix suggestion
+      - Mark the test as `test.skip()` with a clear reason: `test.skip('BUG: [description] — see [file]:[line]')`
+      - Add the skipped test to summary.md under "Blocked Tests" section
+      - NEVER mark a skipped/failing test as "pass" in test-cases.csv — use status `skip` or `fail`
+      Using `test.fail()` makes broken tests report as "pass", which hides bugs from the team lead and validators.
+
+   h. **Health check before E2E run** — Before running any E2E tests, verify both servers are responding. Use `BACKEND_URL` and `FRONTEND_URL` from `helpers.ts` (configured via `E2E_BACKEND_PORT` / `E2E_FRONTEND_PORT` env vars, defaults to 3001/3002):
+      ```typescript
+      import { BACKEND_URL, FRONTEND_URL } from './helpers';
+      test.beforeAll(async () => {
+        const backendOk = await fetch(`${BACKEND_URL}/api/v1`).then(r => r.status < 500).catch(() => false);
+        if (!backendOk) throw new Error(`Backend not running at ${BACKEND_URL}`);
+        const frontendOk = await fetch(FRONTEND_URL).then(r => r.status < 500).catch(() => false);
+        if (!frontendOk) throw new Error(`Frontend not running at ${FRONTEND_URL}`);
+      });
+      ```
+      NEVER hardcode ports — always use the helpers. If either server is down, the test MUST fail immediately with a clear error — never silently produce screenshots of error pages.
+
+   i. **Screenshot error detection** — After taking screenshots, visually inspect them (if you have access) or add assertions to detect error states:
+      - Check page does NOT contain `Runtime TypeError` or `Runtime Error` text
+      - Check page does NOT have error toast (`.sonner-toast` with error variant)
+      - If screenshot shows an error page instead of the expected content, the test MUST fail — not pass
+      ```typescript
+      // Add after navigation, before snap:
+      const errorOverlay = page.locator('text=Runtime TypeError, text=Runtime Error').first();
+      expect(await errorOverlay.count()).toBe(0);
+      ```
 5. **Run the tests.** Execute the test suite to confirm all new tests pass. Fix any failures in the test code (never in the implementation code).
 6. **Save test results.** You MUST create ALL of the following files before marking the task complete. A PostToolUse validator will **block** your TaskUpdate if any are missing.
 
@@ -156,9 +185,11 @@ When invoked, you must follow these steps:
 
 ```
 docs/test-results/
-├── test-cases.csv             # MANDATORY — CSV catalog for easy validation in Excel/Sheets
-├── test-cases.md              # MANDATORY — markdown catalog (same data, for git review)
-├── summary.md                 # MANDATORY — overall summary with backend + frontend breakdown
+├── unit-test-cases.csv        # MANDATORY — Unit/component test catalog (auto-generated from test runner)
+├── unit-test-cases.md         # MANDATORY — Same data as CSV, markdown for git review
+├── e2e-test-cases.csv         # MANDATORY if E2E tests exist — QA-grade E2E test case catalog with full steps
+├── e2e-test-cases.md          # MANDATORY if E2E tests exist — Same data, markdown with detailed step tables
+├── summary.md                 # MANDATORY — overall summary with backend + frontend + E2E breakdown
 ├── backend/                   # MANDATORY if backend exists
 │   ├── unit-results.json      # Machine-readable test runner output (jest --json)
 │   └── unit-results.md        # Human-readable report
@@ -174,61 +205,124 @@ docs/test-results/
 
 **Detection rule:** If the project has a `frontend/` or `src/app/` directory with `.tsx` files, frontend tests and e2e tests are MANDATORY, not optional.
 
-### test-cases.csv format (MANDATORY — primary deliverable)
+**CRITICAL — Unit tests and E2E tests are SEPARATE deliverables:**
+- `unit-test-cases.*` = auto-generated catalog from Jest/Vitest test runner output. Compact format — no manual steps needed.
+- `e2e-test-cases.*` = QA-grade manual test case documentation. MUST include full step-by-step instructions, preconditions, expected results, and test data. This is a human-readable QA document, not just a test runner report.
 
-Engineers and QA validate test cases in spreadsheets. CSV format follows the team's QA structure.
+### unit-test-cases.csv format (MANDATORY)
+
+Auto-generated catalog from test runner output. Compact format for unit/component tests.
+
+```csv
+ID,Test Name,Type,Category,File,Status,Notes
+TC-001,"ReportsService > getProjectCostReport > should return empty report when charge code does not exist",unit,Backend — Reports,backend/src/reports/reports.service.spec.ts,pass,
+TC-002,"api.ts — request function > should resolve with parsed JSON on a 200 response",unit,Frontend — API Client,frontend/src/lib/api.test.ts,pass,
+```
+
+**CSV columns (7 columns):**
+- **ID**: Sequential `TC-001`, `TC-002`, etc.
+- **Test Name**: Full test name from test runner (describe > it)
+- **Type**: `unit` or `component`
+- **Category**: Logical group (e.g. `Backend — Reports`, `Frontend — API Client`, `Components — NotificationBell`)
+- **File**: Relative path to the test file
+- **Status**: `pass`, `fail`, or `skip`
+- **Notes**: Empty unless notable
+
+### unit-test-cases.md format (MANDATORY — same data, for git review)
+
+```markdown
+# Unit Test Cases
+
+> Generated: YYYY-MM-DD | Runner: jest / vitest | Total: N | Pass: N | Fail: N | Skip: N
+
+| ID | Test Name | Type | Category | File | Status | Notes |
+|---|---|---|---|---|---|---|
+| TC-001 | ReportsService > getProjectCostReport > should return empty report... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
+```
+
+### e2e-test-cases.csv format (MANDATORY if E2E tests exist — primary QA deliverable)
+
+**CRITICAL:** This is a QA-grade document, NOT a test runner report. Each row describes a complete manual test scenario with step-by-step instructions that a QA engineer can follow.
+
+**Reference template:** See `docs/example-e2e-test-cases.csv` for the canonical format with Thai step descriptions.
 
 ```csv
 ID,Title,Type,Section,Priority,Preconditions,Steps,Expected Result,Test Data,File,Status,Notes
-TC-001,"Create project under program",e2e,E2E > Charge Codes,High,"Admin logged in, Program exists","1. Navigate to /charge-codes 2. Click Create New 3. Select level=Project 4. Select parent 5. Click Create","New project appears in tree, API returns node with correct parentId","Role: admin, Code: PRJ-PAY-001",frontend/e2e/charge-codes.spec.ts,pass,
-TC-002,"Submit blocked when hours < 8h",e2e,E2E > Time Entry,High,"Employee logged in, Monday has 4h","1. Fill Mon=4h 2. Click Submit","Validation dialog shows 'Incomplete Hours' with '4.0h / 8h', status remains Draft","Role: employee, Hours: 4h on Monday",frontend/e2e/time-entry.spec.ts,pass,Negative case
-TC-003,"Timesheets service creates entry",unit,Backend > Timesheets,Medium,"Mocked DB and auth","Call createEntry with valid payload","Returns entry with id and calculated_cost","hours: 8, chargeCodeId: uuid",backend/src/timesheets/timesheets.service.spec.ts,pass,
+TC-001,"Employee logs hours to multiple charge codes and submits",e2e,E2E > Time Entry,High,"1. เข้าระบบด้วย wichai.s@central.co.th (employee) 2. Timesheet สถานะ Draft 3. มี Charge Code ที่ assign ให้อย่างน้อย 1 รายการ","1. คลิกเมนู 'Time Entry' ที่ sidebar ซ้าย 2. ตรวจสอบว่า grid แสดงสัปดาห์ปัจจุบัน 3. คลิก '+ Add Charge Code' → เลือก OPS-002 4. กรอกชั่วโมงวันจันทร์: PRJ-001 = 4h, OPS-002 = 4h 5. คลิก 'Submit →'","1. แถว OPS-002 ปรากฏใน grid 2. ยอดรวมวันจันทร์ = 8h 3. สถานะเปลี่ยนจาก Draft → Submitted 4. ช่องกรอกเวลาทั้งหมดกลายเป็น read-only","ผู้ใช้: wichai.s@central.co.th (employee) | Charge Code: PRJ-001, OPS-002 | ชั่วโมง: จ=4+4, อ-ศ=8 ต่อวัน",frontend/e2e/time-entry.spec.ts,pass,ครอบคลุม AC-1 AC-3 AC-4 AC-5 AC-6
 ```
 
 **CSV columns (12 columns, this exact order):**
-- **ID**: Sequential `TC-001`, `TC-002`, etc.
-- **Title**: Human-readable description of what is being tested
-- **Type**: `unit`, `e2e`, `integration`, or `snapshot`
-- **Section**: Hierarchical group for filtering (e.g. `E2E > Time Entry`, `Backend > Timesheets`, `Frontend > Components > ApprovalQueue`)
+- **ID**: Sequential `TC-001`, `TC-002`, etc. (separate numbering from unit tests)
+- **Title**: Human-readable description of the complete user scenario
+- **Type**: Always `e2e`
+- **Section**: Hierarchical group (e.g. `E2E > Time Entry`, `E2E > Approval Workflow`, `E2E > RBAC`)
 - **Priority**: `High`, `Medium`, or `Low`
-- **Preconditions**: What must be true before the test runs (logged-in user, existing data, role)
-- **Steps**: Numbered step-by-step actions (condensed to single line, separated by numbered steps)
-- **Expected Result**: What should happen after the steps complete (UI state + API state)
-- **Test Data**: Specific data values used in the test (role, IDs, amounts, dates)
-- **File**: Relative path to the test file
+- **Preconditions**: Numbered list of what must be true before test runs (logged-in user, existing data, system state)
+- **Steps**: Numbered step-by-step user actions — describe WHERE (which page/menu), WHAT (click/fill/select), and WHAT TO CHECK at each step. For multi-role tests, prefix each step with `[Role username]`
+- **Expected Result**: Numbered list of observable outcomes — UI state changes, toast messages, element visibility, data in API response
+- **Test Data**: Specific data used — user credentials, charge codes, hours, dates, amounts. Use `|` as separator
+- **File**: Relative path to the Playwright spec file
 - **Status**: `pass`, `fail`, or `skip`
-- **Notes**: Empty unless notable (e.g. "Negative case", "Multi-role workflow"). Wrap in quotes if contains commas.
+- **Notes**: Acceptance criteria references (e.g. `AC-1 AC-3`), test type (e.g. `Negative case`), or workflow notes
 
-### test-cases.md format (MANDATORY — same data as CSV, for git review)
+**E2E Steps writing rules:**
+- Write steps as if instructing a manual QA tester — describe exact UI interactions
+- For multi-role workflows (e.g. employee submits → manager approves), prefix steps with `[Role]` to indicate login switch
+- Include pre-checks (what should be visible) and post-checks (what should change) within steps
+- Reference specific button text, menu names, and field labels as they appear in the UI
+- Steps language should match the project's primary language (Thai for this project)
+
+### e2e-test-cases.md format (MANDATORY if E2E tests exist — detailed step tables)
+
+Each E2E test case gets its own section with a metadata table and a step-by-step table.
 
 ```markdown
-# Test Cases
+# E2E Test Cases
 
-> Generated: YYYY-MM-DD | Runner: <vitest|jest|pytest|etc> | Total: N | Pass: N | Fail: N
+> Generated: YYYY-MM-DD | Runner: Playwright | Total: N | Pass: N | Fail: N | Skip: N
 
-## E2E > Charge Codes
+---
 
-| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
-|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
-| TC-001 | Create project under program | High | Admin logged in, Program exists | 1. Navigate to /charge-codes 2. Click Create New 3. Select level=Project 4. Select parent 5. Click Create | New project in tree, API returns correct parentId | Role: admin, Code: PRJ-PAY-001 | frontend/e2e/charge-codes.spec.ts | pass |
+### TC-001: Employee logs hours to multiple charge codes and submits
 
-## E2E > Time Entry
+| Field | Detail |
+|---|---|
+| **Priority** | High |
+| **Section** | E2E > Time Entry |
+| **File** | `frontend/e2e/time-entry.spec.ts` |
+| **Acceptance Criteria** | AC-1 AC-3 AC-4 AC-5 AC-6 |
 
-| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
-|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
-| TC-002 | Submit blocked when hours < 8h | High | Employee logged in, Monday has 4h | 1. Fill Mon=4h 2. Click Submit | Dialog: 'Incomplete Hours', status remains Draft | Role: employee, Hours: 4h | frontend/e2e/time-entry.spec.ts | pass |
+**Preconditions:**
+1. เข้าระบบด้วย wichai.s@central.co.th (employee)
+2. Timesheet สถานะ Draft
+3. มี Charge Code ที่ assign ให้อย่างน้อย 1 รายการ
 
-## Backend > Timesheets
+**Test Data:**
+- ผู้ใช้: wichai.s@central.co.th (employee)
+- Charge Code: PRJ-001 Digital Platform, OPS-002 Internal Support
+- ชั่วโมง: จ=4+4, อ-ศ=8 ต่อวัน
 
-| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
-|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
-| TC-003 | Creates entry with cost | Medium | Mocked DB | Call createEntry | Returns entry with calculated_cost | hours: 8 | backend/src/timesheets/timesheets.service.spec.ts | pass |
+**Steps:**
+
+| # | Action | Expected Result |
+|---|---|---|
+| 1 | คลิกเมนู 'Time Entry' ที่ sidebar ซ้าย | หน้า Time Entry เปิดขึ้น |
+| 2 | ตรวจสอบว่า grid แสดงสัปดาห์ปัจจุบัน (จ-อา) | Grid แสดงสัปดาห์ปัจจุบัน |
+| 3 | คลิก '+ Add Charge Code' → เลือก OPS-002 | แถว OPS-002 ปรากฏใน grid |
+| 4 | กรอกชั่วโมงวันจันทร์: PRJ-001 = 4h, OPS-002 = 4h | ยอดรวมวันจันทร์ = 8h |
+| 5 | คลิก 'Submit →' | สถานะเปลี่ยนเป็น Submitted, ช่องกรอกเวลากลายเป็น read-only |
+
+---
 ```
 
-**Markdown grouping rules:**
-- Group test cases by **Section** as `## Section Name` headers
-- Within each section, render one table with all test cases for that section
-- This mirrors the Section Hierarchy used by the QA team's test management tools
+**Markdown formatting rules for E2E test cases:**
+- Each test case is a `### TC-NNN: Title` section
+- Metadata in a 2-column table (Field | Detail)
+- Preconditions as a numbered list
+- Test Data as a bullet list
+- Steps as a 3-column table (# | Action | Expected Result) — one row per step
+- Separate each test case with `---`
+- This format allows QA engineers to read and follow each test case independently
 
 ### summary.md format
 
@@ -277,9 +371,11 @@ TC-003,"Timesheets service creates entry",unit,Backend > Timesheets,Medium,"Mock
 7. **Self-validate before completing.** Before calling TaskUpdate with status=completed, verify:
 
    ### File existence checks
-   - [ ] `docs/test-results/test-cases.csv` exists with header row and all 12 columns (ID,Title,Type,Section,Priority,Preconditions,Steps,Expected Result,Test Data,File,Status,Notes)
-   - [ ] `docs/test-results/test-cases.md` exists with same data grouped by Section in markdown tables
-   - [ ] `docs/test-results/summary.md` exists with date, pass/fail counts, AND separate backend/frontend breakdown
+   - [ ] `docs/test-results/unit-test-cases.csv` exists with 7-column header (ID,Test Name,Type,Category,File,Status,Notes)
+   - [ ] `docs/test-results/unit-test-cases.md` exists with same data in markdown table
+   - [ ] `docs/test-results/e2e-test-cases.csv` exists with 12-column header (ID,Title,Type,Section,Priority,Preconditions,Steps,Expected Result,Test Data,File,Status,Notes) — if E2E tests exist
+   - [ ] `docs/test-results/e2e-test-cases.md` exists with detailed step tables per test case — if E2E tests exist
+   - [ ] `docs/test-results/summary.md` exists with date, pass/fail counts, AND separate backend/frontend/E2E breakdown
    - [ ] `docs/test-results/backend/unit-results.json` exists (if backend exists)
    - [ ] `docs/test-results/backend/unit-results.md` exists (if backend exists)
    - [ ] `docs/test-results/frontend/unit-results.json` exists (if frontend exists with .tsx files)
@@ -288,7 +384,9 @@ TC-003,"Timesheets service creates entry",unit,Backend > Timesheets,Medium,"Mock
    - [ ] `docs/test-results/e2e/e2e-results.md` exists (if project has UI pages)
    - [ ] `docs/test-results/screenshots/` has at least 1 screenshot per key page (if project has UI pages)
    - [ ] Screenshots use `<name>--<viewport>.png` naming (double-dash before viewport)
-   - [ ] test-cases.csv includes BOTH backend AND frontend test entries (if both exist)
+   - [ ] unit-test-cases.csv includes BOTH backend AND frontend unit test entries (if both exist)
+   - [ ] e2e-test-cases.csv has full Steps, Preconditions, Expected Result, and Test Data for EVERY row (no empty step columns)
+   - [ ] e2e-test-cases.md has a detailed step table (# | Action | Expected Result) for EVERY test case
 
    ### E2E assertion quality checks (CRITICAL — prevents shallow tests)
    - [ ] Every E2E test file contains at least 1 `click`, `fill`, or `selectOption` call (tests perform actions, not just visit pages)

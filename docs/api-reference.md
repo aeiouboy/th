@@ -4,6 +4,22 @@ Base URL: `/api/v1`
 
 All endpoints require a `Authorization: Bearer <token>` header unless marked as **Public**. Role restrictions are noted where applicable.
 
+## Pagination
+
+Most list endpoints support offset-based pagination via two query parameters:
+
+| Parameter | Type | Default | Max | Description |
+|-----------|------|---------|-----|-------------|
+| `limit` | integer | `100` | `500` | Maximum number of records to return |
+| `offset` | integer | `0` | — | Number of records to skip before returning results |
+
+Example:
+```
+GET /api/v1/approvals/pending?limit=20&offset=40
+```
+
+Endpoints that use a different pagination scheme (such as `GET /budgets` which uses `page`/`limit`) document their parameters individually.
+
 ---
 
 ## Users
@@ -27,6 +43,28 @@ Get the current authenticated user's profile.
   "updatedAt": "2026-01-01T00:00:00.000Z"
 }
 ```
+
+### PUT /users/me/avatar
+
+Update the current user's avatar URL.
+
+- **Auth**: Yes (any role)
+- **Request Body**:
+```json
+{
+  "avatarUrl": "https://storage.example.com/avatars/user-uuid.jpg"
+}
+```
+- **Validation**: `avatarUrl` must be a valid HTTP or HTTPS URL.
+- **Response**:
+```json
+{
+  "avatarUrl": "https://storage.example.com/avatars/user-uuid.jpg"
+}
+```
+- **Errors**: 400 (invalid or non-HTTP/S URL), 401 (unauthorized)
+
+> **Storage note:** The frontend uploads files directly to the Supabase Storage bucket `avatars` (public, 2 MB limit) and then calls this endpoint with the resulting public URL. The backend stores only the URL string — it does not handle file uploads itself.
 
 ### PUT /users/me
 
@@ -180,6 +218,37 @@ Create or update entries for a timesheet.
 - **Response**: Array of upserted entry objects
 - **Errors**: 400, 401, 404
 
+### POST /timesheets/:id/copy-from-previous
+
+Copy charge code rows from the previous period into the current draft timesheet. Hours are not copied — only the charge code structure.
+
+- **Auth**: Yes (owner only)
+- **Params**: `id` (UUID of the current draft timesheet)
+- **Request Body**: None
+- **Response**:
+```json
+{
+  "entries": [
+    {
+      "id": "uuid",
+      "timesheetId": "uuid",
+      "chargeCodeId": "PROJ-001",
+      "date": "2026-03-17",
+      "hours": "0.00",
+      "description": null,
+      "calculatedCost": "0.00",
+      "createdAt": "2026-03-17T00:00:00.000Z"
+    }
+  ]
+}
+```
+- **Errors**:
+  - `400` — no previous period timesheet found
+  - `401` — unauthorized
+  - `404` — timesheet not found
+
+---
+
 ### POST /timesheets/:id/submit
 
 Submit a timesheet for approval.
@@ -199,7 +268,7 @@ Submit a timesheet for approval.
 
 ### GET /charge-codes
 
-List all charge codes with optional filters.
+List all charge codes with optional filters and pagination.
 
 - **Auth**: Yes (any role)
 - **Query Params**:
@@ -207,6 +276,8 @@ List all charge codes with optional filters.
   - `status` (optional): filter by status
   - `billable` (optional): `true` or `false`
   - `search` (optional): text search
+  - `limit` (optional, default `50`): maximum number of records to return
+  - `offset` (optional, default `0`): number of records to skip for pagination
 - **Response**: Array of charge code objects
 - **Errors**: 401
 
@@ -277,6 +348,127 @@ Get direct children of a charge code.
 - **Response**: Array of child charge code objects
 - **Errors**: 401, 404
 
+### GET /charge-codes/:id/budget-detail
+
+Get budget breakdown for a charge code, including child charge codes and team breakdown.
+
+- **Auth**: Yes (any role)
+- **Response**:
+```json
+{
+  "chargeCodeId": "PRG-001",
+  "budget": 5000000,
+  "actual": 3200000,
+  "children": [
+    {
+      "chargeCodeId": "PRJ-001",
+      "name": "Platform Modernization",
+      "budget": 3000000,
+      "actual": 2000000,
+      "percentage": 67
+    }
+  ],
+  "teamBreakdown": [
+    {
+      "team": "Engineering",
+      "hours": 1200,
+      "cost": 2400000,
+      "percentage": 75
+    }
+  ],
+  "personBreakdown": [
+    {
+      "userId": "uuid",
+      "fullName": "Wichai Sukjai",
+      "hours": 600,
+      "cost": 1200000
+    }
+  ]
+}
+```
+- **Errors**: 401, 404
+
+### POST /charge-codes/:id/cascade-access
+
+Propagate the current user access list of a charge code down to all child charge codes in a single transaction.
+
+- **Auth**: Yes — **charge code owner**, **approver**, or **admin** only
+- **Request Body**:
+```json
+{
+  "userIds": ["uuid1", "uuid2"]
+}
+```
+- **Response**:
+```json
+{
+  "affected": 5
+}
+```
+- **Errors**:
+  - `401` — unauthorized
+  - `403` — caller is not the charge code owner, approver, or admin
+  - `404` — charge code not found
+
+### POST /charge-codes/:id/request-access
+
+Submit a request from the current user to be granted access to a charge code they are not assigned to.
+
+- **Auth**: Yes (any role)
+- **Request Body**:
+```json
+{
+  "reason": "I need to log hours for the Q2 migration work"
+}
+```
+- **Response**:
+```json
+{
+  "requestId": "uuid",
+  "status": "pending"
+}
+```
+- **Errors**: 400, 401
+
+### GET /charge-codes/access-requests/list
+
+List access requests for charge codes where the current user is the owner or approver. Admins see all requests across all charge codes.
+
+- **Auth**: Yes — **charge code owner**, **approver**, or **admin**
+- **Response**:
+```json
+[
+  {
+    "id": "uuid",
+    "requester": { "id": "uuid", "fullName": "Wichai Sukjai" },
+    "chargeCode": { "id": "PRJ-002", "name": "CRM Platform" },
+    "reason": "I need to log hours for the Q2 migration work",
+    "status": "pending",
+    "createdAt": "2026-03-18T10:00:00.000Z"
+  }
+]
+```
+- **Errors**: 401, 403
+
+### PATCH /charge-codes/access-requests/:id
+
+Approve or reject a charge code access request. Approving automatically grants `charge_code_access` to the requester.
+
+- **Auth**: Yes — **charge code owner**, **approver**, or **admin**
+- **Params**: `id` (UUID of the request)
+- **Request Body**:
+```json
+{
+  "status": "approved"
+}
+```
+- **Response**: Updated request object
+- **Errors**:
+  - `400` — invalid status value
+  - `401` — unauthorized
+  - `403` — caller is not authorized to review this request
+  - `404` — request not found
+
 ### PUT /charge-codes/:id/access
 
 Update user access (assignments) for a charge code.
@@ -301,10 +493,25 @@ Update user access (assignments) for a charge code.
 
 ### GET /approvals/pending
 
-Get timesheets pending the current user's approval.
+Get timesheets pending the current user's approval, with optional search filtering (CR-12).
 
-- **Auth**: Yes (any role -- returns results relevant to the user)
-- **Response**: Array of timesheet objects with user details
+- **Auth**: Yes (any role -- returns results relevant to the caller's role)
+- **Query Params**:
+  - `search` (optional): filter by employee name, email, or department
+- **Response**: Array of timesheet objects with user details. Each item now includes a `programs` field listing the charge code program names referenced by that timesheet's entries.
+```json
+[
+  {
+    "id": "uuid",
+    "userId": "uuid",
+    "periodStart": "2026-03-01",
+    "periodEnd": "2026-03-15",
+    "status": "submitted",
+    "user": { "id": "uuid", "fullName": "Wichai Sukjai", "department": "Engineering" },
+    "programs": ["Digital Transformation", "CRM Platform"]
+  }
+]
+```
 - **Errors**: 401
 
 ### POST /approvals/:timesheet_id/approve
@@ -371,6 +578,62 @@ Get detailed view of a timesheet for approval review.
 ---
 
 ## Budgets
+
+### GET /budgets
+
+Get budget summaries with optional charge code filtering and pagination (CR-22).
+
+- **Auth**: Yes — **admin**, **pmo**, or **finance** only
+- **Query Params**:
+  - `chargeCodeIds` (optional): comma-separated list of charge code IDs (e.g. `PRG-001,PRJ-002`)
+  - `page` (optional, default `1`): page number (1-based)
+  - `limit` (optional, default `20`, max `100`): items per page
+- **Response**:
+```json
+{
+  "data": [
+    {
+      "chargeCodeId": "PRG-001",
+      "name": "Digital Transformation",
+      "budget": 5000000,
+      "actual": 3200000,
+      "forecast": 4800000,
+      "severity": "green"
+    }
+  ],
+  "total": 42,
+  "page": 1,
+  "limit": 20,
+  "totalPages": 3
+}
+```
+- **Severity values**: `green` (≤80% used), `yellow` (80–90% or forecast overrun), `orange` (90–100%), `red` (>100%)
+- **Errors**: 401, 403
+
+### GET /budgets/:id/team-breakdown
+
+Get team-level cost breakdown for a specific budget entry.
+
+- **Auth**: Yes (any role)
+- **Params**: `id` (budget UUID or charge code ID)
+- **Response**:
+```json
+[
+  {
+    "team": "Engineering",
+    "hours": 480,
+    "cost": 960000,
+    "percentage": 75
+  },
+  {
+    "team": "QA",
+    "hours": 120,
+    "cost": 180000,
+    "percentage": 14
+  }
+]
+```
+- **Errors**: 401, 404
 
 ### GET /budgets/alerts
 
@@ -562,7 +825,139 @@ Reject a vacation request.
 
 ---
 
+## Dashboard
+
+### GET /dashboard/chargeability-ytd
+
+Get year-to-date chargeability data for the current user, broken down by month.
+
+- **Auth**: Yes (any role)
+- **Response**:
+```json
+{
+  "ytdChargeability": 84.5,
+  "months": [
+    {
+      "month": "2026-01",
+      "chargeability": 87.2,
+      "billableHours": 145,
+      "totalHours": 166
+    },
+    {
+      "month": "2026-02",
+      "chargeability": 81.0,
+      "billableHours": 130,
+      "totalHours": 160
+    }
+  ]
+}
+```
+- **Errors**: 401
+
+### GET /dashboard/program-distribution
+
+Get hours distribution across programs for the current user, with both current-period and YTD views.
+
+- **Auth**: Yes (any role)
+- **Response**:
+```json
+{
+  "currentPeriod": [
+    {
+      "programName": "Digital Transformation",
+      "programId": "PRG-001",
+      "hours": 32,
+      "percentage": 80
+    }
+  ],
+  "ytd": [
+    {
+      "programName": "Digital Transformation",
+      "programId": "PRG-001",
+      "hours": 640,
+      "percentage": 78
+    }
+  ]
+}
+```
+- **Errors**: 401
+
+---
+
 ## Reports
+
+### GET /reports/by-program
+
+Get budget vs actual, task distribution, and team distribution for a specific program (CR-13).
+
+- **Auth**: Yes — **admin**, **pmo**, or **finance** only
+- **Query Params**:
+  - `programId` (required): charge code ID of the program
+  - `period` (optional): month string, e.g. `2026-03`
+- **Response**:
+```json
+{
+  "program": { "id": "PRG-001", "name": "Digital Transformation" },
+  "budget": 5000000,
+  "actual": 3200000,
+  "budgetVsActual": [
+    { "name": "PRJ-001 Platform Mod.", "budget": 3000000, "actual": 2000000 }
+  ],
+  "taskDistribution": [
+    { "category": "Development", "hours": 800, "percentage": 65 }
+  ],
+  "teamDistribution": [
+    { "team": "Engineering", "hours": 960, "percentage": 78 }
+  ]
+}
+```
+- **Errors**: 400, 401, 404
+
+### GET /reports/by-cost-center
+
+Get chargeability and charge distribution for a specific cost center (CR-14).
+
+- **Auth**: Yes — **admin**, **pmo**, or **finance** only
+- **Query Params**:
+  - `costCenter` (required): cost center identifier (maps to `profiles.department`, e.g. `DEPT-MER`)
+  - `period` (optional): month string, e.g. `2026-03`
+- **Response**:
+```json
+{
+  "costCenter": "DEPT-MER",
+  "chargeability": 83.5,
+  "chargeDistribution": [
+    { "chargeCodeId": "PRJ-001", "name": "Platform Mod.", "hours": 320, "isBillable": true }
+  ],
+  "nonChargeableHours": 40
+}
+```
+- **Errors**: 400, 401
+
+### GET /reports/by-person
+
+Get hours history, project summary, vacation days, and total hours for a specific employee (CR-15).
+
+- **Auth**: Yes — **admin**, **pmo**, or **finance** only
+- **Query Params**:
+  - `userId` (required): UUID of the employee
+  - `periodFrom` (optional): start month, e.g. `2026-01`
+  - `periodTo` (optional): end month, e.g. `2026-03`
+- **Response**:
+```json
+{
+  "person": { "id": "uuid", "fullName": "Wichai Sukjai", "jobGrade": "L3" },
+  "totalHours": 160,
+  "vacationDays": 2,
+  "history": [
+    { "month": "2026-01", "hours": 166, "chargeability": 87 }
+  ],
+  "projectSummary": [
+    { "chargeCodeId": "PRJ-001", "name": "Platform Mod.", "hours": 128 }
+  ]
+}
+```
+- **Errors**: 400, 401, 404
 
 ### GET /reports/project-cost
 

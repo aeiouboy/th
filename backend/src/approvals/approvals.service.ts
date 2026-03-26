@@ -185,7 +185,7 @@ export class ApprovalsService {
     return { periodStart, periodEnd, workingDayCount, targetHours, members };
   }
 
-  async getPending(userId: string) {
+  async getPending(userId: string, search?: string) {
     // As manager: timesheets where submitter's manager_id = current user AND status = 'submitted'
     const managerPending = await this.db
       .select({
@@ -245,12 +245,24 @@ export class ApprovalsService {
         pendingMap.set(r.timesheet.id, r);
       }
     }
-    const allPending = Array.from(pendingMap.values());
+    let allPending = Array.from(pendingMap.values());
+
+    // Apply search filter on employee name, email, or department
+    if (search && search.trim()) {
+      const term = search.trim().toLowerCase();
+      allPending = allPending.filter((r) => {
+        const name = r.employee.fullName?.toLowerCase() ?? '';
+        const email = r.employee.email.toLowerCase();
+        const dept = r.employee.department?.toLowerCase() ?? '';
+        return name.includes(term) || email.includes(term) || dept.includes(term);
+      });
+    }
 
     // Get total hours for each timesheet
     const allTimesheetIds = allPending.map((r) => r.timesheet.id);
 
     let hoursMap: Record<string, string> = {};
+    let programsMap: Record<string, string[]> = {};
     if (allTimesheetIds.length > 0) {
       const hourRows = await this.db
         .select({
@@ -264,12 +276,31 @@ export class ApprovalsService {
       hoursMap = Object.fromEntries(
         hourRows.map((r) => [r.timesheetId, r.totalHours]),
       );
+
+      // Get distinct program names for each timesheet from charge code entries
+      const programRows = await this.db
+        .selectDistinct({
+          timesheetId: timesheetEntries.timesheetId,
+          programName: chargeCodes.programName,
+        })
+        .from(timesheetEntries)
+        .innerJoin(chargeCodes, eq(timesheetEntries.chargeCodeId, chargeCodes.id))
+        .where(inArray(timesheetEntries.timesheetId, allTimesheetIds));
+
+      for (const row of programRows) {
+        const tsId = row.timesheetId;
+        if (!programsMap[tsId]) programsMap[tsId] = [];
+        if (row.programName && !programsMap[tsId].includes(row.programName)) {
+          programsMap[tsId].push(row.programName);
+        }
+      }
     }
 
     const enrichRow = (r: (typeof allPending)[0]) => ({
       ...r.timesheet,
       employee: r.employee,
       totalHours: parseFloat(hoursMap[r.timesheet.id] || '0'),
+      programs: programsMap[r.timesheet.id] || [],
     });
 
     return {
@@ -478,7 +509,10 @@ export class ApprovalsService {
     return { results };
   }
 
-  async getHistory(userId: string) {
+  async getHistory(userId: string, pagination?: { limit?: number; offset?: number }) {
+    const limit = Math.min(pagination?.limit ?? 100, 500);
+    const offset = pagination?.offset ?? 0;
+
     // Fetch timesheet approval logs
     const logs = await this.db
       .select({
@@ -559,14 +593,14 @@ export class ApprovalsService {
       employee: row.employee,
     }));
 
-    // Merge and sort by date descending
+    // Merge and sort by date descending, then apply pagination
     const combined = [...timesheetHistory, ...vacationHistory].sort((a, b) => {
       const dateA = new Date(a.approvedAt).getTime();
       const dateB = new Date(b.approvedAt).getTime();
       return dateB - dateA;
     });
 
-    return combined;
+    return combined.slice(offset, offset + limit);
   }
 
   async getTimesheetDetail(timesheetId: string) {

@@ -124,7 +124,8 @@ describe('CostRatesService', () => {
 function buildOrderByChain(resolveValue: any[]) {
   return {
     from: jest.fn().mockReturnThis(),
-    orderBy: jest.fn().mockResolvedValue(resolveValue),
+    orderBy: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockResolvedValue(resolveValue),
   };
 }
 

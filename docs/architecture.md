@@ -41,18 +41,20 @@ AppModule
 ├── ScheduleModule (cron)
 ├── DatabaseModule (Drizzle provider)
 ├── UsersModule
-├── ChargeCodesModule
-├── TimesheetsModule
-├── BudgetsModule
+├── ChargeCodesModule          ← CR-07: access requests, CR-11: cascade access
+├── TimesheetsModule           ← CR-05: copy-from-previous
+├── BudgetsModule              ← CR-16/17: multi-select filter, team breakdown
 ├── ApprovalsModule
 ├── CalendarModule
 ├── CostRatesModule
+├── DashboardModule            ← NEW (CR-01/02/03): chargeability-ytd, program-distribution
 ├── SchedulersModule
 │   ├── TimesheetsScheduler
 │   ├── BudgetsScheduler
 │   ├── ReportsScheduler
 │   └── NotificationService
-├── ReportsModule
+├── ReportsModule              ← CR-13/14/15: by-program, by-cost-center, by-person
+├── SettingsModule             ← Company billing rate settings
 └── IntegrationsModule
     ├── Teams bot (Bot Framework)
     ├── NotificationService
@@ -70,18 +72,19 @@ app/
 ├── login/                        # Public — Supabase email/password login
 ├── auth/callback/                # Public — OAuth callback handler
 └── (authenticated)/              # Protected layout group (layout.tsx)
-    │   # Layout includes: sidebar, mobile nav, topbar with NotificationBell
-    ├── page.tsx                  # Dashboard: summary, pending items, alerts
+    │   # Layout includes: sidebar (RIS logo — CR-19), mobile nav, topbar with NotificationBell
+    │   # Layout also includes: ChatWidget (CR-21 chatbot)
+    ├── page.tsx                  # Dashboard: KPIs, ChargeabilityTrend, ProgramDistribution (CR-01/02/03)
     ├── time-entry/
-    │   └── page.tsx              # Timesheet entry: period selector, daily grid
+    │   └── page.tsx              # Timesheet entry: PeriodSelector, daily grid, RequestChargeCode (CR-04/07)
     ├── charge-codes/
-    │   └── page.tsx              # Charge code browser: hierarchical tree
+    │   └── page.tsx              # Charge code browser: ChargeCodeTree, BudgetDetail, TeamBreakdown (CR-08/09/10/11)
     ├── approvals/
-    │   └── page.tsx              # Approval queue: pending + history tabs
+    │   └── page.tsx              # Approval queue: pending + history tabs (search fixed — CR-12)
     ├── budget/
-    │   └── page.tsx              # Budget tracking: alerts, summaries, drill-down
+    │   └── page.tsx              # Budget tracking: MultiSelectFilter, TeamBreakdown (CR-16/17)
     ├── reports/
-    │   └── page.tsx              # Analytics: KPI cards, 3-col charts, Financial P/L
+    │   └── page.tsx              # Analytics: tabs By Program / By Cost Center / By Person / Overview (CR-13/14/15)
     ├── notifications/
     │   └── page.tsx              # Notification Center: filter tabs, read/unread, pagination
     ├── profile/
@@ -94,7 +97,7 @@ app/
         ├── calendar/
         │   └── page.tsx          # Calendar admin: holidays, vacations
         └── rates/
-            └── page.tsx          # Cost rate management: job grade → hourly rate
+            └── page.tsx          # Cost rate management: job grade → hourly rate, company billing rate
 ```
 
 ---
@@ -117,6 +120,71 @@ reports/page.tsx
     └── Tab: "Alerts (N)"
         └── AlertList (budget overruns + chargeability gaps combined)
 ```
+
+---
+
+## New Components Added in CR-01–CR-22
+
+### Dashboard Components
+
+```
+frontend/src/components/dashboard/
+├── ChargeabilityTrend.tsx    # CR-02: Line chart of monthly chargeability YTD (Recharts LineChart)
+└── ProgramDistribution.tsx   # CR-03: Pie chart of hours per program, toggle Current/YTD
+```
+
+Both components fetch their own data via TanStack Query and are embedded directly on `page.tsx`.
+
+### Time Entry Components
+
+```
+frontend/src/components/time-entry/
+├── PeriodSelector.tsx        # CR-04: Dropdown with 52-week list; drives the timesheet grid period
+└── RequestChargeCode.tsx     # CR-07: Dialog to search CC and submit an access request with reason
+```
+
+### Charge Codes Components
+
+```
+frontend/src/components/charge-codes/
+├── ChargeCodeTree.tsx        # CR-10: Improved tree with aligned columns (ID | Name | Budget)
+├── BudgetDetail.tsx          # CR-08: Budget vs actual breakdown per child charge code with progress bars
+└── (charge-codes/TeamBreakdown inside BudgetDetail) # CR-09: Hours/cost/% per team
+```
+
+### Reports Components
+
+```
+frontend/src/components/reports/
+├── ReportByProgram.tsx       # CR-13: Program-level budget vs actual, task/team distribution
+├── ReportByCostCenter.tsx    # CR-14: Cost center chargeability and charge distribution
+└── ReportByPerson.tsx        # CR-15: Per-employee hours history, project summary, vacation days
+```
+
+### Budget Components
+
+```
+frontend/src/components/budget/
+├── MultiSelectFilter.tsx     # CR-16: Multi-select dropdown for filtering multiple charge codes
+└── TeamBreakdown.tsx         # CR-17: Cost breakdown per department for a selected budget
+```
+
+### Layout Components
+
+```
+frontend/src/components/layout/
+├── ChatWidget.tsx            # CR-21: In-app chat widget (Phase 1 — NLP via /integrations/teams/message)
+└── ChatBubble.tsx            # CR-21: Individual message bubble inside ChatWidget
+```
+
+### Public Assets
+
+```
+frontend/public/
+└── ris-logo.svg              # CR-19: RIS corporate logo displayed in sidebar header
+```
+
+---
 
 ### Shared Alert Types
 
@@ -157,6 +225,30 @@ layout.tsx
 - Popover closes on outside click (via `mousedown` event listener)
 - Each alert item in the popover navigates to `/reports` on click
 - "View all alerts" footer link also navigates to `/reports`
+
+---
+
+## Supabase Storage — Avatar Uploads
+
+Profile avatars are stored in Supabase Storage, not on the backend server.
+
+**Bucket:** `avatars`
+**Access policy:** Public (URLs are readable without authentication)
+**Size limit:** 2 MB per file
+**Accepted MIME types:** `image/jpeg`, `image/png`, `image/gif`, `image/webp`
+
+**Upload flow:**
+
+```
+Browser
+  └─▶ Supabase Storage (PUT /storage/v1/object/avatars/<userId>/<filename>)
+          └─▶ Returns a public URL
+                └─▶ Frontend calls PUT /api/v1/users/me/avatar { avatarUrl: "<public URL>" }
+                        └─▶ Backend stores URL in profiles.avatar_url
+                                └─▶ Avatar displayed in layout topbar and profile page
+```
+
+The backend validates that `avatarUrl` is a valid HTTP/HTTPS URL before persisting it. File type and size enforcement is performed by the Supabase Storage bucket policy — the backend does not re-validate these constraints.
 
 ---
 
@@ -231,19 +323,20 @@ This allows efficient tree queries without recursive CTEs.
 
 ## Database Overview
 
-Ten tables managed by Drizzle ORM:
+Twelve tables managed by Drizzle ORM:
 
 | Table | Purpose |
 |-------|---------|
 | `profiles` | User accounts, roles, job grades |
 | `charge_codes` | Hierarchical project/activity codes |
 | `charge_code_access` | User-to-charge-code assignments |
+| `charge_code_requests` | Employee requests to join a charge code (NEW — CR-07) |
 | `timesheets` | Per-user, per-period timesheet records |
 | `timesheet_entries` | Daily hour entries within a timesheet |
 | `approval_logs` | Audit log of all approval actions |
 | `budgets` | Budget tracking per charge code |
 | `calendar_days` | Working days, weekends, and holidays |
-| `vacation_requests` | Employee vacation requests |
+| `vacation_requests` | Employee vacation requests (added `leave_type` column — CR-06) |
 | `cost_rates` | Hourly cost rates by job grade |
 | `notifications` | Per-user notification inbox with read state and Teams delivery |
 

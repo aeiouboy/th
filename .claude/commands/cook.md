@@ -29,10 +29,21 @@ PATH_TO_PLAN: $ARGUMENTS
    - Include the full task description, assigned agent type, and dependencies
    - Set `blockedBy` for tasks that depend on other tasks
 
+### Create GitHub Issues
+
+7. After creating all tasks, create a GitHub Issue for each task using `gh issue create`:
+   - **Title**: `[<Task ID>] <Task Name>` (e.g., `[setup-database] Setup Database Schema`)
+   - **Body**: Include task description, dependencies, assigned agent, and a link back to the plan file
+   - **Labels**: auto-create labels if needed: `pipeline`, `build`, `test`, `review`, `docs`, `validate`
+     - Assign label based on agent type: builder→`build`, test-writer→`test`, code-reviewer→`review`, docs-writer→`docs`, validator→`validate`
+   - Save the mapping of Task ID → GitHub Issue Number for later updates
+   - As tasks complete, close the corresponding GitHub Issue with a comment summarizing what was done
+   - If a task fails and heals, add a comment to the issue with the failure details and fix applied
+
 ### Spawn Teammates
 
-7. Read the `## Team Orchestration > Team Members` section from the plan.
-8. For each team member, spawn a teammate using the `Agent` tool with:
+8. Read the `## Team Orchestration > Team Members` section from the plan.
+9. For each team member, spawn a teammate using the `Agent` tool with:
    - `name`: The member's Name from the plan
    - `subagent_type`: The member's Agent Type from the plan
    - `team_name`: The team name from step 4
@@ -41,7 +52,7 @@ PATH_TO_PLAN: $ARGUMENTS
 
 ### Infra Verify (before feature builds)
 
-9. After the foundation/scaffolding task completes, **verify infrastructure BEFORE assigning feature tasks**:
+10. After the foundation/scaffolding task completes, **verify infrastructure BEFORE assigning feature tasks**:
    - If the plan uses external services (database, auth, APIs), the foundation builder must verify real connections as its LAST step
    - The team lead must confirm the builder reported successful connection tests (e.g., `SELECT 1` on DB, JWKS endpoint returns keys, auth token flow works)
    - If infra verification fails, DO NOT proceed to feature builds. Fix infra first.
@@ -49,20 +60,49 @@ PATH_TO_PLAN: $ARGUMENTS
 
 ### Orchestrate
 
-10. You are the **team lead**. You NEVER write code directly.
-11. Assign the first unblocked task(s) to the appropriate teammate(s) using `TaskUpdate` with `owner`.
-12. When a teammate completes a task, mark it completed via `TaskUpdate` and assign the next unblocked task.
-13. Follow the `## Pipeline` section ordering from the plan.
-14. **For the Write Tests task**: Ensure the tester writes BOTH unit tests (mocked) AND E2E tests (real services).
+11. You are the **team lead**. You NEVER write code directly.
+12. Assign the first unblocked task(s) to the appropriate teammate(s) using `TaskUpdate` with `owner`.
+13. When a teammate completes a task:
+    - Mark it completed via `TaskUpdate`
+    - Close the corresponding GitHub Issue with a comment: what was done, files changed
+    - Assign the next unblocked task
+14. Follow the `## Pipeline` section ordering from the plan.
+15. **For the Write Tests task**: Ensure the tester writes BOTH unit tests (mocked) AND E2E tests (real services).
     - E2E tests MUST implement every spec listed in the plan's `## E2E Test Specifications` section
     - E2E tests MUST perform real user actions (click, fill, submit) — NOT just check element visibility
     - E2E tests MUST include negative cases (invalid input → error shown)
     - E2E tests MUST run against real backend — NO mocked API responses
     - Tests that only check page rendering (headings, buttons visible) are INSUFFICIENT and must be rejected
     - After the tester reports completion, SPOT-CHECK at least 2 E2E test files: read the code and verify it contains real user actions and meaningful assertions. If it only checks visibility, send back for rewrite.
-15. **For the Validate task**: Ensure the validator starts real servers, makes real API calls with real auth tokens, and verifies response bodies contain actual data from the database — not just HTTP 200 status codes.
-16. If a validation step fails, follow the `## Healing Rules` to route fixes to the right agent.
-17. Continue until all tasks are completed or max retries are exhausted.
+    - **BAN `test.fail()`**: If any E2E test uses `test.fail()`, REJECT and send back. `test.fail()` hides failures by inverting pass/fail — making broken tests report as "pass". Use `test.skip('BUG: ...')` instead.
+    - **Screenshot verification**: After E2E tests complete, READ at least 3 screenshot images from `docs/test-results/screenshots/`. If any screenshot shows error toasts, crash screens, or blank pages, the tests are NOT passing — reject and investigate.
+    - **Port configuration**: E2E ports are configured via `E2E_FRONTEND_PORT` (default 3002) and `E2E_BACKEND_PORT` (default 3001) env vars. NEVER hardcode ports in test files — use `FRONTEND_URL` / `BACKEND_URL` from `frontend/e2e/helpers.ts`.
+16. **For the Update Docs task**: Only assign AFTER Code Review has passed with no remaining issues.
+    - If Code Review found issues and the builder is still fixing them, do NOT start docs yet
+    - The docs-writer should document the **reviewed** code, not pre-review code that may still change
+    - Gate: Code Review task status must be `completed` with no pending fixes before assigning Update Docs
+17. **For the Validate task**: Ensure the validator starts real servers, makes real API calls with real auth tokens, and verifies response bodies contain actual data from the database — not just HTTP 200 status codes.
+18. If a validation step fails, follow the `## Healing Rules` to route fixes to the right agent.
+19. Continue until all tasks are completed or max retries are exhausted.
+
+### Upload E2E Screenshots to GitHub Issues
+
+20. After E2E tests complete (Write Tests or Validate task), upload screenshots to the relevant GitHub Issues:
+    - Find all screenshots in `docs/test-results/screenshots/`
+    - For each screenshot, determine which task/issue it belongs to based on the test ID prefix (e.g., `e2e-cc-01-*` → charge codes task)
+    - Upload screenshots as comments to the corresponding GitHub Issue using:
+      ```bash
+      # Upload image and comment on issue
+      gh issue comment <issue-number> --body "### E2E Screenshot: <screenshot-name>
+      ![<screenshot-name>](<url>)"
+      ```
+    - If direct image upload is not possible, attach screenshots by referencing their path in the repo:
+      ```bash
+      gh issue comment <issue-number> --body "### E2E Test Evidence
+      Screenshots saved to \`docs/test-results/screenshots/\`:
+      $(ls docs/test-results/screenshots/<test-prefix>-* 2>/dev/null | sed 's/^/- /')"
+      ```
+    - For failed tests, include the screenshot in the failure comment with the error details
 
 ### Healing Log
 

@@ -5,9 +5,9 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
-import { eq, and, like, ilike, sql, inArray } from 'drizzle-orm';
+import { eq, and, like, ilike, sql, inArray, sum } from 'drizzle-orm';
 import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
-import { chargeCodes, chargeCodeUsers, profiles, budgets } from '../database/schema';
+import { chargeCodes, chargeCodeUsers, chargeCodeRequests, profiles, budgets, timesheetEntries, timesheets } from '../database/schema';
 import { CreateChargeCodeDto, ChargeCodeLevel } from './dto/create-charge-code.dto';
 import { UpdateChargeCodeDto } from './dto/update-charge-code.dto';
 import { UpdateAccessDto } from './dto/update-access.dto';
@@ -35,6 +35,8 @@ export class ChargeCodesService {
     status?: string;
     billable?: string;
     search?: string;
+    limit?: number;
+    offset?: number;
   }) {
     let query = this.db.select().from(chargeCodes).$dynamic();
 
@@ -51,8 +53,9 @@ export class ChargeCodesService {
     }
 
     if (filters?.search) {
+      const escaped = filters.search.replace(/[%_\\]/g, '\\$&');
       conditions.push(
-        ilike(chargeCodes.name, `%${filters.search}%`),
+        ilike(chargeCodes.name, `%${escaped}%`),
       );
     }
 
@@ -69,6 +72,11 @@ export class ChargeCodesService {
     if (conditions.length > 0) {
       query = query.where(and(...conditions)) as any;
     }
+
+    const resultLimit = filters?.limit ?? 100;
+    const resultOffset = filters?.offset ?? 0;
+
+    query = query.limit(resultLimit).offset(resultOffset) as any;
 
     return query;
   }
@@ -88,7 +96,8 @@ export class ChargeCodesService {
     return this.db
       .select()
       .from(chargeCodes)
-      .where(inArray(chargeCodes.id, assignedIds));
+      .where(inArray(chargeCodes.id, assignedIds))
+      .limit(500);
   }
 
   async findById(id: string) {
@@ -140,7 +149,8 @@ export class ChargeCodesService {
     return this.db
       .select()
       .from(chargeCodes)
-      .where(eq(chargeCodes.parentId, id));
+      .where(eq(chargeCodes.parentId, id))
+      .limit(500);
   }
 
   async create(dto: CreateChargeCodeDto) {
@@ -262,6 +272,154 @@ export class ChargeCodesService {
     return this.findById(chargeCodeId);
   }
 
+  async getBudgetDetail(id: string) {
+    const code = await this.findByIdRaw(id);
+
+    // Get all descendants using recursive approach
+    const allCodes = await this.db.select().from(chargeCodes);
+    const allBudgets = await this.db.select().from(budgets);
+    const budgetMap = new Map(allBudgets.map((b) => [b.chargeCodeId, b]));
+
+    // Get timesheet entries for cost/hours breakdown
+    const entries = await this.db
+      .select({
+        chargeCodeId: timesheetEntries.chargeCodeId,
+        userId: timesheets.userId,
+        totalHours: sql<string>`SUM(${timesheetEntries.hours}::numeric)`,
+        totalCost: sql<string>`SUM(${timesheetEntries.calculatedCost}::numeric)`,
+      })
+      .from(timesheetEntries)
+      .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
+      .groupBy(timesheetEntries.chargeCodeId, timesheets.userId);
+
+    const allProfiles = await this.db.select().from(profiles);
+    const profileMap = new Map(allProfiles.map((p) => [p.id, p]));
+
+    // Build descendant set
+    const descendantIds = new Set<string>();
+    const collectDescendants = (parentId: string) => {
+      for (const c of allCodes) {
+        if (c.parentId === parentId && !descendantIds.has(c.id)) {
+          descendantIds.add(c.id);
+          collectDescendants(c.id);
+        }
+      }
+    };
+    collectDescendants(id);
+    descendantIds.add(id);
+    const allRelevantIds = descendantIds;
+
+    // Build budget tree
+    const buildBudgetTree = (parentId: string): any[] => {
+      return allCodes
+        .filter((c) => c.parentId === parentId)
+        .map((c) => {
+          const b = budgetMap.get(c.id);
+          const budget = Number(b?.budgetAmount ?? c.budgetAmount ?? 0);
+          const actual = Number(b?.actualSpent ?? 0);
+          return {
+            id: c.id,
+            name: c.name,
+            level: c.level,
+            budget,
+            actual,
+            variance: budget - actual,
+            percentage: budget > 0 ? Math.round((actual / budget) * 10000) / 100 : 0,
+            children: buildBudgetTree(c.id),
+          };
+        });
+    };
+
+    // Team breakdown: group by profiles.department for users who logged to these charge codes
+    const teamMap = new Map<string, { name: string; hours: number; cost: number }>();
+    const personMap = new Map<string, { name: string; hours: number; cost: number }>();
+
+    for (const entry of entries) {
+      if (!allRelevantIds.has(entry.chargeCodeId)) continue;
+      const hours = Number(entry.totalHours ?? 0);
+      const cost = Number(entry.totalCost ?? 0);
+      const profile = profileMap.get(entry.userId);
+      const dept = profile?.department ?? 'Unassigned';
+      const personName = profile?.fullName ?? profile?.email ?? 'Unknown';
+
+      if (!teamMap.has(dept)) teamMap.set(dept, { name: dept, hours: 0, cost: 0 });
+      const t = teamMap.get(dept)!;
+      t.hours += hours;
+      t.cost += cost;
+
+      if (!personMap.has(entry.userId)) personMap.set(entry.userId, { name: personName, hours: 0, cost: 0 });
+      const p = personMap.get(entry.userId)!;
+      p.hours += hours;
+      p.cost += cost;
+    }
+
+    const totalHours = Array.from(personMap.values()).reduce((s, p) => s + p.hours, 0);
+
+    const codeBudget = budgetMap.get(id);
+    const topBudget = Number(codeBudget?.budgetAmount ?? code.budgetAmount ?? 0);
+    const topActual = Number(codeBudget?.actualSpent ?? 0);
+
+    return {
+      budget: topBudget,
+      actual: topActual,
+      variance: topBudget - topActual,
+      percentage: topBudget > 0 ? Math.round((topActual / topBudget) * 10000) / 100 : 0,
+      children: buildBudgetTree(id),
+      teamBreakdown: Array.from(teamMap.values()).map((t) => ({
+        name: t.name,
+        hours: Math.round(t.hours * 100) / 100,
+        cost: Math.round(t.cost * 100) / 100,
+        percentage: totalHours > 0 ? Math.round((t.hours / totalHours) * 10000) / 100 : 0,
+      })).sort((a, b) => b.hours - a.hours),
+      personBreakdown: Array.from(personMap.entries()).map(([userId, p]) => ({
+        userId,
+        name: p.name,
+        hours: Math.round(p.hours * 100) / 100,
+        cost: Math.round(p.cost * 100) / 100,
+        percentage: totalHours > 0 ? Math.round((p.hours / totalHours) * 10000) / 100 : 0,
+      })).sort((a, b) => b.hours - a.hours),
+    };
+  }
+
+  async cascadeAccess(chargeCodeId: string, userIds: string[], callerId: string) {
+    const code = await this.findByIdRaw(chargeCodeId);
+
+    // Permission check
+    if (code.ownerId !== callerId && code.approverId !== callerId) {
+      const [caller] = await this.db
+        .select({ role: profiles.role })
+        .from(profiles)
+        .where(eq(profiles.id, callerId))
+        .limit(1);
+      if (caller?.role !== 'admin') {
+        throw new ForbiddenException(
+          'Only the charge code owner, approver, or admin can cascade access',
+        );
+      }
+    }
+
+    // Get all descendant IDs
+    const descendantIds = await this.findDescendantIds(chargeCodeId);
+    const allChargeCodeIds = [chargeCodeId, ...descendantIds];
+
+    // Insert access for each user x charge code combination
+    const values = allChargeCodeIds.flatMap((ccId) =>
+      userIds.map((userId) => ({
+        chargeCodeId: ccId,
+        userId,
+      })),
+    );
+
+    if (values.length > 0) {
+      await this.db
+        .insert(chargeCodeUsers)
+        .values(values)
+        .onConflictDoNothing();
+    }
+
+    return { affected: values.length };
+  }
+
   async getTree() {
     const all = await this.db.select().from(chargeCodes);
     return this.buildTree(all);
@@ -277,21 +435,192 @@ export class ChargeCodesService {
   }
 
   /**
-   * Recursively find all descendant charge code IDs for a given parent.
-   * Traverses the hierarchy using the parentId field.
+   * Find all descendant charge code IDs for a given parent.
+   * Loads all charge codes once and traverses in memory to avoid N+1 queries.
    */
   private async findDescendantIds(parentId: string): Promise<string[]> {
-    const children = await this.db
-      .select({ id: chargeCodes.id })
-      .from(chargeCodes)
-      .where(eq(chargeCodes.parentId, parentId));
+    const allCodes = await this.db
+      .select({ id: chargeCodes.id, parentId: chargeCodes.parentId })
+      .from(chargeCodes);
 
-    const childIds = children.map((c) => c.id);
-    const grandchildIds = await Promise.all(
-      childIds.map((childId) => this.findDescendantIds(childId)),
-    );
+    const childrenMap = new Map<string, string[]>();
+    for (const cc of allCodes) {
+      if (cc.parentId) {
+        const children = childrenMap.get(cc.parentId) ?? [];
+        children.push(cc.id);
+        childrenMap.set(cc.parentId, children);
+      }
+    }
 
-    return [...childIds, ...grandchildIds.flat()];
+    const result: string[] = [];
+    const collect = (pid: string) => {
+      const children = childrenMap.get(pid) ?? [];
+      for (const childId of children) {
+        result.push(childId);
+        collect(childId);
+      }
+    };
+    collect(parentId);
+    return result;
+  }
+
+  async requestAccess(chargeCodeId: string, requesterId: string, reason: string) {
+    // Validate charge code exists
+    await this.findByIdRaw(chargeCodeId);
+
+    // Check if already assigned
+    const [existing] = await this.db
+      .select()
+      .from(chargeCodeUsers)
+      .where(
+        and(
+          eq(chargeCodeUsers.chargeCodeId, chargeCodeId),
+          eq(chargeCodeUsers.userId, requesterId),
+        ),
+      )
+      .limit(1);
+
+    if (existing) {
+      throw new BadRequestException('You already have access to this charge code');
+    }
+
+    // Check for pending request
+    const [pendingReq] = await this.db
+      .select()
+      .from(chargeCodeRequests)
+      .where(
+        and(
+          eq(chargeCodeRequests.chargeCodeId, chargeCodeId),
+          eq(chargeCodeRequests.requesterId, requesterId),
+          eq(chargeCodeRequests.status, 'pending'),
+        ),
+      )
+      .limit(1);
+
+    if (pendingReq) {
+      throw new BadRequestException('You already have a pending request for this charge code');
+    }
+
+    const [created] = await this.db
+      .insert(chargeCodeRequests)
+      .values({
+        requesterId,
+        chargeCodeId,
+        reason: reason || null,
+      })
+      .returning();
+
+    return created;
+  }
+
+  async getAccessRequests(userId: string, role: string) {
+    // Admins see all pending requests; CC owners/managers see requests for their codes
+    if (role === 'admin') {
+      return this.db
+        .select({
+          id: chargeCodeRequests.id,
+          requesterId: chargeCodeRequests.requesterId,
+          chargeCodeId: chargeCodeRequests.chargeCodeId,
+          reason: chargeCodeRequests.reason,
+          status: chargeCodeRequests.status,
+          createdAt: chargeCodeRequests.createdAt,
+          requesterName: profiles.fullName,
+          requesterEmail: profiles.email,
+          chargeCodeName: chargeCodes.name,
+        })
+        .from(chargeCodeRequests)
+        .innerJoin(profiles, eq(chargeCodeRequests.requesterId, profiles.id))
+        .innerJoin(chargeCodes, eq(chargeCodeRequests.chargeCodeId, chargeCodes.id))
+        .where(eq(chargeCodeRequests.status, 'pending'))
+        .limit(500);
+    }
+
+    // CC owners/managers: only their codes
+    return this.db
+      .select({
+        id: chargeCodeRequests.id,
+        requesterId: chargeCodeRequests.requesterId,
+        chargeCodeId: chargeCodeRequests.chargeCodeId,
+        reason: chargeCodeRequests.reason,
+        status: chargeCodeRequests.status,
+        createdAt: chargeCodeRequests.createdAt,
+        requesterName: profiles.fullName,
+        requesterEmail: profiles.email,
+        chargeCodeName: chargeCodes.name,
+      })
+      .from(chargeCodeRequests)
+      .innerJoin(profiles, eq(chargeCodeRequests.requesterId, profiles.id))
+      .innerJoin(chargeCodes, eq(chargeCodeRequests.chargeCodeId, chargeCodes.id))
+      .where(
+        and(
+          eq(chargeCodeRequests.status, 'pending'),
+          sql`(${chargeCodes.ownerId} = ${userId} OR ${chargeCodes.approverId} = ${userId})`,
+        ),
+      )
+      .limit(500);
+  }
+
+  async reviewAccessRequest(requestId: string, status: 'approved' | 'rejected', reviewerId: string) {
+    const [request] = await this.db
+      .select()
+      .from(chargeCodeRequests)
+      .where(eq(chargeCodeRequests.id, requestId))
+      .limit(1);
+
+    if (!request) throw new NotFoundException('Request not found');
+    if (request.status !== 'pending') {
+      throw new BadRequestException('Request already reviewed');
+    }
+
+    const [updated] = await this.db
+      .update(chargeCodeRequests)
+      .set({
+        status: status as any,
+        reviewedBy: reviewerId,
+        reviewedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(chargeCodeRequests.id, requestId))
+      .returning();
+
+    // If approved, add user to charge_code_users
+    if (status === 'approved') {
+      await this.db
+        .insert(chargeCodeUsers)
+        .values({
+          chargeCodeId: request.chargeCodeId,
+          userId: request.requesterId,
+        })
+        .onConflictDoNothing();
+    }
+
+    return updated;
+  }
+
+  async remove(id: string) {
+    const code = await this.findByIdRaw(id);
+
+    // Delete children first (cascade), then this node
+    const descendantIds = await this.findDescendantIds(id);
+    const allIds = [...descendantIds, id];
+
+    // Delete related records from all referencing tables
+    if (allIds.length > 0) {
+      await this.db.delete(timesheetEntries).where(inArray(timesheetEntries.chargeCodeId, allIds));
+      await this.db.delete(budgets).where(inArray(budgets.chargeCodeId, allIds));
+      await this.db.delete(chargeCodeUsers).where(inArray(chargeCodeUsers.chargeCodeId, allIds));
+      await this.db.delete(chargeCodeRequests).where(inArray(chargeCodeRequests.chargeCodeId, allIds));
+    }
+
+    // Delete descendants bottom-up (reverse order to respect FK)
+    for (const descId of descendantIds.reverse()) {
+      await this.db.delete(chargeCodes).where(eq(chargeCodes.id, descId));
+    }
+
+    // Delete the node itself
+    await this.db.delete(chargeCodes).where(eq(chargeCodes.id, id));
+
+    return { deleted: true, id };
   }
 
   private async findByIdRaw(id: string) {

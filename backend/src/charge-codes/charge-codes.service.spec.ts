@@ -156,14 +156,14 @@ describe('ChargeCodesService', () => {
         { id: 'PRJ-001', name: 'Project 1', parentId: 'PRG-001', level: 'project' },
         { id: 'PRJ-002', name: 'Project 2', parentId: 'PRG-001', level: 'project' },
       ];
-      db.select.mockReturnValueOnce(buildSelectWhereChain(children));
+      db.select.mockReturnValueOnce(buildSelectWhereLimitChain(children));
 
       const result = await service.findChildren('PRG-001');
       expect(result).toHaveLength(2);
     });
 
     it('should return empty array for leaf nodes', async () => {
-      db.select.mockReturnValueOnce(buildSelectWhereChain([]));
+      db.select.mockReturnValueOnce(buildSelectWhereLimitChain([]));
       const result = await service.findChildren('TSK-001');
       expect(result).toHaveLength(0);
     });
@@ -180,12 +180,16 @@ describe('ChargeCodesService', () => {
     it('should add users to a charge code and cascade to descendants', async () => {
       const code = { id: 'PRG-001', name: 'Program', level: 'program', ownerId: 'owner-1', approverId: null };
       const codeWithUsers = { ...code, assignedUsers: [{ userId: 'u1', email: 'a@test.com', fullName: 'Alice' }] };
+      // findDescendantIds loads ALL charge codes in one full-table query (new implementation)
+      const allCodes = [
+        { id: 'PRG-001', parentId: null },
+        { id: 'PRJ-001', parentId: 'PRG-001' },
+      ];
 
       db.select
-        .mockReturnValueOnce(buildLimitChain([code]))  // findByIdRaw (auth check)
-        .mockReturnValueOnce(buildSelectWhereChain([{ id: 'PRJ-001' }]))  // findDescendantIds: direct children of PRG-001
-        .mockReturnValueOnce(buildSelectWhereChain([]))  // findDescendantIds: children of PRJ-001 (none)
-        .mockReturnValueOnce(buildLimitChain([code]))  // findById -> findByIdRaw
+        .mockReturnValueOnce(buildLimitChain([code]))   // findByIdRaw (auth check)
+        .mockReturnValueOnce(buildFromChain(allCodes))  // findDescendantIds (full table)
+        .mockReturnValueOnce(buildLimitChain([code]))   // findById -> findByIdRaw
         .mockReturnValueOnce(buildJoinSelectChain(codeWithUsers.assignedUsers)) // findById -> users
         .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])) // findById -> budget
         .mockReturnValueOnce(buildLimitChain([{ fullName: 'Owner' }])); // findById -> ownerName
@@ -206,14 +210,14 @@ describe('ChargeCodesService', () => {
       const code = { id: 'PRG-001', name: 'Program', level: 'program', ownerId: 'owner-1', approverId: null };
 
       db.select
-        .mockReturnValueOnce(buildLimitChain([code]))  // findByIdRaw (auth check)
-        .mockReturnValueOnce(buildSelectWhereChain([]))  // findDescendantIds (no children)
-        .mockReturnValueOnce(buildLimitChain([code]))  // findById -> findByIdRaw
+        .mockReturnValueOnce(buildLimitChain([code]))   // findByIdRaw (auth check)
+        .mockReturnValueOnce(buildFromChain([{ id: 'PRG-001', parentId: null }]))  // findDescendantIds (full table, no children)
+        .mockReturnValueOnce(buildLimitChain([code]))   // findById -> findByIdRaw
         .mockReturnValueOnce(buildJoinSelectChain([])) // findById -> users (now empty)
         .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])) // findById -> budget
         .mockReturnValueOnce(buildLimitChain([{ fullName: 'Owner' }])); // findById -> ownerName
 
-      const deleteChain = { from: jest.fn().mockReturnThis(), where: jest.fn().mockResolvedValue([]) };
+      const deleteChain = { where: jest.fn().mockResolvedValue([]) };
       db.delete.mockReturnValueOnce(deleteChain);
 
       const result = await service.updateAccess('PRG-001', { removeUserIds: ['u1'] }, 'owner-1');
@@ -241,7 +245,7 @@ describe('ChargeCodesService', () => {
       db.select
         .mockReturnValueOnce(buildLimitChain([code]))           // findByIdRaw
         .mockReturnValueOnce(buildLimitChain([adminProfile]))   // caller profile lookup (not owner)
-        .mockReturnValueOnce(buildSelectWhereChain([]))          // findDescendantIds (no children)
+        .mockReturnValueOnce(buildFromChain([{ id: 'PRG-001', parentId: null }]))  // findDescendantIds
         .mockReturnValueOnce(buildLimitChain([code]))           // findById -> findByIdRaw
         .mockReturnValueOnce(buildJoinSelectChain(codeWithUsers.assignedUsers)) // findById -> users
         .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])) // findById -> budget
@@ -261,7 +265,7 @@ describe('ChargeCodesService', () => {
       // owner-1 matches code.ownerId → profile lookup is skipped
       db.select
         .mockReturnValueOnce(buildLimitChain([code]))           // findByIdRaw
-        .mockReturnValueOnce(buildSelectWhereChain([]))          // findDescendantIds (no children)
+        .mockReturnValueOnce(buildFromChain([{ id: 'PRG-001', parentId: null }]))  // findDescendantIds
         .mockReturnValueOnce(buildLimitChain([code]))           // findById -> findByIdRaw
         .mockReturnValueOnce(buildJoinSelectChain(codeWithUsers.assignedUsers)) // findById -> users
         .mockReturnValueOnce(buildLimitChain([{ actualSpent: '0', forecastAtCompletion: null }])) // findById -> budget
@@ -311,6 +315,16 @@ function buildSelectWhereChain(resolveValue: any[]) {
   return chain;
 }
 
+function buildSelectWhereLimitChain(resolveValue: any[]) {
+  const chain: any = {
+    from: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    innerJoin: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockResolvedValue(resolveValue),
+  };
+  return chain;
+}
+
 function buildJoinSelectChain(resolveValue: any[]) {
   const chain: any = {
     from: jest.fn().mockReturnThis(),
@@ -327,5 +341,17 @@ function buildInsertChain(resolveValue: any[]) {
     returning: jest.fn().mockResolvedValue(resolveValue),
     onConflictDoNothing: jest.fn().mockResolvedValue(resolveValue),
   };
+  return chain;
+}
+
+// For queries that resolve after .from() with no .where() — uses thenable pattern
+function buildFromChain(resolveValue: any[]) {
+  const chain: any = {
+    from: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockResolvedValue(resolveValue),
+    then: (resolve: (value: any[]) => void) => resolve(resolveValue),
+  };
+  chain.where.mockReturnValue(chain);
   return chain;
 }

@@ -5,7 +5,16 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 async function getAuthHeaders(): Promise<HeadersInit> {
   const supabase = createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+
+  // getSession() can return stale/null right after login.
+  // Try getSession first, fall back to getUser + getSession retry.
+  let { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    // Force token refresh by calling getUser, then retry getSession
+    await supabase.auth.getUser();
+    ({ data: { session } } = await supabase.auth.getSession());
+  }
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',

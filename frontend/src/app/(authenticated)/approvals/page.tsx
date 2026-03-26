@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ApprovalQueue } from '@/components/approvals/ApprovalQueue';
+import { MultiSelectFilter } from '@/components/budget/MultiSelectFilter';
 import { Search, CheckCircle, History, Palmtree, CheckIcon, XIcon, Users, AlertTriangle } from 'lucide-react';
 import { formatShortDate } from '@/lib/utils';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -29,6 +30,7 @@ interface PendingTimesheet {
   status: string;
   submittedAt: string | null;
   totalHours: number;
+  programs: string[];
   employee: {
     id: string;
     fullName: string | null;
@@ -109,6 +111,7 @@ export default function ApprovalsPage() {
   const [search, setSearch] = useState('');
   const [period, setPeriod] = useState(() => format(new Date(), 'yyyy-MM'));
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('manager');
 
@@ -180,6 +183,18 @@ export default function ApprovalsPage() {
     });
   }, []);
 
+  const programOptions = useMemo(() => {
+    const programSet = new Set<string>();
+    for (const t of pending.pending) {
+      for (const p of t.programs || []) {
+        programSet.add(p);
+      }
+    }
+    return Array.from(programSet)
+      .sort()
+      .map((p) => ({ id: p, label: p }));
+  }, [pending.pending]);
+
   const filterItems = (items: PendingTimesheet[]) => {
     let filtered = items;
 
@@ -188,6 +203,13 @@ export default function ApprovalsPage() {
       filtered = filtered.filter((t) => t.status === 'submitted');
     } else if (statusFilter === 'approved') {
       filtered = filtered.filter((t) => t.status === 'locked');
+    }
+
+    // Filter by selected programs
+    if (selectedPrograms.length > 0) {
+      filtered = filtered.filter((t) =>
+        (t.programs || []).some((p) => selectedPrograms.includes(p)),
+      );
     }
 
     // Filter by search
@@ -237,10 +259,19 @@ export default function ApprovalsPage() {
           </SelectContent>
         </Select>
 
+        {programOptions.length > 0 && (
+          <MultiSelectFilter
+            options={programOptions}
+            selected={selectedPrograms}
+            onChange={setSelectedPrograms}
+            label="Programs"
+          />
+        )}
+
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
           <Input
-            placeholder="Search by name..."
+            placeholder="Search by name, email, or department..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"

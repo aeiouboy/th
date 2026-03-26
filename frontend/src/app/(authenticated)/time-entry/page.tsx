@@ -23,6 +23,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { PeriodSelector } from '@/components/time-entry/PeriodSelector';
+import { RequestChargeCode } from '@/components/time-entry/RequestChargeCode';
 
 interface Timesheet {
   id: string;
@@ -57,6 +59,7 @@ interface VacationRequest {
   userId: string;
   startDate: string;
   endDate: string;
+  leaveType: 'full_day' | 'half_am' | 'half_pm';
   status: 'pending' | 'approved' | 'rejected';
 }
 
@@ -112,7 +115,8 @@ export default function TimeEntryPage() {
     queryFn: ({ signal }) => api.get('/timesheets/charge-codes', signal),
   });
 
-  const chargeCodes = rawChargeCodes;
+  // Filter out LEAVE-001 from the selector dropdown — it's managed as a system row
+  const chargeCodes = rawChargeCodes.filter((c) => !c.chargeCodeId.startsWith('LEAVE-'));
 
   // Fetch user's approved vacations
   const { data: vacations = [] } = useQuery<VacationRequest[]>({
@@ -127,19 +131,26 @@ export default function TimeEntryPage() {
     queryFn: ({ signal }) => api.get(`/calendar?year=${calendarYear}`, signal),
   });
 
-  // Build a set of vacation dates for the current week
-  const vacationDates = useMemo(() => {
-    const set = new Set<string>();
+  // Build sets of full-day and half-day vacation dates for the current week
+  const { vacationDates, halfDayDates } = useMemo(() => {
+    const fullSet = new Set<string>();
+    const halfSet = new Set<string>();
     const weekEndDate = addDays(weekStart, 6);
     for (const v of vacations) {
       if (v.status !== 'approved') continue;
+      const leaveType = v.leaveType || 'full_day';
       const vStart = new Date(Math.max(new Date(v.startDate).getTime(), weekStart.getTime()));
       const vEnd = new Date(Math.min(new Date(v.endDate).getTime(), weekEndDate.getTime()));
       for (let d = new Date(vStart); d <= vEnd; d.setDate(d.getDate() + 1)) {
-        set.add(format(d, 'yyyy-MM-dd'));
+        const dateStr = format(d, 'yyyy-MM-dd');
+        if (leaveType === 'full_day') {
+          fullSet.add(dateStr);
+        } else {
+          halfSet.add(dateStr);
+        }
       }
     }
-    return set;
+    return { vacationDates: fullSet, halfDayDates: halfSet };
   }, [vacations, weekStart]);
 
   // Build a set of holiday dates for the current week
@@ -263,6 +274,25 @@ export default function TimeEntryPage() {
       toast.error(err.message || 'Failed to save');
     },
   });
+
+  // Copy from previous period mutation
+  const copyMutation = useMutation({
+    mutationFn: async () => {
+      if (!timesheet?.id) return;
+      return api.post(`/timesheets/${timesheet.id}/copy-from-previous`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['timesheet-entries', timesheet?.id],
+      });
+      toast.success('Charge codes copied from previous period');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to copy');
+    },
+  });
+
+  const canCopyFromPrevious = timesheet?.status === 'draft' && activeRows.filter(r => r.chargeCodeId !== 'LEAVE-001').length === 0;
 
   // Submit mutation
   const submitMutation = useMutation({
@@ -446,6 +476,10 @@ export default function TimeEntryPage() {
             >
               <ChevronRightIcon />
             </Button>
+            <PeriodSelector
+              currentWeekStart={weekStart}
+              onSelect={(d) => setWeekStart(d)}
+            />
           </div>
           <div className="flex items-center gap-3">
             {timesheet?.status && (
@@ -505,6 +539,7 @@ export default function TimeEntryPage() {
             disabled={!canEdit}
             onRemoveRow={handleRemoveRow}
             vacationDates={vacationDates}
+            halfDayDates={halfDayDates}
             holidayDates={holidayDates}
           />
         )}
@@ -519,6 +554,18 @@ export default function TimeEntryPage() {
               usedCodeIds={usedCodeIds}
               onSelect={handleAddCode}
             />
+          )}
+          {canEdit && <RequestChargeCode />}
+          {canEdit && canCopyFromPrevious && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs"
+              onClick={() => copyMutation.mutate()}
+              disabled={copyMutation.isPending}
+            >
+              {copyMutation.isPending ? 'Copying...' : 'Copy from Last Period'}
+            </Button>
           )}
           <span className="text-[11px] text-[var(--text-muted)]">
             Auto-saves every 30s

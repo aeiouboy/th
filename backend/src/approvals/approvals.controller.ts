@@ -4,9 +4,10 @@ import {
   Post,
   Body,
   Param,
+  Query,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { ApprovalsService } from './approvals.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -25,8 +26,9 @@ export class ApprovalsController {
   }
 
   @Get('pending')
-  getPending(@CurrentUser() user: any) {
-    return this.approvalsService.getPending(user.id);
+  @ApiQuery({ name: 'search', required: false, description: 'Filter by employee name, email, or department' })
+  getPending(@CurrentUser() user: any, @Query('search') search?: string) {
+    return this.approvalsService.getPending(user.id, search);
   }
 
   @Post(':timesheet_id/approve')
@@ -53,8 +55,17 @@ export class ApprovalsController {
   }
 
   @Get('history')
-  getHistory(@CurrentUser() user: any) {
-    return this.approvalsService.getHistory(user.id);
+  @ApiQuery({ name: 'limit', required: false, description: 'Max results (default 100, max 500)' })
+  @ApiQuery({ name: 'offset', required: false, description: 'Offset for pagination (default 0)' })
+  getHistory(
+    @CurrentUser() user: any,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    return this.approvalsService.getHistory(user.id, {
+      limit: limit ? Math.min(parseInt(limit, 10) || 100, 500) : 100,
+      offset: offset ? parseInt(offset, 10) || 0 : 0,
+    });
   }
 
   @Get(':timesheet_id/detail')
