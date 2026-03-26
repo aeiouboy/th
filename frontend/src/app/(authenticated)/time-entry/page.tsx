@@ -110,9 +110,10 @@ export default function TimeEntryPage() {
   const periodStr = format(weekStart, 'yyyy-MM-dd');
 
   // Fetch charge codes assigned to user
-  const { data: rawChargeCodes = [] } = useQuery<ChargeCode[]>({
+  const { data: rawChargeCodes = [], isPending: chargeCodesLoading, isError: chargeCodesError } = useQuery<ChargeCode[]>({
     queryKey: ['timesheet-charge-codes'],
     queryFn: ({ signal }) => api.get('/timesheets/charge-codes', signal),
+    retry: 3,
   });
 
   // Filter out LEAVE-001 from the selector dropdown — it's managed as a system row
@@ -548,7 +549,7 @@ export default function TimeEntryPage() {
       {/* Actions bar (sticky bottom) */}
       <div className="sticky bottom-0 z-20 bg-[var(--bg-card)]/95 backdrop-blur-sm border border-[var(--border-default)] rounded-xl shadow-lg p-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          {canEdit && (
+          {canEdit && !chargeCodesLoading && !chargeCodesError && (
             <ChargeCodeSelector
               availableCodes={chargeCodes}
               usedCodeIds={usedCodeIds}
