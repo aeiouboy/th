@@ -260,6 +260,16 @@ https://centralgroup.webhook.office.com/webhookb2/8a66c931-96fd-4e87-962f-a29275
 
 **Rule: `test.fail()` is BANNED. Screenshots are EVIDENCE — validators must READ them. Ports come from env vars. Health check servers before every E2E run.**
 
+### Category 14: Loading State False Positives
+
+| # | Mistake | Root Cause | Correct Behavior |
+|---|---------|-----------|-----------------|
+| 42 | Screenshot shows "Loading timesheet..." but test reports PASS | Test snaps before content loads, no assertion on content | After `page.goto()`, ALWAYS `waitForSelector('text=Loading', { state: 'hidden', timeout: 15000 })` before snap. If loading hangs → FAIL |
+| 43 | Backend DB connection dies mid-test, all API calls hang | Supabase pooler idle timeout + `max_lifetime` too long | Set `max_lifetime: 120` (2min) and `fetch_types: false` in postgres-js config. Backend must recycle connections before pooler kills them |
+| 44 | All BF test screenshots identical (same loading screen) | Backend crashed during test run, no health re-check between tests | Add `test.beforeEach` health check — if backend returns 5xx or timeout, skip remaining tests with clear error message |
+
+**Rule: A screenshot of "Loading..." is evidence of FAILURE, not success. Wait for content before snap. Recycle DB connections every 2 minutes to prevent pooler disconnects.**
+
 ### Quick Checklist Before Declaring Done
 
 ```

@@ -178,6 +178,218 @@ When invoked, you must follow these steps:
       const errorOverlay = page.locator('text=Runtime TypeError, text=Runtime Error').first();
       expect(await errorOverlay.count()).toBe(0);
       ```
+
+   j. **NEVER snap a loading state as evidence of success** — If the page shows "Loading...", a spinner, or skeleton, the content has NOT loaded yet. You MUST wait for actual content before taking a screenshot:
+      ```typescript
+      // ❌ WRONG — snaps loading state and claims pass
+      await page.goto('/time-entry');
+      await snap(page, 'bf-te-01', '01-page-loaded');
+
+      // ✅ CORRECT — waits for content, fails if loading hangs
+      await page.goto('/time-entry');
+      await page.waitForSelector('text=Loading', { state: 'hidden', timeout: 15000 })
+        .catch(() => { throw new Error('Page stuck on loading — backend API may be down'); });
+      await snap(page, 'bf-te-01', '01-page-loaded');
+      ```
+      Rules:
+      - After `page.goto()`, ALWAYS wait for loading indicators to disappear before snap
+      - Common loading indicators: `text=Loading`, `text=Loading timesheet...`, `.animate-spin`, `animate-pulse`
+      - Set timeout to 15 seconds — if content doesn't load, throw error with clear message
+      - A screenshot of "Loading..." is NOT evidence of a passing test — it's evidence of a FAILING test
+
+4b. **Write Business Functional Tests (MANDATORY for E2E).**
+
+   Business Functional Tests validate the system from a **business user's perspective**. These are NOT technical tests — they answer the question: "Does this feature work correctly for the business?"
+
+   Every E2E test MUST be written as a business scenario, not a technical assertion. The test name, steps, and pass/fail criteria must be understandable by a non-developer stakeholder.
+
+   ### Business Functional Test structure
+
+   Each test follows this pattern:
+
+   ```typescript
+   test('BF-TE-01: พนักงานบันทึกเวลาทำงานเกิน 8 ชม./วัน — ระบบต้องแจ้งเตือน', async ({ page }) => {
+     // === Business Scenario ===
+     // ผู้ใช้: พนักงาน (wichai.s@central.co.th)
+     // สถานการณ์: กรอกชั่วโมงทำงานรวมเกิน 8 ชม. ในวันเดียว
+     // คาดหวัง: ระบบแสดง warning ว่าเกินเวลามาตรฐาน แต่ยังอนุญาตให้บันทึกได้
+     // Business Rule: OT ต้อง visible เพื่อให้ผู้จัดการเห็นตอน approve
+
+     // Step 1: เข้าหน้า Time Entry
+     await page.goto('/time-entry');
+     await snap(page, 'bf-te-01', '01-time-entry-page');
+
+     // Step 2: กรอกชั่วโมง charge code แรก = 6 ชม.
+     // ... fill hours ...
+     await snap(page, 'bf-te-01', '02-first-code-filled');
+
+     // Step 3: กรอกชั่วโมง charge code สอง = 4 ชม. (รวม = 10 ชม. > 8)
+     // ... fill hours ...
+     await snap(page, 'bf-te-01', '03-overtime-entered');
+
+     // Step 4: ✅ PASS CRITERIA — ตรวจว่าระบบแสดง warning/variance
+     // Business expects: Daily Total แสดง 10.00 และ Variance แสดงค่า +2.0 (เกิน 2 ชม.)
+     const dailyTotal = page.locator('[data-testid="daily-total-mon"]');
+     await expect(dailyTotal).toContainText('10.00');
+     await snap(page, 'bf-te-01', '04-overtime-warning-shown');
+
+     // Step 5: ✅ PASS CRITERIA — ยืนยันว่ายังบันทึกได้ (ไม่ block)
+     await page.click('button:has-text("Save Draft")');
+     await expect(page.locator('text=Saved')).toBeVisible();
+     await snap(page, 'bf-te-01', '05-saved-successfully');
+   });
+   ```
+
+   ### Key principles
+
+   **a. Test name = Business scenario (Thai or English)**
+   - ❌ `test('should show warning when hours > 8')`
+   - ✅ `test('BF-TE-01: พนักงานบันทึกเวลาเกิน 8 ชม./วัน — ระบบต้องแจ้งเตือน')`
+
+   **b. Every test MUST define PASS CRITERIA as a comment**
+   ```typescript
+   // ✅ PASS CRITERIA — <business language description of what "pass" means>
+   ```
+   This tells business stakeholders exactly what was verified, not just what code ran.
+
+   **c. Screenshot at EVERY significant business state change**
+   Each screenshot is evidence. Name it to tell a story:
+   - `bf-te-01-01-time-entry-page` — ก่อนกรอก
+   - `bf-te-01-02-first-code-filled` — กรอกรหัสแรก
+   - `bf-te-01-03-overtime-entered` — กรอก OT เกิน 8 ชม.
+   - `bf-te-01-04-overtime-warning-shown` — ระบบแสดง warning
+   - `bf-te-01-05-saved-successfully` — บันทึกสำเร็จ
+
+   **d. Test ID format: `BF-<MODULE>-<NUM>`**
+   | Prefix | Module |
+   |--------|--------|
+   | BF-TE | Time Entry |
+   | BF-AP | Approval Workflow |
+   | BF-CC | Charge Code Management |
+   | BF-BU | Budget & Cost |
+   | BF-RP | Reports & Analytics |
+   | BF-CA | Calendar & Vacation |
+   | BF-US | User & Profile |
+   | BF-DB | Dashboard |
+   | BF-NT | Notifications |
+   | BF-RB | RBAC & Access Control |
+
+   **e. GitHub Issue integration (MANDATORY)**
+
+   After running all business functional tests, create/update a GitHub Issue for EACH test case:
+
+   ```bash
+   gh issue create \
+     --title "[BF-TE-01] พนักงานบันทึกเวลาเกิน 8 ชม./วัน — ระบบต้องแจ้งเตือน" \
+     --label "business-test,time-entry" \
+     --body "$(cat <<'EOF'
+   ## Business Functional Test: BF-TE-01
+
+   **Module**: Time Entry
+   **Role**: พนักงาน (employee)
+   **Business Rule**: OT (เกิน 8 ชม.) ต้องแสดง warning แต่ไม่ block การบันทึก
+
+   ### Scenario
+   พนักงานกรอกเวลาทำงานรวมเกิน 8 ชม. ในวันเดียว
+
+   ### Pass Criteria
+   1. Daily Total แสดงยอดรวมที่ถูกต้อง (เช่น 10.00)
+   2. Variance แสดงค่าเกิน (เช่น +2.0)
+   3. ระบบยังอนุญาตให้ Save Draft ได้
+
+   ### Test Steps
+   | # | Action | Expected | Screenshot |
+   |---|--------|----------|------------|
+   | 1 | เข้าหน้า Time Entry | หน้า grid แสดงสัปดาห์ปัจจุบัน | 📸 01-time-entry-page |
+   | 2 | กรอก charge code แรก 6 ชม. | ยอดรวมวันนั้น = 6.00 | 📸 02-first-code-filled |
+   | 3 | กรอก charge code สอง 4 ชม. | ยอดรวม = 10.00, Variance = +2.0 | 📸 03-overtime-entered |
+   | 4 | ตรวจ warning OT | ⚠️ แสดง variance สีแดง/เหลือง | 📸 04-overtime-warning-shown |
+   | 5 | คลิก Save Draft | ✅ บันทึกสำเร็จ, toast "Saved" | 📸 05-saved-successfully |
+
+   ### Result: ⏳ Pending
+   EOF
+   )"
+   ```
+
+   After test execution, comment on the issue with results + screenshots:
+
+   ```bash
+   gh issue comment <issue-number> --body "$(cat <<'EOF'
+   ## Test Result: ✅ PASS (or ❌ FAIL)
+
+   **Run Date**: 2026-03-26
+   **Runner**: Playwright (desktop 1280x720)
+
+   ### Evidence Screenshots
+
+   | Step | Result | Screenshot |
+   |------|--------|------------|
+   | 1. เข้าหน้า Time Entry | ✅ | ![](url-to-screenshot-01) |
+   | 2. กรอก 6 ชม. | ✅ | ![](url-to-screenshot-02) |
+   | 3. กรอก OT 4 ชม. (รวม 10) | ✅ | ![](url-to-screenshot-03) |
+   | 4. Warning แสดง | ✅ Variance = +2.0 สีแดง | ![](url-to-screenshot-04) |
+   | 5. Save Draft | ✅ Toast "Saved" แสดง | ![](url-to-screenshot-05) |
+
+   ### Bugs Found
+   - None (or list bugs with file:line)
+
+   ### Business Verdict
+   ✅ ระบบรองรับการบันทึก OT ได้ถูกต้อง — แสดง warning แต่ไม่ block การบันทึก
+   EOF
+   )"
+   ```
+
+   **f. Business Functional Test coverage requirements**
+
+   Every plan MUST include business functional tests for these categories:
+
+   | Category | What to test | Example scenario |
+   |----------|-------------|------------------|
+   | Happy path | ฟีเจอร์ทำงานปกติ | กรอกเวลา 8 ชม. แล้ว submit สำเร็จ |
+   | Boundary | ค่าขอบเขต | กรอกเวลาพอดี 8 ชม., กรอก 0 ชม., กรอก 24 ชม. |
+   | Validation | ระบบ validate input | กรอกตัวอักษรแทนตัวเลข, ส่งฟอร์มไม่ครบ |
+   | Business rule | กฎเกณฑ์ธุรกิจ | OT warning, min 8hr/day, period lock |
+   | Workflow | ขั้นตอนข้ามบทบาท | พนักงาน submit → ผู้จัดการ approve → lock |
+   | Access control | สิทธิ์การเข้าถึง | employee ไม่เห็นเมนู Admin, charge_manager เห็น Approvals |
+   | Data integrity | ข้อมูลถูกต้องหลัง action | approve แล้ว status เปลี่ยน, ชม. ถูก lock |
+
+   **g. Business test result files (MANDATORY)**
+
+   ```
+   docs/test-results/
+   ├── business-functional/
+   │   ├── bf-test-cases.md          # Business-readable test case catalog
+   │   ├── bf-results.md             # Execution results with screenshots
+   │   └── bf-summary.md             # Executive summary: X/Y pass, coverage areas
+   ```
+
+   `bf-summary.md` format (for business stakeholders):
+   ```markdown
+   # Business Functional Test Summary
+
+   **วันที่ทดสอบ**: 2026-03-26
+   **ผลรวม**: 15/18 ผ่าน (83%)
+
+   ## ผลตาม Module
+
+   | Module | ผ่าน | ไม่ผ่าน | ข้าม | ความครอบคลุม |
+   |--------|------|---------|------|-------------|
+   | Time Entry | 4/5 | 1 | 0 | กรอกเวลา, OT, submit, copy |
+   | Approval | 3/3 | 0 | 0 | approve, reject, bulk |
+   | Charge Codes | 2/3 | 0 | 1 | CRUD, hierarchy, search |
+
+   ## ❌ Test Cases ที่ไม่ผ่าน
+
+   | ID | Scenario | ปัญหาที่พบ | ผลกระทบ |
+   |----|----------|-----------|---------|
+   | BF-TE-03 | บันทึก 0 ชม. ทุกวัน แล้ว submit | ระบบไม่ validate min hours | พนักงานส่ง timesheet เปล่าได้ |
+
+   ## GitHub Issues
+   - [BF-TE-01] ✅ #10
+   - [BF-TE-02] ✅ #11
+   - [BF-TE-03] ❌ #12
+   ```
+
 5. **Run the tests.** Execute the test suite to confirm all new tests pass. Fix any failures in the test code (never in the implementation code).
 6. **Save test results.** You MUST create ALL of the following files before marking the task complete. A PostToolUse validator will **block** your TaskUpdate if any are missing.
 
@@ -199,8 +411,14 @@ docs/test-results/
 ├── e2e/                       # MANDATORY if project has UI pages
 │   ├── e2e-results.json       # Playwright JSON report
 │   └── e2e-results.md         # Human-readable report
-└── screenshots/               # MANDATORY if project has UI pages
-    └── <name>--<viewport>.png # kebab-case, double-dash before viewport
+├── business-functional/       # MANDATORY if project has UI pages
+│   ├── bf-test-cases.md       # Business-readable test case catalog (Thai/English)
+│   ├── bf-results.md          # Execution results with screenshot evidence per step
+│   └── bf-summary.md          # Executive summary for business stakeholders
+├── screenshots/               # MANDATORY if project has UI pages
+│   ├── <page-name>--<viewport>.png    # Static page captures
+│   └── bf-<id>-<step>--desktop.png    # Business functional test step evidence
+└── github-issues.md           # MANDATORY — mapping of test ID → GitHub Issue number
 ```
 
 **Detection rule:** If the project has a `frontend/` or `src/app/` directory with `.tsx` files, frontend tests and e2e tests are MANDATORY, not optional.
@@ -409,6 +627,17 @@ Each E2E test case gets its own section with a metadata table and a step-by-step
      - Static page captures: `<page-name>--desktop.png` (page-level)
      - Workflow step evidence: `<test-id>-<step>--desktop.png` (action-level)
    - [ ] Count of step-evidence screenshots >= number of `Snap:` lines in the plan
+
+   ### Business Functional Test checks (CRITICAL — prevents meaningless tests)
+   - [ ] `docs/test-results/business-functional/bf-test-cases.md` exists with scenario descriptions in business language
+   - [ ] `docs/test-results/business-functional/bf-results.md` exists with per-step screenshot evidence
+   - [ ] `docs/test-results/business-functional/bf-summary.md` exists with pass/fail per module (readable by non-developers)
+   - [ ] Every BF test has `// ✅ PASS CRITERIA` comments explaining what "pass" means in business terms
+   - [ ] Every BF test has sequential numbered screenshots (bf-xx-01, bf-xx-02, ...) showing state progression
+   - [ ] GitHub Issues created for each BF test case with results + screenshots commented
+   - [ ] `docs/test-results/github-issues.md` maps test IDs to GitHub Issue numbers
+   - [ ] BF tests cover: happy path, boundary, validation, business rule, workflow, access control (minimum 1 each)
+   - [ ] No BF test passes by only checking element visibility — every test must perform actions and verify business outcomes
 
    ### Acceptance criteria traceability check
    - [ ] Read the plan's `## Acceptance Criteria > Feature Criteria` section

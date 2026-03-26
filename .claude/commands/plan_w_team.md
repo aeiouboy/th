@@ -31,6 +31,7 @@ hooks:
             --contains 'Code Review'
             --contains 'Write Tests'
             --contains 'Validate Final'
+            --contains '### Business Functional Test Specifications'
 ---
 
 # Plan With Team
@@ -662,6 +663,58 @@ E2E-CC-01: Admin creates Project under existing Program
 - At least 1 multi-step workflow (e.g., login → create → submit → approve)
 - At least 1 negative test per module (invalid input, missing required field, unauthorized)
 - At least 1 role-based access test (admin can, employee cannot)
+
+### Business Functional Test Specifications (MANDATORY for UI projects)
+
+Every plan MUST include business functional test scenarios written in **business language** (Thai or English). These tests validate that the system works correctly from the user's perspective, not just technically.
+
+Format:
+```
+BF-<MODULE>-<NUM>: <business scenario in Thai or English>
+  Role: <ผู้ใช้และบทบาท>
+  Business Rule: <กฎธุรกิจที่ทดสอบ>
+
+  Steps:
+  | # | Action | Expected | Pass Criteria |
+  |---|--------|----------|---------------|
+  | 1 | <สิ่งที่ผู้ใช้ทำ> | <ผลที่คาดหวัง> | <วัดจากอะไร> |
+
+  Screenshot Evidence:
+  - bf-xx-01-<description> — ก่อนทำ
+  - bf-xx-02-<description> — หลังทำ
+```
+
+Example:
+```
+BF-TE-01: พนักงานบันทึกเวลาเกิน 8 ชม./วัน — ระบบต้องแจ้งเตือน
+  Role: employee (wichai.s@central.co.th)
+  Business Rule: Overtime (>8 ชม.) ต้องแสดง warning แต่ไม่ block การบันทึก
+
+  Steps:
+  | # | Action | Expected | Pass Criteria |
+  |---|--------|----------|---------------|
+  | 1 | เข้าหน้า Time Entry | Grid แสดงสัปดาห์ | หน้าโหลดไม่ error |
+  | 2 | กรอก ACT-001 = 6 ชม. | Daily Total = 6.00 | ตัวเลขถูกต้อง |
+  | 3 | กรอก ACT-008 = 4 ชม. | Daily Total = 10.00 | ยอดรวม update |
+  | 4 | ตรวจ Variance | แสดง +2.0 สีแดง | Variance != 0 |
+  | 5 | Save Draft | Toast "Saved" | ไม่ถูก block |
+
+  Screenshot Evidence:
+  - bf-te-01-01-time-entry-page
+  - bf-te-01-03-overtime-entered
+  - bf-te-01-04-variance-warning
+  - bf-te-01-05-saved-successfully
+```
+
+Minimum coverage per plan:
+- At least 1 **happy path** per module (feature ทำงานปกติ)
+- At least 1 **boundary test** (ค่าขอบเขต: 0, max, exactly 8 ชม.)
+- At least 1 **validation test** (input ผิด → error message)
+- At least 1 **business rule test** (OT warning, min hours, period lock)
+- At least 1 **workflow test** (cross-role: submit → approve → lock)
+- At least 1 **access control test** (role ไม่มีสิทธิ์ → ไม่เห็นเมนู)
+
+Each BF test MUST be pushed to GitHub Issues with screenshot evidence after execution.
 
 ### Infrastructure Criteria (verified by Infra Verify stage)
 - All external service connections verified with real queries/requests (not just config file checks)

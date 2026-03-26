@@ -16,10 +16,15 @@ export const DrizzleProvider: Provider = {
     }
     const client = postgres(connectionString, {
       prepare: false,
-      max: 5,               // Conservative pool size for Supabase free-tier (20 connection limit)
-      idle_timeout: 10,     // Release idle connections after 10s to prevent pool exhaustion
-      max_lifetime: 300,    // Recycle connections after 5min to prevent stale handles
-      connect_timeout: 15,
+      max: 3,               // Conservative pool for Supabase free-tier (20 conn limit)
+      idle_timeout: 20,     // Release idle connections after 20s
+      max_lifetime: 120,    // Recycle connections every 2min to prevent stale handles from pooler
+      connect_timeout: 10,  // Fail fast if can't connect
+      fetch_types: false,   // Skip type fetching — reduces startup queries on pooler
+      connection: {
+        application_name: 'timesheet-backend',
+      },
+      onnotice: () => {},   // Suppress notice messages
     });
     return drizzle(client, { schema });
   },

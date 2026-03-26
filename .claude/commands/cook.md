@@ -77,6 +77,12 @@ PATH_TO_PLAN: $ARGUMENTS
     - **BAN `test.fail()`**: If any E2E test uses `test.fail()`, REJECT and send back. `test.fail()` hides failures by inverting pass/fail — making broken tests report as "pass". Use `test.skip('BUG: ...')` instead.
     - **Screenshot verification**: After E2E tests complete, READ at least 3 screenshot images from `docs/test-results/screenshots/`. If any screenshot shows error toasts, crash screens, or blank pages, the tests are NOT passing — reject and investigate.
     - **Port configuration**: E2E ports are configured via `E2E_FRONTEND_PORT` (default 3002) and `E2E_BACKEND_PORT` (default 3001) env vars. NEVER hardcode ports in test files — use `FRONTEND_URL` / `BACKEND_URL` from `frontend/e2e/helpers.ts`.
+    - **Business Functional Tests (MANDATORY)**: The tester MUST write BF-* tests in addition to technical E2E tests. After tester reports completion:
+      a. Verify `docs/test-results/business-functional/` exists with bf-test-cases.md, bf-results.md, bf-summary.md
+      b. READ bf-summary.md — it must be understandable by non-developer stakeholders
+      c. Verify GitHub Issues were created for each BF test case with screenshots
+      d. READ at least 2 BF test screenshots — each must show real application state (not error pages)
+      e. If bf-summary.md is missing or has 0% coverage, REJECT and send back
 16. **For the Update Docs task**: Only assign AFTER Code Review has passed with no remaining issues.
     - If Code Review found issues and the builder is still fixing them, do NOT start docs yet
     - The docs-writer should document the **reviewed** code, not pre-review code that may still change
