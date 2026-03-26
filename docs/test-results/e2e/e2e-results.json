@@ -89,8 +89,8 @@
     "version": "1.58.2",
     "workers": 1,
     "webServer": {
-      "command": "pnpm dev --turbopack",
-      "url": "http://localhost:3000",
+      "command": "pnpm dev --port 3307",
+      "url": "http://localhost:3307",
       "reuseExistingServer": true,
       "timeout": 120000
     }
@@ -118,12 +118,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 20211,
+                  "duration": 18842,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-18T02:38:25.387Z",
+                  "startTime": "2026-03-26T04:03:06.927Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -139,20 +139,20 @@
       ]
     },
     {
-      "title": "reports-consolidated.spec.ts",
-      "file": "reports-consolidated.spec.ts",
+      "title": "approvals-cr1-filter.spec.ts",
+      "file": "approvals-cr1-filter.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "E2E-RPT-CON: Consolidated Reports Layout",
-          "file": "reports-consolidated.spec.ts",
-          "line": 16,
+          "title": "Approvals CR-1: Multi-Select Program Filter",
+          "file": "approvals-cr1-filter.spec.ts",
+          "line": 10,
           "column": 6,
           "specs": [
             {
-              "title": "E2E-RPT-CON-01: Reports page shows consolidated layout",
+              "title": "E2E-AP-FILTER-01: Admin views approvals page with program filter",
               "ok": true,
               "tags": [],
               "tests": [
@@ -167,12 +167,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 16698,
+                      "duration": 3461,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-18T02:38:47.617Z",
+                      "startTime": "2026-03-26T04:03:27.475Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -180,13 +180,13 @@
                   "status": "expected"
                 }
               ],
-              "id": "b96347be2ab749fd1306-8ce8d5bc5c05c234c95e",
-              "file": "reports-consolidated.spec.ts",
-              "line": 19,
+              "id": "229910623bb83e254288-fce0acd2ab6334718223",
+              "file": "approvals-cr1-filter.spec.ts",
+              "line": 11,
               "column": 7
             },
             {
-              "title": "E2E-RPT-CON-02 (NEGATIVE): Old standalone Alerts section no longer exists",
+              "title": "E2E-AP-FILTER-02: Search filter works on approvals page (NEGATIVE - no match)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -201,12 +201,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3071,
+                      "duration": 3321,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-18T02:39:04.822Z",
+                      "startTime": "2026-03-26T04:03:31.340Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -214,55 +214,198 @@
                   "status": "expected"
                 }
               ],
-              "id": "b96347be2ab749fd1306-222c788deb219d3782a4",
-              "file": "reports-consolidated.spec.ts",
-              "line": 84,
+              "id": "229910623bb83e254288-0b75a64bb58124963292",
+              "file": "approvals-cr1-filter.spec.ts",
+              "line": 111,
               "column": 7
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "title": "profile-avatar.spec.ts",
+      "file": "profile-avatar.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
         {
-          "title": "E2E-BELL: NotificationBell Component",
-          "file": "reports-consolidated.spec.ts",
-          "line": 108,
+          "title": "Profile Avatar Upload",
+          "file": "profile-avatar.spec.ts",
+          "line": 21,
           "column": 6,
           "specs": [
             {
-              "title": "E2E-BELL-01: Notification bell shows badge when alerts exist",
+              "title": "E2E-AVATAR-01: Profile page shows avatar area with upload capability",
               "ok": true,
               "tags": [],
               "tests": [
                 {
                   "timeout": 360000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
+                  "annotations": [
+                    {
+                      "type": "fail",
+                      "description": "IMPLEMENTATION BUG: profile/page.tsx getInitials() crashes — email[0].toUpperCase() when email is empty string",
+                      "location": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                        "line": 26,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "failed",
                   "projectId": "desktop",
                   "projectName": "desktop",
                   "results": [
                     {
                       "workerIndex": 1,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5910,
-                      "errors": [],
+                      "status": "failed",
+                      "duration": 13010,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[aria-label=\"Change photo\"]')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[aria-label=\"Change photo\"]')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[aria-label=\"Change photo\"]')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[aria-label=\"Change photo\"]')\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:43:29",
+                        "location": {
+                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                          "column": 29,
+                          "line": 43
+                        },
+                        "snippet": "  41 |     // Step 2: Verify Camera button overlay (aria-label=\"Change photo\") is present\n  42 |     const cameraBtn = page.locator('button[aria-label=\"Change photo\"]');\n> 43 |     await expect(cameraBtn).toBeVisible({ timeout: 10000 });\n     |                             ^\n  44 |     await snap(page, 'e2e-avatar-01', 'upload-area');\n  45 |\n  46 |     // Step 3: Verify file input for avatar upload exists"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                            "column": 29,
+                            "line": 43
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button[aria-label=\"Change photo\"]')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('button[aria-label=\"Change photo\"]')\u001b[22m\n\n\n  41 |     // Step 2: Verify Camera button overlay (aria-label=\"Change photo\") is present\n  42 |     const cameraBtn = page.locator('button[aria-label=\"Change photo\"]');\n> 43 |     await expect(cameraBtn).toBeVisible({ timeout: 10000 });\n     |                             ^\n  44 |     await snap(page, 'e2e-avatar-01', 'upload-area');\n  45 |\n  46 |     // Step 3: Verify file input for avatar upload exists\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:43:29"
+                        }
+                      ],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-18T02:39:07.898Z",
-                      "annotations": [],
-                      "attachments": []
+                      "startTime": "2026-03-26T04:03:34.670Z",
+                      "annotations": [
+                        {
+                          "type": "fail",
+                          "description": "IMPLEMENTATION BUG: profile/page.tsx getInitials() crashes — email[0].toUpperCase() when email is empty string",
+                          "location": {
+                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                            "line": 26,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-55bbb-area-with-upload-capability-desktop/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                        "column": 29,
+                        "line": 43
+                      }
                     }
                   ],
                   "status": "expected"
                 }
               ],
-              "id": "b96347be2ab749fd1306-43d3f4250d403508d097",
-              "file": "reports-consolidated.spec.ts",
-              "line": 111,
+              "id": "c419bd88c712331ff6e1-ef310a4579a316d9bd1c",
+              "file": "profile-avatar.spec.ts",
+              "line": 23,
               "column": 7
             },
             {
-              "title": "E2E-BELL-02 (NEGATIVE): Bell popover closes when clicking outside",
+              "title": "E2E-AVATAR-02: Profile page edit form shows and cancel preserves original value",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 360000,
+                  "annotations": [
+                    {
+                      "type": "fail",
+                      "description": "IMPLEMENTATION BUG: profile/page.tsx getInitials() crashes — email[0].toUpperCase() when email is empty string",
+                      "location": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                        "line": 67,
+                        "column": 10
+                      }
+                    }
+                  ],
+                  "expectedStatus": "failed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 13066,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button').filter({ hasText: /Edit/i }).first()\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('button').filter({ hasText: /Edit/i }).first()\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button').filter({ hasText: /Edit/i }).first()\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('button').filter({ hasText: /Edit/i }).first()\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:85:27",
+                        "location": {
+                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                          "column": 27,
+                          "line": 85
+                        },
+                        "snippet": "  83 |     // Step 2: Click Edit button\n  84 |     const editBtn = page.locator('button').filter({ hasText: /Edit/i }).first();\n> 85 |     await expect(editBtn).toBeVisible({ timeout: 10000 });\n     |                           ^\n  86 |     await expect(editBtn).toBeEnabled();\n  87 |     await editBtn.click();\n  88 |     await page.waitForTimeout(500);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                            "column": 27,
+                            "line": 85
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('button').filter({ hasText: /Edit/i }).first()\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('button').filter({ hasText: /Edit/i }).first()\u001b[22m\n\n\n  83 |     // Step 2: Click Edit button\n  84 |     const editBtn = page.locator('button').filter({ hasText: /Edit/i }).first();\n> 85 |     await expect(editBtn).toBeVisible({ timeout: 10000 });\n     |                           ^\n  86 |     await expect(editBtn).toBeEnabled();\n  87 |     await editBtn.click();\n  88 |     await page.waitForTimeout(500);\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:85:27"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-03-26T04:03:47.687Z",
+                      "annotations": [
+                        {
+                          "type": "fail",
+                          "description": "IMPLEMENTATION BUG: profile/page.tsx getInitials() crashes — email[0].toUpperCase() when email is empty string",
+                          "location": {
+                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                            "line": 67,
+                            "column": 10
+                          }
+                        }
+                      ],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-56fea-el-preserves-original-value-desktop/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts",
+                        "column": 27,
+                        "line": 85
+                      }
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c419bd88c712331ff6e1-1e4033af828abcb714b4",
+              "file": "profile-avatar.spec.ts",
+              "line": 65,
+              "column": 7
+            },
+            {
+              "title": "E2E-AVATAR-03: PUT /users/me/avatar validates URL format (NEGATIVE)",
               "ok": true,
               "tags": [],
               "tests": [
@@ -277,12 +420,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2552,
+                      "duration": 2665,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-18T02:39:13.813Z",
+                      "startTime": "2026-03-26T04:04:00.759Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -290,9 +433,9 @@
                   "status": "expected"
                 }
               ],
-              "id": "b96347be2ab749fd1306-ca66ced833031bc93ac9",
-              "file": "reports-consolidated.spec.ts",
-              "line": 183,
+              "id": "c419bd88c712331ff6e1-0a443bd42c1c47614927",
+              "file": "profile-avatar.spec.ts",
+              "line": 114,
               "column": 7
             }
           ]
@@ -302,9 +445,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-18T02:38:24.526Z",
-    "duration": 51874.898,
-    "expected": 5,
+    "startTime": "2026-03-26T04:03:06.338Z",
+    "duration": 57120.451,
+    "expected": 6,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

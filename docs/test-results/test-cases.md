@@ -1,598 +1,783 @@
 # Test Cases
 
-> Generated: 2026-03-18 | Runner: jest / vitest / playwright | Total: 560 | Pass: 560 | Fail: 0 | Skip: 0
+> Generated: 2026-03-20 | Total: 612 | Pass: 535 | Fail: 77
 
-| ID | Test Name | Type | Category | File | Status | Notes |
-|---|---|---|---|---|---|---|
-| TC-001 | ReportsService > getProjectCostReport > should return empty report when charge code doe... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-002 | ReportsService > getProjectCostReport > should return report with budget and actuals | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-003 | ReportsService > getProjectCostReport > should include child breakdown in report | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-004 | ReportsService > getChargeabilityReport > should return zero chargeability when no hour... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-005 | ReportsService > getChargeabilityReport > should calculate chargeability correctly (bil... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-006 | ReportsService > getChargeabilityReport > should have 80% target chargeability | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-007 | ReportsService > getActivityDistribution > should return empty distribution when no ent... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-008 | ReportsService > getActivityDistribution > should calculate percentage for each category | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-009 | ReportsService > getActivityDistribution > should sort distribution by hours descending | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-010 | ReportsService > getUtilizationReport > should fallback to 22 working days when calenda... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-011 | ReportsService > getUtilizationReport > should calculate utilization rate per employee | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-012 | ReportsService > getBudgetAlerts > should return formatted budget alerts with overrunAm... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-013 | ReportsService > getBudgetAlerts > should pass through severity values from budgets ser... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-014 | ReportsService > getBudgetAlerts > should calculate overrunPercent as percentage over b... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-015 | ReportsService > getBudgetAlerts > should return zero overrunAmount when actual is less... | unit | Backend — Reports | `backend/src/reports/reports.service.spec.ts` | pass |  |
-| TC-016 | CostRatesService > findAll > should return all cost rates ordered by jobGrade and effec... | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-017 | CostRatesService > findAll > should return empty array when no cost rates exist | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-018 | CostRatesService > create > should create a new cost rate and return it | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-019 | CostRatesService > create > should create cost rate with effectiveTo date when provided | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-020 | CostRatesService > update > should update an existing cost rate and return it | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-021 | CostRatesService > update > should throw NotFoundException when cost rate does not exist | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-022 | CostRatesService > update > should allow partial updates (only jobGrade) | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-023 | CostRatesService > remove > should delete a cost rate and return { deleted: true } | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-024 | CostRatesService > remove > should throw NotFoundException when cost rate does not exist | unit | Backend — Cost Rates | `backend/src/cost-rates/cost-rates.service.spec.ts` | pass |  |
-| TC-025 | ApprovalsService > getPending > should return empty results when no pending approvals e... | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-026 | ApprovalsService > getPending > should return timesheets pending manager approval | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-027 | ApprovalsService > approve > should throw NotFoundException when timesheet does not exist | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-028 | ApprovalsService > approve > should throw BadRequestException when timesheet is in lock... | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-029 | ApprovalsService > approve > should throw ForbiddenException when approver is not the e... | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-030 | ApprovalsService > approve > should transition timesheet from submitted to manager_appr... | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-031 | ApprovalsService > approve > should create an audit log entry when approving | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-032 | ApprovalsService > approve > should auto-lock when no CC approvers are needed | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-033 | ApprovalsService > approve > should throw ForbiddenException when CC approver does not ... | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-034 | ApprovalsService > reject > should throw NotFoundException when timesheet does not exist | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-035 | ApprovalsService > reject > should throw BadRequestException when rejecting a locked ti... | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-036 | ApprovalsService > reject > should reject a submitted timesheet and set status to rejected | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-037 | ApprovalsService > reject > should create audit log with reject action | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-038 | ApprovalsService > bulkApprove > should approve multiple timesheets and return results | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-039 | ApprovalsService > bulkApprove > should include error entry when individual approval fails | unit | Backend — Approvals | `backend/src/approvals/approvals.service.spec.ts` | pass |  |
-| TC-040 | UsersService > findAll > should return all user profiles | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-041 | UsersService > findAll > should return empty array when no profiles exist | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-042 | UsersService > findById > should return the user when found | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-043 | UsersService > findById > should throw NotFoundException when user does not exist | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-044 | UsersService > updateProfile > should update and return the user profile | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-045 | UsersService > updateProfile > should throw NotFoundException when user to update does ... | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-046 | UsersService > updateRole > should update user role successfully | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-047 | UsersService > updateRole > should throw NotFoundException when user does not exist | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-048 | UsersService > updateJobGrade > should update job grade successfully | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-049 | UsersService > updateJobGrade > should throw NotFoundException when user does not exist | unit | Backend — Users | `backend/src/users/users.service.spec.ts` | pass |  |
-| TC-050 | SupabaseAuthGuard > should allow public routes without a token | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-051 | SupabaseAuthGuard > should throw UnauthorizedException when Authorization header is mis... | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-052 | SupabaseAuthGuard > should throw UnauthorizedException when Authorization header does n... | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-053 | SupabaseAuthGuard > should throw UnauthorizedException when JWT verification fails (inv... | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-054 | SupabaseAuthGuard > should throw UnauthorizedException when user profile is not found i... | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-055 | SupabaseAuthGuard > should allow request and attach profile when JWT is valid | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-056 | RolesGuard > should allow access when no roles are required | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-057 | RolesGuard > should allow access when user has the required role | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-058 | RolesGuard > should throw ForbiddenException when user does not have the required role | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-059 | RolesGuard > should throw ForbiddenException when no user is on the request | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-060 | RolesGuard > should allow access when user role matches one of multiple required roles | unit | Backend — Auth Guard | `backend/src/common/guards/supabase-auth.guard.spec.ts` | pass |  |
-| TC-061 | CalendarService > populateWeekends > should insert weekend entries for a given year | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-062 | CalendarService > populateWeekends > should only insert weekend dates (count matches ex... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-063 | CalendarService > createHoliday > should create a new holiday entry when date does not ... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-064 | CalendarService > createHoliday > should update existing entry to be a holiday when dat... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-065 | CalendarService > updateHoliday > should throw NotFoundException when holiday does not ... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-066 | CalendarService > updateHoliday > should throw NotFoundException when entry exists but ... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-067 | CalendarService > updateHoliday > should update holiday name successfully | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-068 | CalendarService > deleteHoliday > should throw NotFoundException when holiday does not ... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-069 | CalendarService > deleteHoliday > should clear holiday fields (not delete) when entry i... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-070 | CalendarService > deleteHoliday > should delete the entry entirely when it is only a ho... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-071 | CalendarService > getWorkingDays > should count working days excluding weekends and hol... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-072 | CalendarService > getWorkingDays > should subtract vacation days when userId is provided | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-073 | CalendarService > createVacation > should throw BadRequestException when end date is be... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-074 | CalendarService > createVacation > should create a vacation request successfully | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-075 | CalendarService > approveVacation > should throw NotFoundException when vacation does n... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-076 | CalendarService > approveVacation > should throw BadRequestException when vacation is n... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-077 | CalendarService > approveVacation > should throw ForbiddenException when approver is no... | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-078 | CalendarService > approveVacation > should approve a pending vacation successfully | unit | Backend — Calendar | `backend/src/calendar/calendar.service.spec.ts` | pass |  |
-| TC-079 | BudgetsService > getBudgetForChargeCode > should throw NotFoundException when charge co... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-080 | BudgetsService > getBudgetForChargeCode > should return budget with percentage when bud... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-081 | BudgetsService > getBudgetForChargeCode > should return 0 percentage when budget is 0 | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-082 | BudgetsService > getStatus (via getBudgetForChargeCode) > should return under_budget st... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-083 | BudgetsService > getStatus (via getBudgetForChargeCode) > should return warning status ... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-084 | BudgetsService > getStatus (via getBudgetForChargeCode) > should return critical status... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-085 | BudgetsService > getStatus (via getBudgetForChargeCode) > should return overrun status ... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-086 | BudgetsService > getForecast > should throw NotFoundException when charge code does not... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-087 | BudgetsService > getForecast > should return null forecast when charge code has no dates | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-088 | BudgetsService > getForecast > should calculate forecast at completion when dates are p... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-089 | BudgetsService > getAlerts > should return empty array when no charge codes are over th... | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-090 | BudgetsService > getAlerts > should return yellow alert at 81% usage | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-091 | BudgetsService > getAlerts > should return orange alert at 91% usage | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-092 | BudgetsService > getAlerts > should return red alert at 101% usage | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-093 | BudgetsService > getAlerts > should sort alerts: red first, then orange, then yellow | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-094 | BudgetsService > getSummary > should return zero summary when no budget records exist | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-095 | BudgetsService > getSummary > should correctly count over-budget charge codes | unit | Backend — Budgets | `backend/src/budgets/budgets.service.spec.ts` | pass |  |
-| TC-096 | TimesheetsService > getWeekBounds (via create) > should normalize a Wednesday to its Mo... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-097 | TimesheetsService > getWeekBounds (via create) > should return existing timesheet if on... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-098 | TimesheetsService > findByPeriod > should return null when no timesheet exists for the ... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-099 | TimesheetsService > findByPeriod > should return the timesheet when it exists | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-100 | TimesheetsService > findById > should throw NotFoundException when timesheet does not e... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-101 | TimesheetsService > findById > should return timesheet with entries when it exists | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-102 | TimesheetsService > upsertEntries > should throw NotFoundException when timesheet does ... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-103 | TimesheetsService > upsertEntries > should throw ForbiddenException when timesheet stat... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-104 | TimesheetsService > upsertEntries > should throw ForbiddenException when timesheet stat... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-105 | TimesheetsService > upsertEntries > should allow editing when status is draft | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-106 | TimesheetsService > upsertEntries > should allow editing when status is rejected | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-107 | TimesheetsService > upsertEntries > should validate that charge codes are assigned to t... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-108 | TimesheetsService > upsertEntries > should filter out entries with 0 hours | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-109 | TimesheetsService > submit > should throw NotFoundException when timesheet does not exist | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-110 | TimesheetsService > submit > should throw BadRequestException when status is already su... | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-111 | TimesheetsService > submit > should throw BadRequestException when status is locked | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-112 | TimesheetsService > submit > should transition draft timesheet to submitted | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-113 | TimesheetsService > submit > should allow resubmitting a rejected timesheet | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass |  |
-| TC-114 | ChargeCodesService > create > should create a program-level charge code with auto-gener... | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-115 | ChargeCodesService > create > should auto-generate sequential IDs (PRG-002 after PRG-001) | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-116 | ChargeCodesService > create > should create a project with PRJ- prefix under a program ... | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-117 | ChargeCodesService > create > should throw BadRequestException when program has a parentId | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-118 | ChargeCodesService > create > should throw BadRequestException when project has no pare... | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-119 | ChargeCodesService > create > should throw BadRequestException when project parent is n... | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-120 | ChargeCodesService > create > should build materialized path from parent | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-121 | ChargeCodesService > findById > should throw NotFoundException when charge code does no... | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-122 | ChargeCodesService > findById > should return charge code with assigned users | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-123 | ChargeCodesService > findChildren > should return direct children of a charge code | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-124 | ChargeCodesService > findChildren > should return empty array for leaf nodes | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-125 | ChargeCodesService > updateAccess > should throw NotFoundException when charge code doe... | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-126 | ChargeCodesService > updateAccess > should add users to a charge code | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-127 | ChargeCodesService > updateAccess > should remove users from a charge code | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass |  |
-| TC-128 | api.ts — request function > successful requests > should resolve with parsed JSON on a ... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-129 | api.ts — request function > successful requests > should send GET request without body | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-130 | api.ts — request function > successful requests > should send POST request with seriali... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-131 | api.ts — request function > successful requests > should send PUT request with serializ... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-132 | api.ts — request function > successful requests > should send DELETE request | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-133 | api.ts — request function > successful requests > should include Authorization Bearer h... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-134 | api.ts — request function > successful requests > should include Content-Type: applicat... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-135 | api.ts — request function > 401 Unauthorized — session expired flow > should call toast... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-136 | api.ts — request function > 401 Unauthorized — session expired flow > should redirect w... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-137 | api.ts — request function > 401 Unauthorized — session expired flow > should throw an e... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-138 | api.ts — request function > non-401 errors — toast and re-throw > should call toast.err... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-139 | api.ts — request function > non-401 errors — toast and re-throw > should call toast.err... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-140 | api.ts — request function > non-401 errors — toast and re-throw > should call toast.err... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-141 | api.ts — request function > non-401 errors — toast and re-throw > should call toast.err... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-142 | api.ts — request function > non-401 errors — toast and re-throw > should NOT redirect t... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-143 | api.ts — request function > non-401 errors — toast and re-throw > should throw error wi... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-144 | api.ts — request function > error — malformed or unparseable response body > should fal... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-145 | api.ts — request function > error — malformed or unparseable response body > should fal... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-146 | api.ts — request function > API URL construction > should prepend API_URL and /api/v1 t... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-147 | api.ts — session without token > should not include Authorization header when session i... | unit | Frontend — API Client | `frontend/src/lib/api.test.ts` | pass |  |
-| TC-148 | DashboardPage > should render status banner with week period | unit | Frontend — Pages | `frontend/src/app/(authenticated)/page.test.tsx` | pass |  |
-| TC-149 | DashboardPage > should render 4 metric cards | unit | Frontend — Pages | `frontend/src/app/(authenticated)/page.test.tsx` | pass |  |
-| TC-150 | DashboardPage > should render Recent Entries section | unit | Frontend — Pages | `frontend/src/app/(authenticated)/page.test.tsx` | pass |  |
-| TC-151 | DashboardPage > should render Alerts & Notifications section | unit | Frontend — Pages | `frontend/src/app/(authenticated)/page.test.tsx` | pass |  |
-| TC-152 | DashboardPage > should render quick action Log Time button | unit | Frontend — Pages | `frontend/src/app/(authenticated)/page.test.tsx` | pass |  |
-| TC-153 | DashboardPage > should render My Codes quick action | unit | Frontend — Pages | `frontend/src/app/(authenticated)/page.test.tsx` | pass |  |
-| TC-154 | DashboardPage > should render progress bar tracking area | unit | Frontend — Pages | `frontend/src/app/(authenticated)/page.test.tsx` | pass |  |
-| TC-155 | LoginPage > should render the logo/branding | unit | Frontend — Login | `frontend/src/app/login/page.test.tsx` | pass |  |
-| TC-156 | LoginPage > should render email input | unit | Frontend — Login | `frontend/src/app/login/page.test.tsx` | pass |  |
-| TC-157 | LoginPage > should render password input | unit | Frontend — Login | `frontend/src/app/login/page.test.tsx` | pass |  |
-| TC-158 | LoginPage > should render Sign In button | unit | Frontend — Login | `frontend/src/app/login/page.test.tsx` | pass |  |
-| TC-159 | LoginPage > should render Microsoft SSO button | unit | Frontend — Login | `frontend/src/app/login/page.test.tsx` | pass |  |
-| TC-160 | LoginPage > should render Forgot password link | unit | Frontend — Login | `frontend/src/app/login/page.test.tsx` | pass |  |
-| TC-161 | LoginPage > should render "or" divider | unit | Frontend — Login | `frontend/src/app/login/page.test.tsx` | pass |  |
-| TC-162 | LoginPage > should render subtitle text | unit | Frontend — Login | `frontend/src/app/login/page.test.tsx` | pass |  |
-| TC-163 | ApprovalQueue > rendering > should show empty state when no items | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-164 | ApprovalQueue > rendering > should render table headers correctly | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-165 | ApprovalQueue > rendering > should render employee name in table row | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-166 | ApprovalQueue > rendering > should render employee department | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-167 | ApprovalQueue > rendering > should render hours | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-168 | ApprovalQueue > rendering > should show warning indicator for hours below 40 | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-169 | ApprovalQueue > rendering > should render submitted status badge as Pending | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-170 | ApprovalQueue > rendering > should render manager_approved status badge | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-171 | ApprovalQueue > rendering > should render multiple rows for multiple items | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-172 | ApprovalQueue > checkbox selection > should render a select-all checkbox in the header | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-173 | ApprovalQueue > checkbox selection > should select all items when select-all checkbox i... | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-174 | ApprovalQueue > checkbox selection > should deselect all when select-all is clicked again | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-175 | ApprovalQueue > checkbox selection > should allow individual row selection | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-176 | ApprovalQueue > bulk approval bar > should show bulk approval bar when items are selected | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-177 | ApprovalQueue > bulk approval bar > should not show bulk approval bar when nothing is s... | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-178 | ApprovalQueue > approve action > should call api.post when approve button is clicked | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-179 | ApprovalQueue > approve action > should call onRefresh after approve | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-180 | ApprovalQueue > reject dialog > should open reject dialog when reject button is clicked | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-181 | ApprovalQueue > reject dialog > should not submit rejection without a comment | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-182 | ApprovalQueue > status badges > should show locked badge for locked status | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-183 | ApprovalQueue > status badges > should show Rejected badge for rejected status | unit | Frontend — Approvals | `frontend/src/components/approvals/ApprovalQueue.test.tsx` | pass |  |
-| TC-184 | BulkApprovalBar > when count is 0 > should not render anything | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-185 | BulkApprovalBar > when count > 0 > should render the count | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-186 | BulkApprovalBar > when count > 0 > should render Approve Selected button | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-187 | BulkApprovalBar > when count > 0 > should render Reject Selected button | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-188 | BulkApprovalBar > when count > 0 > should call onApprove when Approve Selected is clicked | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-189 | BulkApprovalBar > when count > 0 > should call onReject when Reject Selected is clicked | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-190 | BulkApprovalBar > when count > 0 > should disable buttons when loading is true | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-191 | BulkApprovalBar > when count > 0 > should show singular "1 selected" for count of 1 | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-192 | BulkApprovalBar > when count > 0 > should render check icon in approve button | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-193 | BulkApprovalBar > when count > 0 > should render x icon in reject button | unit | Frontend — Approvals | `frontend/src/components/approvals/BulkApprovalBar.test.tsx` | pass |  |
-| TC-194 | TimesheetReview > loading state > should show loading skeleton initially | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
-| TC-195 | TimesheetReview > success state > should render charge code column header | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
-| TC-196 | TimesheetReview > success state > should render Total column header | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
-| TC-197 | TimesheetReview > success state > should render charge code names | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
-| TC-198 | TimesheetReview > success state > should render charge code IDs | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
-| TC-199 | TimesheetReview > success state > should render Daily Total row | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
-| TC-200 | TimesheetReview > error/fallback state > should render error message when API fails | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass | Updated: error state replaces mock-data fallback |
-| TC-200b | TimesheetReview > error/fallback state > should render retry button when API fails | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass | New test added |
-| TC-201 | TimesheetReview > empty state > should render empty state when no entries | unit | Frontend — Approvals | `frontend/src/components/approvals/TimesheetReview.test.tsx` | pass |  |
-| TC-202 | AccessManager > rendering > should render "Assigned Users" heading | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-203 | AccessManager > rendering > should render the Add button | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-204 | AccessManager > rendering > should render assigned user names | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-205 | AccessManager > rendering > should render assigned user emails | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-206 | AccessManager > rendering > should show empty state when no users assigned | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-207 | AccessManager > add user flow > should toggle add user panel when Add button is clicked | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-208 | AccessManager > add user flow > should show available users in add panel (excludes alre... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-209 | AccessManager > add user flow > should call api.put when a user is added | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-210 | AccessManager > add user flow > should call onUpdate after adding a user | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-211 | AccessManager > remove user > should render remove buttons for each assigned user | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-212 | AccessManager > remove user > should call api.put with removeUserIds when remove is cli... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/AccessManager.test.tsx` | pass |  |
-| TC-213 | ChargeCodeForm > create mode (no editData) > should render "Create Charge Code" title | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-214 | ChargeCodeForm > create mode (no editData) > should render Name field | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-215 | ChargeCodeForm > create mode (no editData) > should render Level dropdown in create mode | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-216 | ChargeCodeForm > create mode (no editData) > should render Program Name field | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-217 | ChargeCodeForm > create mode (no editData) > should render Cost Center field | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-218 | ChargeCodeForm > create mode (no editData) > should render Budget field | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-219 | ChargeCodeForm > create mode (no editData) > should render Valid From and Valid To date... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-220 | ChargeCodeForm > create mode (no editData) > should render Billable checkbox checked by... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-221 | ChargeCodeForm > create mode (no editData) > should render Cancel and Create buttons | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-222 | ChargeCodeForm > create mode (no editData) > should call onOpenChange(false) when Cance... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-223 | ChargeCodeForm > create mode (no editData) > should call api.post when form is submitted | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-224 | ChargeCodeForm > create mode (no editData) > should call onSuccess after successful create | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-225 | ChargeCodeForm > edit mode (with editData) > should render "Edit Charge Code" title | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-226 | ChargeCodeForm > edit mode (with editData) > should populate Name field with existing v... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-227 | ChargeCodeForm > edit mode (with editData) > should not render Level dropdown in edit mode | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-228 | ChargeCodeForm > edit mode (with editData) > should render Update button instead of Create | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-229 | ChargeCodeForm > edit mode (with editData) > should uncheck Billable checkbox when edit... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-230 | ChargeCodeForm > edit mode (with editData) > should call api.put when form is submitted... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-231 | ChargeCodeForm > error handling > should display error message when api.post fails | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-232 | ChargeCodeForm > closed state > should not render dialog when open is false | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeForm.test.tsx` | pass |  |
-| TC-233 | ChargeCodeTree > rendering > should show empty state when tree is empty | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-234 | ChargeCodeTree > rendering > should render top-level program nodes | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-235 | ChargeCodeTree > rendering > should render PRG level badges for programs | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-236 | ChargeCodeTree > rendering > should render correct level badges for each level | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-237 | ChargeCodeTree > rendering > should display budget amount when provided | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-238 | ChargeCodeTree > rendering > should not display budget amount when not provided | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-239 | ChargeCodeTree > expand/collapse > should expand top-level nodes by default (depth < 1) | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-240 | ChargeCodeTree > expand/collapse > should show expand icon for nodes with children | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-241 | ChargeCodeTree > expand/collapse > should show collapse icon for collapsed nodes with c... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-242 | ChargeCodeTree > expand/collapse > should expand a collapsed node when chevron is clicked | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-243 | ChargeCodeTree > expand/collapse > should collapse an expanded node when chevron is cli... | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-244 | ChargeCodeTree > selection > should call onSelect with the node id when a node is clicked | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-245 | ChargeCodeTree > selection > should visually highlight the selected node | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-246 | ChargeCodeTree > selection > should not highlight unselected nodes | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-247 | ChargeCodeTree > hierarchy > should render project nodes nested under program | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-248 | ChargeCodeTree > hierarchy > should render nodes with increasing indentation for depth | unit | Frontend — Charge Codes | `frontend/src/components/charge-codes/ChargeCodeTree.test.tsx` | pass |  |
-| TC-249 | ActivityPie > with data > should render ResponsiveContainer | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-250 | ActivityPie > with data > should render PieChart | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-251 | ActivityPie > with data > should render Pie with correct item count | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-252 | ActivityPie > with data > should render Pie with hours dataKey | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-253 | ActivityPie > with data > should render Pie with category nameKey | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-254 | ActivityPie > with data > should render as donut (innerRadius > 0) | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-255 | ActivityPie > with data > should render Cell components for each item | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-256 | ActivityPie > with data > should render Legend | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-257 | ActivityPie > with data > should render Tooltip | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-258 | ActivityPie > with empty data > should render empty state message | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-259 | ActivityPie > with empty data > should not render pie chart when data is empty | unit | Frontend — Reports | `frontend/src/components/reports/ActivityPie.test.tsx` | pass |  |
-| TC-260 | AlertList > rendering > should render Severity column header | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-261 | AlertList > rendering > should render Charge Code column header | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-262 | AlertList > rendering > should render Budget column header | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-263 | AlertList > rendering > should render Actual column header | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-264 | AlertList > rendering > should render Overrun column header | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-265 | AlertList > rendering > should render all alert names | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-266 | AlertList > rendering > should render charge code IDs | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-267 | AlertList > rendering > should render formatted budget amounts | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-268 | AlertList > rendering > should render severity indicators for all alerts | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-269 | AlertList > sorting > should sort by severity by default (red first) | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-270 | AlertList > sorting > should sort by overrun when Overrun header is clicked | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-271 | AlertList > sorting > should sort by severity when Severity header is clicked | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-272 | AlertList > expand row > should show root cause when row is clicked and rootCauseActivi... | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-273 | AlertList > expand row > should collapse expanded row when clicked again | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-274 | AlertList > expand row > should not show expanded row for alert with no rootCauseActivity | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-275 | AlertList > empty state > should render empty state message when no alerts | unit | Frontend — Reports | `frontend/src/components/reports/AlertList.test.tsx` | pass |  |
-| TC-276 | BudgetChart > with data > should render ResponsiveContainer | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-277 | BudgetChart > with data > should render BarChart with data | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-278 | BudgetChart > with data > should render Actual bar | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-279 | BudgetChart > with data > should render Budget bar | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-280 | BudgetChart > with data > should render Legend | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-281 | BudgetChart > with data > should render Tooltip | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-282 | BudgetChart > with data > should render CartesianGrid | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-283 | BudgetChart > with empty data > should render empty state message when no data | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-284 | BudgetChart > with empty data > should not render bar chart when data is empty | unit | Frontend — Reports | `frontend/src/components/reports/BudgetChart.test.tsx` | pass |  |
-| TC-285 | ChargeabilityGauge > with data > should render ResponsiveContainer | unit | Frontend — Reports | `frontend/src/components/reports/ChargeabilityGauge.test.tsx` | pass |  |
-| TC-286 | ChargeabilityGauge > with data > should render BarChart | unit | Frontend — Reports | `frontend/src/components/reports/ChargeabilityGauge.test.tsx` | pass |  |
-| TC-287 | ChargeabilityGauge > with data > should render a reference line for the target | unit | Frontend — Reports | `frontend/src/components/reports/ChargeabilityGauge.test.tsx` | pass |  |
-| TC-288 | ChargeabilityGauge > with data > should render target label on reference line | unit | Frontend — Reports | `frontend/src/components/reports/ChargeabilityGauge.test.tsx` | pass |  |
-| TC-289 | ChargeabilityGauge > with data > should render rate bar | unit | Frontend — Reports | `frontend/src/components/reports/ChargeabilityGauge.test.tsx` | pass |  |
-| TC-290 | ChargeabilityGauge > with empty data > should render empty state message | unit | Frontend — Reports | `frontend/src/components/reports/ChargeabilityGauge.test.tsx` | pass |  |
-| TC-291 | ChargeabilityGauge > with empty data > should not render bar chart when data is empty | unit | Frontend — Reports | `frontend/src/components/reports/ChargeabilityGauge.test.tsx` | pass |  |
-| TC-292 | ChargeabilityGauge > color coding > should render Cell components for each member | unit | Frontend — Reports | `frontend/src/components/reports/ChargeabilityGauge.test.tsx` | pass |  |
-| TC-293 | UtilizationChart > with data > should render ResponsiveContainer | unit | Frontend — Reports | `frontend/src/components/reports/UtilizationChart.test.tsx` | pass |  |
-| TC-294 | UtilizationChart > with data > should render BarChart with correct item count | unit | Frontend — Reports | `frontend/src/components/reports/UtilizationChart.test.tsx` | pass |  |
-| TC-295 | UtilizationChart > with data > should render rate bar with Utilization name | unit | Frontend — Reports | `frontend/src/components/reports/UtilizationChart.test.tsx` | pass |  |
-| TC-296 | UtilizationChart > with data > should render XAxis with department dataKey | unit | Frontend — Reports | `frontend/src/components/reports/UtilizationChart.test.tsx` | pass |  |
-| TC-297 | UtilizationChart > with data > should render Cell components for color coding | unit | Frontend — Reports | `frontend/src/components/reports/UtilizationChart.test.tsx` | pass |  |
-| TC-298 | UtilizationChart > with data > should render Tooltip | unit | Frontend — Reports | `frontend/src/components/reports/UtilizationChart.test.tsx` | pass |  |
-| TC-299 | UtilizationChart > with empty data > should render empty state message | unit | Frontend — Reports | `frontend/src/components/reports/UtilizationChart.test.tsx` | pass |  |
-| TC-300 | UtilizationChart > with empty data > should not render bar chart when data is empty | unit | Frontend — Reports | `frontend/src/components/reports/UtilizationChart.test.tsx` | pass |  |
-| TC-301 | ChargeCodeSelector > when there are unused codes > should render the select trigger wit... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-302 | ChargeCodeSelector > when there are unused codes > should render select items for each ... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-303 | ChargeCodeSelector > when there are unused codes > should not render items for already-... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-304 | ChargeCodeSelector > when there are unused codes > should display charge code IDs in items | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-305 | ChargeCodeSelector > when there are unused codes > should display charge code names in ... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-306 | ChargeCodeSelector > when there are unused codes > should render Billable badge for bil... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-307 | ChargeCodeSelector > when there are unused codes > should render Non-billable badge for... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-308 | ChargeCodeSelector > when there are unused codes > should call onSelect with code when ... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-309 | ChargeCodeSelector > when all codes are used > should render a message when all codes a... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-310 | ChargeCodeSelector > when all codes are used > should not render the select trigger whe... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-311 | ChargeCodeSelector > when no codes available > should render all-in-use message when av... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/ChargeCodeSelector.test.tsx` | pass |  |
-| TC-312 | EntryCell > disabled state (weekend/holiday) > should render disabled cell with dash wh... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-313 | EntryCell > disabled state (weekend/holiday) > should render disabled cell with formatt... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-314 | EntryCell > disabled state (weekend/holiday) > should not render an interactive button ... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-315 | EntryCell > empty state (not editing) > should render empty string when value is 0 | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-316 | EntryCell > empty state (not editing) > should render formatted value when value > 0 | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-317 | EntryCell > focus/editing behavior > should switch to input mode when button is clicked | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-318 | EntryCell > focus/editing behavior > should populate input with current value on focus ... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-319 | EntryCell > focus/editing behavior > should show empty input on focus when value is 0 | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-320 | EntryCell > focus/editing behavior > should call onChange with parsed value on blur | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-321 | EntryCell > focus/editing behavior > should call onChange with 0 on blur when input is ... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-322 | EntryCell > focus/editing behavior > should cap value at 24 when entered value exceeds 24 | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-323 | EntryCell > focus/editing behavior > should call onChange with 0 when negative value en... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-324 | EntryCell > keyboard navigation > should call onNavigate with "right" when Tab is pressed | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-325 | EntryCell > keyboard navigation > should call onNavigate with "down" when Enter is pressed | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-326 | EntryCell > keyboard navigation > should exit editing mode on Escape | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-327 | EntryCell > billable styling > should apply billable class when isBillable is true and ... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-328 | EntryCell > note icon > should show note icon on hover when value > 0 | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-329 | EntryCell > note icon > should not show note icon on hover when value is 0 | unit | Frontend — Timesheet | `frontend/src/components/timesheet/EntryCell.test.tsx` | pass |  |
-| TC-330 | TimesheetGrid > rendering > should render the charge code column header | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-331 | TimesheetGrid > rendering > should render day headers (Mon through Sun) | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-332 | TimesheetGrid > rendering > should render charge code names in rows | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-333 | TimesheetGrid > rendering > should render charge code IDs | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-334 | TimesheetGrid > rendering > should show empty state message when no rows | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-335 | TimesheetGrid > rendering > should render billable badge for billable charge codes | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-336 | TimesheetGrid > rendering > should render non-billable badge for non-billable charge codes | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-337 | TimesheetGrid > daily totals > should display Daily Total label in footer | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-338 | TimesheetGrid > daily totals > should calculate correct daily total for Monday (8 + 4 =... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-339 | TimesheetGrid > daily totals > should display Required row | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-340 | TimesheetGrid > daily totals > should display Variance row | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-341 | TimesheetGrid > variance indicators > should show negative variance for days under 8 hours | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-342 | TimesheetGrid > variance indicators > should show checkmark for days meeting target hours | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-343 | TimesheetGrid > row totals > should display Total column header | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-344 | TimesheetGrid > remove row button > should show remove button when onRemoveRow is provi... | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-345 | TimesheetGrid > remove row button > should not show remove button when disabled | unit | Frontend — Timesheet | `frontend/src/components/timesheet/TimesheetGrid.test.tsx` | pass |  |
-| TC-346 | ApprovalsPage > should render the page title | unit | Frontend — Approvals | `frontend/src/app/(authenticated)/approvals/page.test.tsx` | pass |  |
-| TC-347 | ApprovalsPage > should render Manager/CC Owner tab toggle | unit | Frontend — Approvals | `frontend/src/app/(authenticated)/approvals/page.test.tsx` | pass |  |
-| TC-348 | ApprovalsPage > should render CC Owner tab | unit | Frontend — Approvals | `frontend/src/app/(authenticated)/approvals/page.test.tsx` | pass |  |
-| TC-349 | ApprovalsPage > should render filter bar with period dropdown | unit | Frontend — Approvals | `frontend/src/app/(authenticated)/approvals/page.test.tsx` | pass |  |
-| TC-350 | ApprovalsPage > should render approval queue component | unit | Frontend — Approvals | `frontend/src/app/(authenticated)/approvals/page.test.tsx` | pass |  |
-| TC-351 | ApprovalsPage > should render search input | unit | Frontend — Approvals | `frontend/src/app/(authenticated)/approvals/page.test.tsx` | pass |  |
-| TC-352 | BudgetPage > should render the page title | unit | Frontend — Pages | `frontend/src/app/(authenticated)/budget/page.test.tsx` | pass |  |
-| TC-353 | BudgetPage > should render overview cards | unit | Frontend — Pages | `frontend/src/app/(authenticated)/budget/page.test.tsx` | pass |  |
-| TC-354 | BudgetPage > should render budget metrics | unit | Frontend — Pages | `frontend/src/app/(authenticated)/budget/page.test.tsx` | pass |  |
-| TC-355 | BudgetPage > should render budget table or empty state | unit | Frontend — Pages | `frontend/src/app/(authenticated)/budget/page.test.tsx` | pass |  |
-| TC-356 | ChargeCodesPage > should render toolbar with search input | unit | Frontend — Charge Codes | `frontend/src/app/(authenticated)/charge-codes/page.test.tsx` | pass |  |
-| TC-357 | ChargeCodesPage > should render Create New Code button | unit | Frontend — Charge Codes | `frontend/src/app/(authenticated)/charge-codes/page.test.tsx` | pass |  |
-| TC-358 | ChargeCodesPage > should render charge code tree panel | unit | Frontend — Charge Codes | `frontend/src/app/(authenticated)/charge-codes/page.test.tsx` | pass |  |
-| TC-359 | ChargeCodesPage > should render detail panel on right side | unit | Frontend — Charge Codes | `frontend/src/app/(authenticated)/charge-codes/page.test.tsx` | pass |  |
-| TC-360 | ChargeCodesPage > should render the page heading | unit | Frontend — Charge Codes | `frontend/src/app/(authenticated)/charge-codes/page.test.tsx` | pass |  |
-| TC-361 | ProfilePage > should render user info section | unit | Frontend — Pages | `frontend/src/app/(authenticated)/profile/page.test.tsx` | pass |  |
-| TC-362 | ProfilePage > should render email field | unit | Frontend — Pages | `frontend/src/app/(authenticated)/profile/page.test.tsx` | pass |  |
-| TC-363 | ProfilePage > should render role badge or field | unit | Frontend — Pages | `frontend/src/app/(authenticated)/profile/page.test.tsx` | pass |  |
-| TC-364 | ProfilePage > should render edit profile button or form | unit | Frontend — Pages | `frontend/src/app/(authenticated)/profile/page.test.tsx` | pass |  |
-| TC-365 | ProfilePage > should render password change section | unit | Frontend — Pages | `frontend/src/app/(authenticated)/profile/page.test.tsx` | pass |  |
-| TC-366 | ProfilePage > should render department field | unit | Frontend — Pages | `frontend/src/app/(authenticated)/profile/page.test.tsx` | pass |  |
-| TC-367 | ReportsPage > should render the page title | unit | Frontend — Reports | `frontend/src/app/(authenticated)/reports/page.test.tsx` | pass |  |
-| TC-368 | ReportsPage > should render filter bar | unit | Frontend — Reports | `frontend/src/app/(authenticated)/reports/page.test.tsx` | pass |  |
-| TC-369 | ReportsPage > should render KPI cards | unit | Frontend — Reports | `frontend/src/app/(authenticated)/reports/page.test.tsx` | pass |  |
-| TC-370 | ReportsPage > should render Budget Chart component | unit | Frontend — Reports | `frontend/src/app/(authenticated)/reports/page.test.tsx` | pass |  |
-| TC-371 | ReportsPage > should render Chargeability Gauge component | unit | Frontend — Reports | `frontend/src/app/(authenticated)/reports/page.test.tsx` | pass |  |
-| TC-372 | ReportsPage > should render Activity Pie component | unit | Frontend — Reports | `frontend/src/app/(authenticated)/reports/page.test.tsx` | pass |  |
-| TC-373 | ReportsPage > should render Alert List component | unit | Frontend — Reports | `frontend/src/app/(authenticated)/reports/page.test.tsx` | pass |  |
-| TC-374 | SettingsPage > should render the page title | unit | Frontend — Pages | `frontend/src/app/(authenticated)/settings/page.test.tsx` | pass |  |
-| TC-375 | SettingsPage > should render theme toggle section | unit | Frontend — Pages | `frontend/src/app/(authenticated)/settings/page.test.tsx` | pass |  |
-| TC-376 | SettingsPage > should render Light and Dark theme options | unit | Frontend — Pages | `frontend/src/app/(authenticated)/settings/page.test.tsx` | pass |  |
-| TC-377 | SettingsPage > should render notification preferences section | unit | Frontend — Pages | `frontend/src/app/(authenticated)/settings/page.test.tsx` | pass |  |
-| TC-378 | SettingsPage > should render email notification toggle | unit | Frontend — Pages | `frontend/src/app/(authenticated)/settings/page.test.tsx` | pass |  |
-| TC-379 | SettingsPage > should render timezone settings | unit | Frontend — Pages | `frontend/src/app/(authenticated)/settings/page.test.tsx` | pass |  |
-| TC-380 | TimeEntryPage > should render period navigator with prev/next controls | unit | Frontend — Pages | `frontend/src/app/(authenticated)/time-entry/page.test.tsx` | pass |  |
-| TC-381 | TimeEntryPage > should render timesheet grid component | unit | Frontend — Pages | `frontend/src/app/(authenticated)/time-entry/page.test.tsx` | pass |  |
-| TC-382 | TimeEntryPage > should render actions bar with Save Draft button | unit | Frontend — Pages | `frontend/src/app/(authenticated)/time-entry/page.test.tsx` | pass |  |
-| TC-383 | TimeEntryPage > should render Submit button | unit | Frontend — Pages | `frontend/src/app/(authenticated)/time-entry/page.test.tsx` | pass |  |
-| TC-384 | TimeEntryPage > should render Add Charge Code button | unit | Frontend — Pages | `frontend/src/app/(authenticated)/time-entry/page.test.tsx` | pass |  |
-| TC-385 | TimeEntryPage > should render the page title | unit | Frontend — Pages | `frontend/src/app/(authenticated)/time-entry/page.test.tsx` | pass |  |
-| TC-386 | AdminCalendarPage > should render the page title | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/calendar/page.test.tsx` | pass |  |
-| TC-387 | AdminCalendarPage > should render year navigation | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/calendar/page.test.tsx` | pass |  |
-| TC-388 | AdminCalendarPage > should render prev/next navigation buttons | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/calendar/page.test.tsx` | pass |  |
-| TC-389 | AdminCalendarPage > should render month names in calendar grid | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/calendar/page.test.tsx` | pass |  |
-| TC-390 | AdminCalendarPage > should render holiday list section | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/calendar/page.test.tsx` | pass |  |
-| TC-391 | AdminCalendarPage > should render Add Holiday button | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/calendar/page.test.tsx` | pass |  |
-| TC-392 | AdminRatesPage > should render the page title | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/rates/page.test.tsx` | pass |  |
-| TC-393 | AdminRatesPage > should render Add Rate button | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/rates/page.test.tsx` | pass |  |
-| TC-394 | AdminRatesPage > should render rate table column headers | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/rates/page.test.tsx` | pass |  |
-| TC-395 | AdminRatesPage > should render Add Rate button or empty state | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/rates/page.test.tsx` | pass |  |
-| TC-396 | AdminUsersPage > should render the page title | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/users/page.test.tsx` | pass |  |
-| TC-397 | AdminUsersPage > should render user management card | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/users/page.test.tsx` | pass |  |
-| TC-398 | AdminUsersPage > should render search input | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/users/page.test.tsx` | pass |  |
-| TC-399 | AdminUsersPage > should render user table with column headers | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/users/page.test.tsx` | pass |  |
-| TC-400 | AdminUsersPage > should render mock user data in table | unit | Frontend — Admin Pages | `frontend/src/app/(authenticated)/admin/users/page.test.tsx` | pass |  |
-| TC-401 | authenticate | e2e | E2E — Auth Setup | `frontend/e2e/auth.setup.ts` | pass |  |
-| TC-402 | E2E-CAL-01: Create a holiday | e2e | E2E — Admin Calendar | `frontend/e2e/admin-calendar.spec.ts` | pass |  |
-| TC-403 | E2E-CAL-02: Delete a holiday | e2e | E2E — Admin Calendar | `frontend/e2e/admin-calendar.spec.ts` | pass |  |
-| TC-404 | E2E-CAL-03: Calendar displays year and navigation | e2e | E2E — Admin Calendar | `frontend/e2e/admin-calendar.spec.ts` | pass |  |
-| TC-405 | E2E-RATE-01: Rates table loads with real data | e2e | E2E — Admin Rates | `frontend/e2e/admin-rates.spec.ts` | pass |  |
-| TC-406 | E2E-RATE-02: Add a new cost rate | e2e | E2E — Admin Rates | `frontend/e2e/admin-rates.spec.ts` | pass |  |
-| TC-407 | E2E-USR-01: Users list loads with real data | e2e | E2E — Admin Users | `frontend/e2e/admin-users.spec.ts` | pass |  |
-| TC-408 | E2E-USR-02: Update user role (verify role display) | e2e | E2E — Admin Users | `frontend/e2e/admin-users.spec.ts` | pass |  |
-| TC-409 | E2E-AP-01: Pending approvals list shows submitted timesheets | e2e | E2E — Approvals | `frontend/e2e/approvals.spec.ts` | pass |  |
-| TC-410 | E2E-AP-02: Approve a timesheet | e2e | E2E — Approvals | `frontend/e2e/approvals.spec.ts` | pass |  |
-| TC-411 | E2E-AP-03: Reject a timesheet with comment (NEGATIVE flow) | e2e | E2E — Approvals | `frontend/e2e/approvals.spec.ts` | pass |  |
-| TC-412 | E2E-BUD-01: Budget summary loads with real data | e2e | E2E — Budget | `frontend/e2e/budget.spec.ts` | pass |  |
-| TC-413 | E2E-BUD-02: Budget alerts section is visible | e2e | E2E — Budget | `frontend/e2e/budget.spec.ts` | pass |  |
-| TC-414 | E2E-CC-01: Create a new program (top-level charge code) | e2e | E2E — Charge Codes | `frontend/e2e/charge-codes.spec.ts` | pass |  |
-| TC-415 | E2E-CC-02: Create a project under a program (hierarchy + parent selector) | e2e | E2E — Charge Codes | `frontend/e2e/charge-codes.spec.ts` | pass |  |
-| TC-416 | E2E-CC-03: Project without parent fails (NEGATIVE) | e2e | E2E — Charge Codes | `frontend/e2e/charge-codes.spec.ts` | pass |  |
-| TC-417 | E2E-CC-04: Edit an existing charge code | e2e | E2E — Charge Codes | `frontend/e2e/charge-codes.spec.ts` | pass |  |
-| TC-418 | E2E-CC-05: Search filters the charge code tree | e2e | E2E — Charge Codes | `frontend/e2e/charge-codes.spec.ts` | fail | Data-dependent: no "Digital" charge code in DB |
-| TC-419 | E2E-DASH-01: Dashboard shows real KPI metrics | e2e | E2E — Dashboard | `frontend/e2e/dashboard.spec.ts` | pass |  |
-| TC-420 | E2E-DASH-02: Dashboard navigation works | e2e | E2E — Dashboard | `frontend/e2e/dashboard.spec.ts` | pass |  |
-| TC-421 | E2E-LOGIN-01: Successful login redirects to dashboard | e2e | E2E — Login | `frontend/e2e/login.spec.ts` | pass |  |
-| TC-422 | E2E-LOGIN-02: Invalid credentials show error (NEGATIVE) | e2e | E2E — Login | `frontend/e2e/login.spec.ts` | pass |  |
-| TC-423 | E2E-LOGIN-03: Empty form shows validation | e2e | E2E — Login | `frontend/e2e/login.spec.ts` | pass |  |
-| TC-424 | E2E-RPT-01: Utilization report loads with real data | e2e | E2E — Reports | `frontend/e2e/reports.spec.ts` | pass |  |
-| TC-425 | E2E-RPT-02: Export CSV button works | e2e | E2E — Reports | `frontend/e2e/reports.spec.ts` | pass |  |
-| TC-426 | E2E-TS-01: Create timesheet and add entries | e2e | E2E — Time Entry | `frontend/e2e/time-entry.spec.ts` | pass |  |
-| TC-427 | E2E-TS-02: Submit timesheet for approval | e2e | E2E — Time Entry | `frontend/e2e/time-entry.spec.ts` | pass |  |
-| TC-428 | E2E-TS-03: Submit empty timesheet shows warning (NEGATIVE) | e2e | E2E — Time Entry | `frontend/e2e/time-entry.spec.ts` | pass |  |
-| TC-429 | E2E-TS-04: Week navigation changes the displayed period | e2e | E2E — Time Entry | `frontend/e2e/time-entry.spec.ts` | pass |  |
-| TC-430 | E2E-RBAC-01: Employee sidebar hides admin menu items (nattaya sees limited sidebar) | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
-| TC-431 | E2E-RBAC-02: Admin sidebar shows all items (tachongrak sees all sidebar items) | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
-| TC-432 | E2E-RBAC-03: Charge manager sees Approvals and can create charge codes | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
-| TC-433 | E2E-RBAC-04: PMO can view reports (ploy navigates to reports page) | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
-| TC-434 | E2E-RBAC-05: Employee cannot access admin pages (nattaya blocked from /admin/users) | e2e | E2E — RBAC | `frontend/e2e/rbac.spec.ts` | pass |  |
-| TC-435 | E2E-WF-01: Nattaya fills and submits timesheet as employee | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-436 | E2E-WF-02: Somchai fills and submits timesheet as employee | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-437 | E2E-WF-03: Wichai sees pending timesheets as manager on approvals page | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-438 | E2E-WF-04: Wichai approves a pending timesheet as charge_manager | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-439 | E2E-WF-05: Tachongrak sees manager-approved timesheets as CC Owner | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-440 | E2E-WF-06: Tachongrak approves as CC Owner to lock timesheet | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-441 | E2E-WF-07: Nattaya submits timesheet for previous week (rejection setup) | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-442 | E2E-WF-07: Wichai rejects a timesheet with comment | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-443 | E2E-WF-08: Nattaya sees rejection and resubmits timesheet | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-444 | E2E-WF-09: Budget page shows spending data after approvals | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-445 | E2E-WF-10: Reports show utilization data as PMO | e2e | E2E — Workflow | `frontend/e2e/workflow-approval.spec.ts` | pass |  |
-| TC-446 | TimesheetsService > getAvailablePeriods > should return empty array when user has no timesheets | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass | New test added |
-| TC-447 | TimesheetsService > getAvailablePeriods > should return periodStart values in descending order | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass | New test added |
-| TC-448 | TimesheetsService > getAvailablePeriods > should return single period when user has one timesheet | unit | Backend — Timesheets | `backend/src/timesheets/timesheets.service.spec.ts` | pass | New test added |
-| TC-449 | TeamsBotService > parseTimeEntry > should parse "Log 4h on PRJ-042 today" | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-450 | TeamsBotService > parseTimeEntry > should parse fractional hours | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-451 | TeamsBotService > parseTimeEntry > should parse "Logged 2h code review ACT-010 yesterday" | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-452 | TeamsBotService > parseTimeEntry > should use yesterday date when "yesterday" keyword present | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-453 | TeamsBotService > parseTimeEntry > should use today date when no date keyword | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-454 | TeamsBotService > parseTimeEntry > should parse an explicit ISO date | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-455 | TeamsBotService > parseTimeEntry > should extract description after charge code | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-456 | TeamsBotService > parseTimeEntry > should extract description before charge code | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-457 | TeamsBotService > parseTimeEntry > should return null when no hours pattern is found | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
-| TC-458 | TeamsBotService > parseTimeEntry > should return null when hours is 0 | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
-| TC-459 | TeamsBotService > parseTimeEntry > should return null when hours exceed 24 | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
-| TC-460 | TeamsBotService > parseTimeEntry > should return null when no charge code pattern is found | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
-| TC-461 | TeamsBotService > parseTimeEntry > should handle charge codes with underscores | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-462 | TeamsBotService > parseTimeEntry > should parse Add 8h on TSK-001 2026-03-15 | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-463 | TeamsBotService > getSuggestedPrompts > should return a non-empty array of prompt strings | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-464 | TeamsBotService > handleIncomingMessage > should return help message when command is unrecognized | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-465 | TeamsBotService > handleIncomingMessage > should return help for empty string | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-466 | TeamsBotService > handleIncomingMessage log time > should log time successfully for a valid command | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-467 | TeamsBotService > handleIncomingMessage log time > should return error message when charge code is not found | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-468 | TeamsBotService > handleIncomingMessage log time > should return parse error message for invalid format | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
-| TC-469 | TeamsBotService > handleIncomingMessage log time > should preserve existing entries when adding a new one | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-470 | TeamsBotService > handleIncomingMessage log time > should return message with suggestedActions after logging | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-471 | TeamsBotService > handleIncomingMessage budget status > should return budget card when charge code is found | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-472 | TeamsBotService > handleIncomingMessage budget status > should include forecast line when present | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-473 | TeamsBotService > handleIncomingMessage budget status > should return error when no charge code in query | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
-| TC-474 | TeamsBotService > handleIncomingMessage budget status > should return error when budgets service throws | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
-| TC-475 | TeamsBotService > handleIncomingMessage budget status > should route budget how query to handler | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-476 | TeamsBotService > handleIncomingMessage show timesheet > should return no timesheet message when none exists | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-477 | TeamsBotService > handleIncomingMessage show timesheet > should return card with timesheet summary | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-478 | TeamsBotService > handleIncomingMessage show timesheet > should handle timesheet with no entries gracefully | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | Edge case |
-| TC-479 | TeamsBotService > handleIncomingMessage show timesheet > should route my timesheet to handler | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-480 | TeamsBotService > handleIncomingMessage hours today > should return no-hours when no timesheet exists | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-481 | TeamsBotService > handleIncomingMessage hours today > should return no-hours when no entries for today | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-482 | TeamsBotService > handleIncomingMessage hours today > should return total hours logged today | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-483 | TeamsBotService > handleIncomingMessage hours today > should route hours did i log to handler | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-484 | TeamsBotService > handleIncomingMessage charge codes > should return no-codes message | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-485 | TeamsBotService > handleIncomingMessage charge codes > should return card with charge code list | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-486 | TeamsBotService > handleIncomingMessage charge codes > should include suggestedActions | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-487 | TeamsBotService > handleIncomingMessage charge codes > should route my charge codes to handler | unit | Backend — Teams Bot | backend/src/integrations/teams-bot.service.spec.ts | pass | |
-| TC-488 | IntegrationNotificationService > getNotifications > should return empty array initially | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-489 | IntegrationNotificationService > clearNotifications > should clear notifications | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-490 | IntegrationNotificationService > sendTimesheetReminders > should send reminders when hours behind | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-491 | IntegrationNotificationService > sendTimesheetReminders > should not send reminder when on track | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-492 | IntegrationNotificationService > sendTimesheetReminders > should skip submitted/approved timesheets | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-493 | IntegrationNotificationService > sendTimesheetReminders > should still remind rejected timesheets | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-494 | IntegrationNotificationService > sendTimesheetReminders > should return empty when all on track | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-495 | IntegrationNotificationService > sendTimesheetReminders > should return empty when no users exist | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
-| TC-496 | IntegrationNotificationService > sendTimesheetReminders > should compute expected hours: daysPassed * 8 | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-497 | IntegrationNotificationService > sendTimesheetReminders > should include notifications in getNotifications() | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-498 | IntegrationNotificationService > sendApprovalReminders > should send reminder to manager | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-499 | IntegrationNotificationService > sendApprovalReminders > should send separate notifications to different managers | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-500 | IntegrationNotificationService > sendApprovalReminders > should skip timesheets with no managerId | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
-| TC-501 | IntegrationNotificationService > sendApprovalReminders > should return empty when no pending | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-502 | IntegrationNotificationService > sendApprovalReminders > should skip manager if profile not found | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
-| TC-503 | IntegrationNotificationService > sendApprovalReminders > should include pending count in subject | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-504 | IntegrationNotificationService > sendManagerSummary > should send weekly summary to manager | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-505 | IntegrationNotificationService > sendManagerSummary > should correctly count completed/pending/not-submitted | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-506 | IntegrationNotificationService > sendManagerSummary > should handle all reports completed | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
-| TC-507 | IntegrationNotificationService > sendManagerSummary > should handle all reports not submitted | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
-| TC-508 | IntegrationNotificationService > sendManagerSummary > should skip manager with no direct reports | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-509 | IntegrationNotificationService > sendManagerSummary > should return empty when no managers exist | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-510 | IntegrationNotificationService > sendManagerSummary > should include employee names and statuses | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-511 | IntegrationNotificationService > sendWeeklyInsights > should send insights to pmo/finance/admin | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-512 | IntegrationNotificationService > sendWeeklyInsights > should calculate chargeability rate correctly | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-513 | IntegrationNotificationService > sendWeeklyInsights > should report 0% chargeability when total=0 | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
-| TC-514 | IntegrationNotificationService > sendWeeklyInsights > should list budget overruns | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-515 | IntegrationNotificationService > sendWeeklyInsights > should report 0 overruns when all under budget | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-516 | IntegrationNotificationService > sendWeeklyInsights > should return empty when no recipients | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | Edge case |
-| TC-517 | IntegrationNotificationService > sendWeeklyInsights > should include total and billable hours in body | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-518 | IntegrationNotificationService > sendWeeklyInsights > should include week date range in subject | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-519 | IntegrationNotificationService > sendAllNotifications > should return counts for all 4 types | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-520 | IntegrationNotificationService > notification ID sequencing > should start at notif-1 | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-521 | IntegrationNotificationService > notification ID sequencing > should increment IDs across calls | unit | Backend — Notifications | backend/src/integrations/notification.service.spec.ts | pass | |
-| TC-522 | E2E-ACC-01: charge_manager can see assigned charge codes via API | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
-| TC-523 | E2E-ACC-02: charge_manager CAN create charge codes (role is authorized) | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | Confirms RBAC permits charge_manager to POST /charge-codes |
-| TC-524 | E2E-ACC-03 (NEGATIVE): Employee role cannot create charge codes | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
-| TC-525 | E2E-ACC-04: Admin can view full charge code tree | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
-| TC-526 | E2E-ACC-05: Admin can access financial-impact report | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
-| TC-527 | E2E-ACC-06 (NEGATIVE): Verifies financial-impact endpoint structure for admin role | e2e | E2E — Access Control | frontend/e2e/cc-access-control.spec.ts | pass | |
-| TC-528 | E2E-DESC-01: Note dialog opens text is typed and saved to entry | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | pass | |
-| TC-529 | E2E-DESC-02 (NEGATIVE): Cancel discards unsaved note text | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | pass | |
-| TC-530 | E2E-MIN-01: Submit blocked when weekday < 8hrs warning shown | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | pass | |
-| TC-531 | E2E-MIN-02 (NEGATIVE): Submit with partial hours keeps page on time-entry | e2e | E2E — Time Entry | frontend/e2e/description-and-minhrs.spec.ts | pass | |
-| TC-532 | E2E-PL-01: P/L section displays stat cards and team table on reports page | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
-| TC-533 | E2E-PL-02: Chargeability alerts visible in alert table | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
-| TC-534 | E2E-PL-03 (NEGATIVE): Reports page not accessible to employee role | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
-| TC-535 | E2E-PL-04: Period filter changes financial data query | e2e | E2E — Reports | frontend/e2e/financial-pl.spec.ts | pass | |
-| TC-536 | NotificationBell > UNIT-BELL-01 > should render the bell button with aria-label | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-537 | NotificationBell > UNIT-BELL-01 > should render the bell icon SVG | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-538 | NotificationBell > UNIT-BELL-02 > should show badge with total count of budget + chargeability alerts | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-539 | NotificationBell > UNIT-BELL-02 > should show badge count equal to budget alerts only when no chargeability alerts | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-540 | NotificationBell > UNIT-BELL-03 > should not render badge when both alert arrays are empty | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-541 | NotificationBell > UNIT-BELL-04 > should open popover when bell button is clicked | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-542 | NotificationBell > UNIT-BELL-04 > should close popover when bell button is clicked again | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-543 | NotificationBell > UNIT-BELL-05 > should show alert names inside popover after opening | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-544 | NotificationBell > UNIT-BELL-05 > should show severity dot elements for alerts | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-545 | NotificationBell > UNIT-BELL-05 > should show No alerts message when popover opens with empty data | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-546 | NotificationBell > UNIT-BELL-05 > should limit displayed alerts to top 5 sorted by severity | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-547 | NotificationBell > UNIT-BELL-06 > should render View all alerts link when alerts exist | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-548 | NotificationBell > UNIT-BELL-06 > should NOT render View all alerts when no alerts exist | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-549 | NotificationBell > UNIT-BELL-06 > should call router.push /reports when View all alerts is clicked | unit | Components — NotificationBell | `frontend/src/components/layout/NotificationBell.test.tsx` | pass |  |
-| TC-550 | FinancialPL > UNIT-PL-TAB-01 > should render P/L Summary tab trigger | unit | Components — FinancialPL | `frontend/src/components/reports/FinancialPL.test.tsx` | pass |  |
-| TC-551 | FinancialPL > UNIT-PL-TAB-01 > should render Alerts tab trigger | unit | Components — FinancialPL | `frontend/src/components/reports/FinancialPL.test.tsx` | pass |  |
-| TC-552 | FinancialPL > UNIT-PL-TAB-02 > should show stat cards when default P/L Summary tab is active | unit | Components — FinancialPL | `frontend/src/components/reports/FinancialPL.test.tsx` | pass |  |
-| TC-553 | FinancialPL > UNIT-PL-TAB-03 > should show Alerts heading when Alerts tab is clicked | unit | Components — FinancialPL | `frontend/src/components/reports/FinancialPL.test.tsx` | pass |  |
-| TC-554 | FinancialPL > UNIT-PL-TAB-03 > should show alert name in AlertList when Alerts tab is active | unit | Components — FinancialPL | `frontend/src/components/reports/FinancialPL.test.tsx` | pass |  |
-| TC-555 | FinancialPL > UNIT-PL-TAB-04 > should show count in Alerts tab label when budget alerts are provided | unit | Components — FinancialPL | `frontend/src/components/reports/FinancialPL.test.tsx` | pass |  |
-| TC-556 | FinancialPL > UNIT-PL-TAB-04 > should show Alerts without count when no alerts are provided | unit | Components — FinancialPL | `frontend/src/components/reports/FinancialPL.test.tsx` | pass |  |
-| TC-557 | E2E-RPT-CON-01: Reports page shows consolidated layout with tabs | e2e | E2E — Reports Consolidated | `frontend/e2e/reports-consolidated.spec.ts` | pass |  |
-| TC-558 | E2E-RPT-CON-02 (NEGATIVE): Old standalone Alerts section no longer exists | e2e | E2E — Reports Consolidated | `frontend/e2e/reports-consolidated.spec.ts` | pass |  |
-| TC-559 | E2E-BELL-01: Notification bell shows badge when alerts exist and navigates to /reports | e2e | E2E — NotificationBell | `frontend/e2e/reports-consolidated.spec.ts` | pass |  |
-| TC-560 | E2E-BELL-02 (NEGATIVE): Bell popover closes when clicking outside | e2e | E2E — NotificationBell | `frontend/e2e/reports-consolidated.spec.ts` | pass |  |
-| TC-561 | UNIT-NOTIF-01: create() inserts a notification and returns it | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-562 | UNIT-NOTIF-01b: create returns notification with correct fields | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-563 | UNIT-NOTIF-02: findByUser() returns notifications filtered by recipientId | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-564 | UNIT-NOTIF-02b: findByUser() respects limit and offset options | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-565 | UNIT-NOTIF-02c: findByUser() returns empty array when user has no notifications | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-566 | UNIT-NOTIF-03: findByUser() with unreadOnly=true filters to isRead=false only | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-567 | UNIT-NOTIF-04: getUnreadCount() returns correct count | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-568 | UNIT-NOTIF-04b: getUnreadCount() returns 0 when no unread notifications | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-569 | UNIT-NOTIF-04c: getUnreadCount() returns 0 when result is empty | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-570 | UNIT-NOTIF-05: markAsRead() updates isRead and readAt | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-571 | UNIT-NOTIF-05b: markAsRead() throws NotFoundException if not found | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-572 | UNIT-NOTIF-05c: markAsRead() throws ForbiddenException for another user's notification | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-573 | UNIT-NOTIF-06: markAllAsRead() bulk updates all unread for user | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-574 | UNIT-NOTIF-06b: markAllAsRead() returns success:true even when no notifications exist | unit | Backend — Notifications | `backend/src/notifications/notifications.service.spec.ts` | pass |  |
-| TC-575 | UNIT-CC-AUTH-01: updateAccess() throws ForbiddenException for non-owner charge_manager | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass | AC10 authorization |
-| TC-576 | UNIT-CC-AUTH-02: updateAccess() succeeds when caller is admin regardless of ownership | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass | AC10 authorization |
-| TC-577 | UNIT-CC-AUTH-03: updateAccess() succeeds when caller is the charge code owner | unit | Backend — Charge Codes | `backend/src/charge-codes/charge-codes.service.spec.ts` | pass | AC10 authorization |
-| TC-578 | UNIT-NOTIF-PAGE-01: renders filter tabs (All Reminders Approvals Summaries Insights) | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-579 | UNIT-NOTIF-PAGE-01b: renders tab labels All Reminders Approvals Summaries Insights | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-580 | UNIT-NOTIF-PAGE-01c: renders the page title Notifications | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-581 | UNIT-NOTIF-PAGE-01d: renders tabs list with all five tabs | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-582 | UNIT-NOTIF-PAGE-02: renders tab content areas for all filter values | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-583 | UNIT-NOTIF-PAGE-02b: renders tab content within all tab areas | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-584 | UNIT-NOTIF-PAGE-02c: shows empty state when API rejects (no notifications) | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-585 | UNIT-NOTIF-PAGE-03: renders Mark all as read button in the page actions | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-586 | UNIT-NOTIF-PAGE-03b: Mark all as read button is present as a button element | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-587 | UNIT-NOTIF-PAGE-03c: Mark all as read button calls api.post when clicked if not disabled | unit | Frontend — Notifications Page | `frontend/src/app/(authenticated)/notifications/page.test.tsx` | pass |  |
-| TC-588 | E2E-AC10-01 (NEGATIVE): Non-owner charge_manager cannot modify charge code access | e2e | E2E — AC10 Authorization | `frontend/e2e/notification-system.spec.ts` | pass |  |
-| TC-589 | E2E-NOTIF-01: Notification Center shows triggered notifications | e2e | E2E — Notifications | `frontend/e2e/notification-system.spec.ts` | pass |  |
-| TC-590 | E2E-NOTIF-02: Marking a notification as read removes the teal dot | e2e | E2E — Notifications | `frontend/e2e/notification-system.spec.ts` | pass |  |
-| TC-591 | E2E-NOTIF-02b (NEGATIVE): Mark all as read button results in zero unread count | e2e | E2E — Notifications | `frontend/e2e/notification-system.spec.ts` | pass |  |
+## Backend > Approvals
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-211 | should return empty results when no pending approvals exist | Medium | pass | approvals.service.spec.ts |
+| TC-212 | should return timesheets pending approval | Medium | pass | approvals.service.spec.ts |
+| TC-213 | should throw NotFoundException when timesheet does not exist | Medium | pass | approvals.service.spec.ts |
+| TC-214 | should throw BadRequestException when timesheet is in locked | Medium | pass | approvals.service.spec.ts |
+| TC-215 | should throw ForbiddenException when approver is not the emp | Medium | pass | approvals.service.spec.ts |
+| TC-216 | should transition timesheet from submitted to locked | Medium | fail | approvals.service.spec.ts |
+| TC-217 | should create an audit log entry when approving | Medium | pass | approvals.service.spec.ts |
+| TC-218 | should throw BadRequestException when timesheet is manager_a | Medium | pass | approvals.service.spec.ts |
+| TC-219 | should throw NotFoundException when timesheet does not exist | Medium | pass | approvals.service.spec.ts |
+| TC-220 | should throw BadRequestException when rejecting a locked tim | Medium | pass | approvals.service.spec.ts |
+| TC-221 | should reject a submitted timesheet and set status to reject | Medium | pass | approvals.service.spec.ts |
+| TC-222 | should create audit log with reject action | Medium | pass | approvals.service.spec.ts |
+| TC-223 | should approve multiple timesheets and return results | Medium | pass | approvals.service.spec.ts |
+| TC-224 | should include error entry when individual approval fails | Medium | pass | approvals.service.spec.ts |
+
+## Backend > Auth
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-179 | should allow public routes without a token | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-180 | should throw UnauthorizedException when Authorization header | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-181 | should throw UnauthorizedException when Authorization header | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-182 | should throw UnauthorizedException when JWT verification fai | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-183 | should throw UnauthorizedException when user profile is not  | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-184 | should allow request and attach profile when JWT is valid | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-185 | should allow access when no roles are required | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-186 | should allow access when user has the required role | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-187 | should throw ForbiddenException when user does not have the  | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-188 | should throw ForbiddenException when no user is on the reque | Medium | pass | supabase-auth.guard.spec.ts |
+| TC-189 | should allow access when user role matches one of multiple r | Medium | pass | supabase-auth.guard.spec.ts |
+
+## Backend > Budgets
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-096 | should throw NotFoundException when charge code does not exi | Medium | pass | budgets.service.spec.ts |
+| TC-097 | should return budget with percentage when budget record exis | Medium | pass | budgets.service.spec.ts |
+| TC-098 | should return 0 percentage when budget is 0 | Medium | pass | budgets.service.spec.ts |
+| TC-099 | should return under_budget status when usage is below 80% | Medium | pass | budgets.service.spec.ts |
+| TC-100 | should return warning status when usage is between 80-90% | Medium | pass | budgets.service.spec.ts |
+| TC-101 | should return critical status when usage is between 90-100% | Medium | pass | budgets.service.spec.ts |
+| TC-102 | should return overrun status when usage exceeds 100% | Medium | pass | budgets.service.spec.ts |
+| TC-103 | should throw NotFoundException when charge code does not exi | Medium | pass | budgets.service.spec.ts |
+| TC-104 | should return null forecast when charge code has no dates | Medium | pass | budgets.service.spec.ts |
+| TC-105 | should calculate forecast at completion when dates are prese | Medium | pass | budgets.service.spec.ts |
+| TC-106 | should return empty array when no charge codes are over thre | Medium | pass | budgets.service.spec.ts |
+| TC-107 | should return yellow alert at 81% usage | Medium | pass | budgets.service.spec.ts |
+| TC-108 | should return orange alert at 91% usage | Medium | pass | budgets.service.spec.ts |
+| TC-109 | should return red alert at 101% usage | Medium | pass | budgets.service.spec.ts |
+| TC-110 | should sort alerts: red first, then orange, then yellow | Medium | pass | budgets.service.spec.ts |
+| TC-111 | should return zero summary when no budget records exist | Medium | pass | budgets.service.spec.ts |
+| TC-112 | should correctly count over-budget charge codes | Medium | pass | budgets.service.spec.ts |
+
+## Backend > Calendar
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-225 | should insert weekend entries for a given year | Medium | pass | calendar.service.spec.ts |
+| TC-226 | should only insert weekend dates (count matches expected wee | Medium | pass | calendar.service.spec.ts |
+| TC-227 | should create a new holiday entry when date does not exist | Medium | pass | calendar.service.spec.ts |
+| TC-228 | should update existing entry to be a holiday when date alrea | Medium | pass | calendar.service.spec.ts |
+| TC-229 | should throw NotFoundException when holiday does not exist | Medium | pass | calendar.service.spec.ts |
+| TC-230 | should throw NotFoundException when entry exists but is not  | Medium | pass | calendar.service.spec.ts |
+| TC-231 | should update holiday name successfully | Medium | pass | calendar.service.spec.ts |
+| TC-232 | should throw NotFoundException when holiday does not exist | Medium | pass | calendar.service.spec.ts |
+| TC-233 | should clear holiday fields (not delete) when entry is also  | Medium | pass | calendar.service.spec.ts |
+| TC-234 | should delete the entry entirely when it is only a holiday | Medium | pass | calendar.service.spec.ts |
+| TC-235 | should count working days excluding weekends and holidays | Medium | pass | calendar.service.spec.ts |
+| TC-236 | should subtract vacation days when userId is provided | Medium | pass | calendar.service.spec.ts |
+| TC-237 | should throw BadRequestException when end date is before sta | Medium | pass | calendar.service.spec.ts |
+| TC-238 | should create a vacation request successfully | Medium | pass | calendar.service.spec.ts |
+| TC-239 | should throw NotFoundException when vacation does not exist | Medium | pass | calendar.service.spec.ts |
+| TC-240 | should throw BadRequestException when vacation is not pendin | Medium | pass | calendar.service.spec.ts |
+| TC-241 | should throw ForbiddenException when approver is not the man | Medium | pass | calendar.service.spec.ts |
+| TC-242 | should approve a pending vacation successfully | Medium | pass | calendar.service.spec.ts |
+
+## Backend > Charge Codes
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-049 | should create a program-level charge code with auto-generate | Medium | pass | charge-codes.service.spec.ts |
+| TC-050 | should auto-generate sequential IDs (PRG-002 after PRG-001) | Medium | pass | charge-codes.service.spec.ts |
+| TC-051 | should create a project with PRJ- prefix under a program par | Medium | pass | charge-codes.service.spec.ts |
+| TC-052 | should throw BadRequestException when program has a parentId | Medium | pass | charge-codes.service.spec.ts |
+| TC-053 | should throw BadRequestException when project has no parentI | Medium | pass | charge-codes.service.spec.ts |
+| TC-054 | should throw BadRequestException when project parent is not  | Medium | pass | charge-codes.service.spec.ts |
+| TC-055 | should build materialized path from parent | Medium | pass | charge-codes.service.spec.ts |
+| TC-056 | should throw NotFoundException when charge code does not exi | Medium | pass | charge-codes.service.spec.ts |
+| TC-057 | should return charge code with assigned users | Medium | pass | charge-codes.service.spec.ts |
+| TC-058 | should return direct children of a charge code | Medium | pass | charge-codes.service.spec.ts |
+| TC-059 | should return empty array for leaf nodes | Medium | pass | charge-codes.service.spec.ts |
+| TC-060 | should throw NotFoundException when charge code does not exi | Medium | pass | charge-codes.service.spec.ts |
+| TC-061 | should add users to a charge code and cascade to descendants | Medium | fail | charge-codes.service.spec.ts |
+| TC-062 | should remove users from a charge code and cascade to descen | Medium | fail | charge-codes.service.spec.ts |
+| TC-063 | UNIT-CC-AUTH-01: should throw ForbiddenException when caller | Medium | pass | charge-codes.service.spec.ts |
+| TC-064 | UNIT-CC-AUTH-02: should succeed when caller is admin (regard | Medium | fail | charge-codes.service.spec.ts |
+| TC-065 | UNIT-CC-AUTH-03: should succeed when caller is the charge co | Medium | fail | charge-codes.service.spec.ts |
+
+## Backend > Charge Codes CR1
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-113 | should throw NotFoundException when charge code does not exi | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-114 | should return budget structure with team and person breakdow | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-115 | should calculate percentage correctly | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-116 | should group entries by department for team breakdown | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-117 | should sort team and person breakdowns by hours descending | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-118 | should handle charge code with no budget record (shows zeros | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-119 | should throw NotFoundException when charge code does not exi | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-120 | should throw ForbiddenException when caller is not owner/app | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-121 | should succeed when caller is the owner | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-122 | should succeed when caller is admin (not owner) | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-123 | should include all descendants in affected count | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-124 | should throw NotFoundException when charge code does not exi | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-125 | should throw BadRequestException when user already has acces | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-126 | should throw BadRequestException when pending request alread | Medium | pass | charge-codes-cr1.service.spec.ts |
+| TC-127 | should create and return new request when validation passes | Medium | pass | charge-codes-cr1.service.spec.ts |
+
+## Backend > Cost Rates
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-202 | should return all cost rates ordered by jobGrade and effecti | Medium | pass | cost-rates.service.spec.ts |
+| TC-203 | should return empty array when no cost rates exist | Medium | pass | cost-rates.service.spec.ts |
+| TC-204 | should create a new cost rate and return it | Medium | pass | cost-rates.service.spec.ts |
+| TC-205 | should create cost rate with effectiveTo date when provided | Medium | pass | cost-rates.service.spec.ts |
+| TC-206 | should update an existing cost rate and return it | Medium | pass | cost-rates.service.spec.ts |
+| TC-207 | should throw NotFoundException when cost rate does not exist | Medium | pass | cost-rates.service.spec.ts |
+| TC-208 | should allow partial updates (only jobGrade) | Medium | pass | cost-rates.service.spec.ts |
+| TC-209 | should delete a cost rate and return { deleted: true } | Medium | pass | cost-rates.service.spec.ts |
+| TC-210 | should throw NotFoundException when cost rate does not exist | Medium | pass | cost-rates.service.spec.ts |
+
+## Backend > Dashboard
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-190 | should return empty months array and 0 ytdChargeability when | Medium | pass | dashboard.service.spec.ts |
+| TC-191 | should calculate ytdChargeability as billable / total hours  | Medium | pass | dashboard.service.spec.ts |
+| TC-192 | should return 0 chargeability for months with no hours | Medium | pass | dashboard.service.spec.ts |
+| TC-193 | should fill all months from Jan to current month | Medium | pass | dashboard.service.spec.ts |
+| TC-194 | should round chargeability to nearest integer | Medium | pass | dashboard.service.spec.ts |
+| TC-195 | should aggregate billable and non-billable hours by month | Medium | pass | dashboard.service.spec.ts |
+| TC-196 | should return empty arrays when no entries | Medium | pass | dashboard.service.spec.ts |
+| TC-197 | should group entries by root program from path | Medium | pass | dashboard.service.spec.ts |
+| TC-198 | should calculate percentage from total hours | Medium | pass | dashboard.service.spec.ts |
+| TC-199 | should sort programs by hours descending | Medium | pass | dashboard.service.spec.ts |
+| TC-200 | should use ccName as fallback when programName is null | Medium | pass | dashboard.service.spec.ts |
+| TC-201 | should return both currentPeriod and ytd data independently | Medium | pass | dashboard.service.spec.ts |
+
+## Backend > Notifications
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-001 | UNIT-NOTIF-01: should insert a notification and return it | Medium | pass | notifications.service.spec.ts |
+| TC-002 | UNIT-NOTIF-01b: should return the inserted notification obje | Medium | pass | notifications.service.spec.ts |
+| TC-003 | UNIT-NOTIF-02: should return notifications filtered by recip | Medium | pass | notifications.service.spec.ts |
+| TC-004 | UNIT-NOTIF-03: findByUser with unreadOnly=true filters to is | Medium | pass | notifications.service.spec.ts |
+| TC-005 | UNIT-NOTIF-02b: should respect limit and offset options | Medium | pass | notifications.service.spec.ts |
+| TC-006 | UNIT-NOTIF-02c: should return empty array when user has no n | Medium | pass | notifications.service.spec.ts |
+| TC-007 | UNIT-NOTIF-04: should return correct unread count | Medium | pass | notifications.service.spec.ts |
+| TC-008 | UNIT-NOTIF-04b: should return count 0 when no unread notific | Medium | pass | notifications.service.spec.ts |
+| TC-009 | UNIT-NOTIF-04c: should return 0 when result is empty (no row | Medium | pass | notifications.service.spec.ts |
+| TC-010 | UNIT-NOTIF-05: should update isRead and readAt when notifica | Medium | pass | notifications.service.spec.ts |
+| TC-011 | UNIT-NOTIF-05b: should throw NotFoundException when notifica | Medium | pass | notifications.service.spec.ts |
+| TC-012 | UNIT-NOTIF-05c: should throw ForbiddenException when notific | Medium | pass | notifications.service.spec.ts |
+| TC-013 | UNIT-NOTIF-06: should bulk update all unread notifications f | Medium | pass | notifications.service.spec.ts |
+| TC-014 | UNIT-NOTIF-06b: should return success:true even when no noti | Medium | pass | notifications.service.spec.ts |
+| TC-015 | should return empty array initially | Medium | pass | notification.service.spec.ts |
+| TC-016 | should clear notifications | Medium | pass | notification.service.spec.ts |
+| TC-017 | should send reminders to users who have logged fewer hours t | Medium | pass | notification.service.spec.ts |
+| TC-018 | should not send reminder to users with no hours shortfall | Medium | pass | notification.service.spec.ts |
+| TC-019 | should skip users whose timesheet is already submitted or ap | Medium | pass | notification.service.spec.ts |
+| TC-020 | should still send reminder to users with rejected timesheets | Medium | pass | notification.service.spec.ts |
+| TC-021 | should return empty array when all users are on track | Medium | pass | notification.service.spec.ts |
+| TC-022 | should return empty array when no users exist | Medium | pass | notification.service.spec.ts |
+| TC-023 | should compute expected hours correctly: daysPassed * 8 | Medium | pass | notification.service.spec.ts |
+| TC-024 | should include notifications in getNotifications() after sen | Medium | pass | notification.service.spec.ts |
+| TC-025 | should send reminder to manager with pending timesheets | Medium | pass | notification.service.spec.ts |
+| TC-026 | should send separate notifications to different managers | Medium | pass | notification.service.spec.ts |
+| TC-027 | should skip timesheets with no managerId | Medium | pass | notification.service.spec.ts |
+| TC-028 | should return empty array when no timesheets are pending | Medium | pass | notification.service.spec.ts |
+| TC-029 | should skip manager if their profile is not found in DB | Medium | pass | notification.service.spec.ts |
+| TC-030 | should include pending count in subject line | Medium | pass | notification.service.spec.ts |
+| TC-031 | should send weekly summary to manager | Medium | pass | notification.service.spec.ts |
+| TC-032 | should correctly count completed, pending and not-submitted | Medium | pass | notification.service.spec.ts |
+| TC-033 | should handle all reports completed | Medium | pass | notification.service.spec.ts |
+| TC-034 | should handle all reports not submitted | Medium | pass | notification.service.spec.ts |
+| TC-035 | should skip manager when they have no direct reports | Medium | pass | notification.service.spec.ts |
+| TC-036 | should return empty array when no managers exist | Medium | pass | notification.service.spec.ts |
+| TC-037 | should include employee names and statuses in the detail sec | Medium | pass | notification.service.spec.ts |
+| TC-038 | should send weekly insights to pmo, finance and admin users | Medium | pass | notification.service.spec.ts |
+| TC-039 | should calculate chargeability rate correctly | Medium | pass | notification.service.spec.ts |
+| TC-040 | should report 0% chargeability when total hours is 0 | Medium | pass | notification.service.spec.ts |
+| TC-041 | should list budget overruns when actualSpent > budgetAmount | Medium | pass | notification.service.spec.ts |
+| TC-042 | should report 0 overruns when all budgets are under limit | Medium | pass | notification.service.spec.ts |
+| TC-043 | should return empty array when no recipients found | Medium | pass | notification.service.spec.ts |
+| TC-044 | should include total and billable hours in the body | Medium | pass | notification.service.spec.ts |
+| TC-045 | should include the week date range in the subject | Medium | pass | notification.service.spec.ts |
+| TC-046 | should return counts for all four notification types | Medium | pass | notification.service.spec.ts |
+| TC-047 | should generate sequential IDs starting at notif-1 | Medium | pass | notification.service.spec.ts |
+| TC-048 | should increment notification IDs across calls | Medium | pass | notification.service.spec.ts |
+
+## Backend > Reports
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-259 | should return empty report when charge code does not exist | Medium | fail | reports.service.spec.ts |
+| TC-260 | should return report with budget and actuals | Medium | fail | reports.service.spec.ts |
+| TC-261 | should include child breakdown in report | Medium | fail | reports.service.spec.ts |
+| TC-262 | should return zero chargeability when no hours logged | Medium | fail | reports.service.spec.ts |
+| TC-263 | should calculate chargeability correctly (billable/total) | Medium | fail | reports.service.spec.ts |
+| TC-264 | should have 80% target chargeability | Medium | fail | reports.service.spec.ts |
+| TC-265 | should return empty distribution when no entries exist | Medium | fail | reports.service.spec.ts |
+| TC-266 | should calculate percentage for each category | Medium | fail | reports.service.spec.ts |
+| TC-267 | should sort distribution by hours descending | Medium | fail | reports.service.spec.ts |
+| TC-268 | should fallback to 22 working days when calendar has no data | Medium | fail | reports.service.spec.ts |
+| TC-269 | should calculate utilization rate per employee | Medium | fail | reports.service.spec.ts |
+| TC-270 | should return formatted budget alerts with overrunAmount cal | Medium | fail | reports.service.spec.ts |
+| TC-271 | should pass through severity values from budgets service (re | Medium | fail | reports.service.spec.ts |
+| TC-272 | should calculate overrunPercent as percentage over budget | Medium | fail | reports.service.spec.ts |
+| TC-273 | should return zero overrunAmount when actual is less than bu | Medium | fail | reports.service.spec.ts |
+
+## Backend > Settings
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-243 | should return all settings as a key-value record | Medium | pass | settings.service.spec.ts |
+| TC-244 | should return empty record when no settings exist | Medium | pass | settings.service.spec.ts |
+| TC-245 | should return value for an existing key | Medium | pass | settings.service.spec.ts |
+| TC-246 | should return THB as default when default_currency key is no | Medium | pass | settings.service.spec.ts |
+| TC-247 | should return empty string for unknown keys not found | Medium | pass | settings.service.spec.ts |
+| TC-248 | should upsert a setting and return key-value | Medium | pass | settings.service.spec.ts |
+
+## Backend > Teams Bot
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-140 | should parse "Log 4h on PRJ-042 today" | Medium | pass | teams-bot.service.spec.ts |
+| TC-141 | should parse fractional hours "Log 2.5h on ACT-010 today" | Medium | pass | teams-bot.service.spec.ts |
+| TC-142 | should parse "Logged 2h code review ACT-010 yesterday" | Medium | pass | teams-bot.service.spec.ts |
+| TC-143 | should use yesterday date when "yesterday" keyword present | Medium | pass | teams-bot.service.spec.ts |
+| TC-144 | should use today date when no date keyword and no ISO date | Medium | pass | teams-bot.service.spec.ts |
+| TC-145 | should parse an explicit ISO date "Add 3.5h PRJ-042 2026-03- | Medium | pass | teams-bot.service.spec.ts |
+| TC-146 | should extract description after charge code | Medium | pass | teams-bot.service.spec.ts |
+| TC-147 | should extract description before charge code (e.g. "Logged  | Medium | pass | teams-bot.service.spec.ts |
+| TC-148 | should return null when no hours pattern is found | Medium | pass | teams-bot.service.spec.ts |
+| TC-149 | should return null when hours is 0 | Medium | pass | teams-bot.service.spec.ts |
+| TC-150 | should return null when hours exceed 24 | Medium | pass | teams-bot.service.spec.ts |
+| TC-151 | should return null when no charge code pattern is found | Medium | pass | teams-bot.service.spec.ts |
+| TC-152 | should handle charge codes with underscores "PRJ_042" | Medium | pass | teams-bot.service.spec.ts |
+| TC-153 | should parse "Add 8h on TSK-001 2026-03-15" | Medium | pass | teams-bot.service.spec.ts |
+| TC-154 | should return a non-empty array of prompt strings | Medium | pass | teams-bot.service.spec.ts |
+| TC-155 | should return help message when command is unrecognized | Medium | pass | teams-bot.service.spec.ts |
+| TC-156 | should return help for empty string | Medium | pass | teams-bot.service.spec.ts |
+| TC-157 | should log time successfully for a valid command | Medium | fail | teams-bot.service.spec.ts |
+| TC-158 | should return error message when charge code is not found in | Medium | pass | teams-bot.service.spec.ts |
+| TC-159 | should return parse error message for invalid format | Medium | pass | teams-bot.service.spec.ts |
+| TC-160 | should preserve existing entries when adding a new one | Medium | fail | teams-bot.service.spec.ts |
+| TC-161 | should return a message type response with suggestedActions  | Medium | fail | teams-bot.service.spec.ts |
+| TC-162 | should return budget card when charge code is found | Medium | pass | teams-bot.service.spec.ts |
+| TC-163 | should include forecast line when forecastAtCompletion is pr | Medium | pass | teams-bot.service.spec.ts |
+| TC-164 | should return error message when no charge code is in the qu | Medium | pass | teams-bot.service.spec.ts |
+| TC-165 | should return error when budgets service throws | Medium | pass | teams-bot.service.spec.ts |
+| TC-166 | should route "How is budget for PRJ-042?" to budget handler | Medium | pass | teams-bot.service.spec.ts |
+| TC-167 | should return "no timesheet" message when none exists for th | Medium | pass | teams-bot.service.spec.ts |
+| TC-168 | should return a card with timesheet summary when timesheet e | Medium | pass | teams-bot.service.spec.ts |
+| TC-169 | should handle timesheet with no entries gracefully | Medium | pass | teams-bot.service.spec.ts |
+| TC-170 | should route "my timesheet" to timesheet handler | Medium | pass | teams-bot.service.spec.ts |
+| TC-171 | should return no-hours message when no timesheet exists | Medium | pass | teams-bot.service.spec.ts |
+| TC-172 | should return no-hours message when timesheet exists but no  | Medium | pass | teams-bot.service.spec.ts |
+| TC-173 | should return total hours logged today | Medium | pass | teams-bot.service.spec.ts |
+| TC-174 | should route "hours did i log" to hours today handler | Medium | pass | teams-bot.service.spec.ts |
+| TC-175 | should return no-codes message when user has no assigned cha | Medium | pass | teams-bot.service.spec.ts |
+| TC-176 | should return card with charge code list when user has codes | Medium | pass | teams-bot.service.spec.ts |
+| TC-177 | should include suggestedActions in charge codes response | Medium | pass | teams-bot.service.spec.ts |
+| TC-178 | should route "my charge codes" to charge codes handler | Medium | pass | teams-bot.service.spec.ts |
+
+## Backend > Timesheets
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-066 | should return an empty array when user has no timesheets | Medium | pass | timesheets.service.spec.ts |
+| TC-067 | should return periodStart values in descending order | Medium | pass | timesheets.service.spec.ts |
+| TC-068 | should return a single period when user has one timesheet | Medium | pass | timesheets.service.spec.ts |
+| TC-069 | should normalize a Wednesday to its Monday start | Medium | fail | timesheets.service.spec.ts |
+| TC-070 | should return existing timesheet if one already exists for t | Medium | pass | timesheets.service.spec.ts |
+| TC-071 | should return null when no timesheet exists for the period | Medium | pass | timesheets.service.spec.ts |
+| TC-072 | should return the timesheet when it exists | Medium | pass | timesheets.service.spec.ts |
+| TC-073 | should throw NotFoundException when timesheet does not exist | Medium | pass | timesheets.service.spec.ts |
+| TC-074 | should return timesheet with entries when it exists | Medium | pass | timesheets.service.spec.ts |
+| TC-075 | should throw NotFoundException when timesheet does not exist | Medium | pass | timesheets.service.spec.ts |
+| TC-076 | should throw ForbiddenException when timesheet status is sub | Medium | fail | timesheets.service.spec.ts |
+| TC-077 | should throw ForbiddenException when timesheet status is loc | Medium | pass | timesheets.service.spec.ts |
+| TC-078 | should allow editing when status is draft | Medium | fail | timesheets.service.spec.ts |
+| TC-079 | should allow editing when status is rejected | Medium | fail | timesheets.service.spec.ts |
+| TC-080 | should validate that charge codes are assigned to the user | Medium | pass | timesheets.service.spec.ts |
+| TC-081 | should filter out entries with 0 hours | Medium | fail | timesheets.service.spec.ts |
+| TC-082 | should throw NotFoundException when timesheet does not exist | Medium | pass | timesheets.service.spec.ts |
+| TC-083 | should throw BadRequestException when status is already subm | Medium | fail | timesheets.service.spec.ts |
+| TC-084 | should throw BadRequestException when status is locked | Medium | pass | timesheets.service.spec.ts |
+| TC-085 | should transition draft timesheet to submitted when min hour | Medium | fail | timesheets.service.spec.ts |
+| TC-086 | should allow resubmitting a rejected timesheet | Medium | fail | timesheets.service.spec.ts |
+| TC-087 | should throw BadRequestException when weekday has less than  | Medium | fail | timesheets.service.spec.ts |
+| TC-088 | should pass when all weekdays have 8+ hours | Medium | pass | timesheets.service.spec.ts |
+| TC-089 | should throw when a weekday has less than 8 hours | Medium | pass | timesheets.service.spec.ts |
+| TC-090 | should exclude holidays from validation | Medium | pass | timesheets.service.spec.ts |
+| TC-091 | should exclude weekends from validation even without calenda | Medium | pass | timesheets.service.spec.ts |
+| TC-092 | should pass when exactly 8 hours logged on weekday | Medium | pass | timesheets.service.spec.ts |
+| TC-093 | should report all short days not just the first one | Medium | pass | timesheets.service.spec.ts |
+| TC-094 | should pass when no entries at all (days without entries are | Medium | pass | timesheets.service.spec.ts |
+| TC-095 | should skip approved vacation days during validation | Medium | pass | timesheets.service.spec.ts |
+
+## Backend > Timesheets CR1
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-128 | should throw NotFoundException when timesheet does not exist | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-129 | should throw BadRequestException when timesheet is not draft | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-130 | should throw BadRequestException when timesheet already has  | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-131 | should throw NotFoundException when no previous timesheet ex | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-132 | should return empty entries message when previous timesheet  | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-133 | should copy charge codes from previous period and return suc | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-134 | should silently drop entries on full-day vacation days | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-135 | should allow entries on half-day vacation days (hours <= 4) | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-136 | should not allow editing LEAVE-001 entries (system managed) | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-137 | should allow 4h on half-day vacation day when combined with  | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-138 | should fail when half-day vacation day has only 2h work (req | Medium | pass | timesheets-cr1.service.spec.ts |
+| TC-139 | should skip full-day vacation days entirely (no hours requir | Medium | pass | timesheets-cr1.service.spec.ts |
+
+## Backend > Users
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-249 | should return all user profiles | Medium | pass | users.service.spec.ts |
+| TC-250 | should return empty array when no profiles exist | Medium | pass | users.service.spec.ts |
+| TC-251 | should return the user when found | Medium | pass | users.service.spec.ts |
+| TC-252 | should throw NotFoundException when user does not exist | Medium | pass | users.service.spec.ts |
+| TC-253 | should update and return the user profile | Medium | pass | users.service.spec.ts |
+| TC-254 | should throw NotFoundException when user to update does not  | Medium | pass | users.service.spec.ts |
+| TC-255 | should update user role successfully | Medium | pass | users.service.spec.ts |
+| TC-256 | should throw NotFoundException when user does not exist | Medium | pass | users.service.spec.ts |
+| TC-257 | should update job grade successfully | Medium | pass | users.service.spec.ts |
+| TC-258 | should throw NotFoundException when user does not exist | Medium | pass | users.service.spec.ts |
+
+## Frontend > API Client
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-274 | should resolve with parsed JSON on a 200 response | Medium | pass | api.test.ts |
+| TC-275 | should send GET request without body | Medium | pass | api.test.ts |
+| TC-276 | should send POST request with serialized JSON body | Medium | pass | api.test.ts |
+| TC-277 | should send PUT request with serialized JSON body | Medium | pass | api.test.ts |
+| TC-278 | should send DELETE request | Medium | pass | api.test.ts |
+| TC-279 | should include Authorization Bearer header when session exis | Medium | pass | api.test.ts |
+| TC-280 | should include Content-Type: application/json header | Medium | pass | api.test.ts |
+| TC-281 | should call toast.error with session expired message on 401 | Medium | pass | api.test.ts |
+| TC-282 | should redirect window.location.href to /login on 401 | Medium | pass | api.test.ts |
+| TC-283 | should throw an error with the response message on 401 | Medium | pass | api.test.ts |
+| TC-284 | should call toast.error with the error message on 400 | Medium | pass | api.test.ts |
+| TC-285 | should call toast.error with the error message on 403 | Medium | pass | api.test.ts |
+| TC-286 | should call toast.error with the error message on 404 | Medium | pass | api.test.ts |
+| TC-287 | should call toast.error with the error message on 500 | Medium | pass | api.test.ts |
+| TC-288 | should NOT redirect to /login on non-401 errors | Medium | pass | api.test.ts |
+| TC-289 | should throw error with message from response body | Medium | pass | api.test.ts |
+| TC-290 | should fallback to "Request failed" when response body is no | Medium | pass | api.test.ts |
+| TC-291 | should fallback to "HTTP 503" when response body has no mess | Medium | pass | api.test.ts |
+| TC-292 | should prepend API_URL and /api/v1 to the path | Medium | pass | api.test.ts |
+| TC-293 | should not include Authorization header when session is null | Medium | pass | api.test.ts |
+
+## Frontend > Approvals
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-301 | should show empty state when no items | Medium | pass | ApprovalQueue.test.tsx |
+| TC-302 | should render table headers correctly | Medium | pass | ApprovalQueue.test.tsx |
+| TC-303 | should render employee name in table row | Medium | pass | ApprovalQueue.test.tsx |
+| TC-304 | should render employee department | Medium | pass | ApprovalQueue.test.tsx |
+| TC-305 | should render hours | Medium | pass | ApprovalQueue.test.tsx |
+| TC-306 | should show warning indicator for hours below 40 | Medium | pass | ApprovalQueue.test.tsx |
+| TC-307 | should render submitted status badge as Pending | Medium | pass | ApprovalQueue.test.tsx |
+| TC-308 | should render manager_approved status badge | Medium | fail | ApprovalQueue.test.tsx |
+| TC-309 | should render multiple rows for multiple items | Medium | pass | ApprovalQueue.test.tsx |
+| TC-310 | should render a select-all checkbox in the header | Medium | pass | ApprovalQueue.test.tsx |
+| TC-311 | should select all items when select-all checkbox is checked | Medium | pass | ApprovalQueue.test.tsx |
+| TC-312 | should deselect all when select-all is clicked again | Medium | pass | ApprovalQueue.test.tsx |
+| TC-313 | should allow individual row selection | Medium | pass | ApprovalQueue.test.tsx |
+| TC-314 | should show bulk approval bar when items are selected | Medium | pass | ApprovalQueue.test.tsx |
+| TC-315 | should not show bulk approval bar when nothing is selected | Medium | pass | ApprovalQueue.test.tsx |
+| TC-316 | should call api.post when approve button is clicked | Medium | pass | ApprovalQueue.test.tsx |
+| TC-317 | should call onRefresh after approve | Medium | pass | ApprovalQueue.test.tsx |
+| TC-318 | should open reject dialog when reject button is clicked | Medium | pass | ApprovalQueue.test.tsx |
+| TC-319 | should not submit rejection without a comment | Medium | pass | ApprovalQueue.test.tsx |
+| TC-320 | should show locked badge for locked status | Medium | pass | ApprovalQueue.test.tsx |
+| TC-321 | should show Rejected badge for rejected status | Medium | pass | ApprovalQueue.test.tsx |
+| TC-322 | should not render anything | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-323 | should render the count | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-324 | should render Approve Selected button | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-325 | should render Reject Selected button | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-326 | should call onApprove when Approve Selected is clicked | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-327 | should call onReject when Reject Selected is clicked | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-328 | should disable buttons when loading is true | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-329 | should show singular "1 selected" for count of 1 | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-330 | should render check icon in approve button | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-331 | should render x icon in reject button | Medium | pass | BulkApprovalBar.test.tsx |
+| TC-332 | should show loading skeleton initially | Medium | pass | TimesheetReview.test.tsx |
+| TC-333 | should render charge code column header | Medium | pass | TimesheetReview.test.tsx |
+| TC-334 | should render Total column header | Medium | pass | TimesheetReview.test.tsx |
+| TC-335 | should render charge code names | Medium | pass | TimesheetReview.test.tsx |
+| TC-336 | should render charge code IDs | Medium | pass | TimesheetReview.test.tsx |
+| TC-337 | should render Daily Total row | Medium | pass | TimesheetReview.test.tsx |
+| TC-338 | should render error message when API fails | Medium | pass | TimesheetReview.test.tsx |
+| TC-339 | should render retry button when API fails | Medium | pass | TimesheetReview.test.tsx |
+| TC-340 | should render empty state when no entries | Medium | pass | TimesheetReview.test.tsx |
+| TC-558 | should render the page title | Medium | fail | page.test.tsx |
+| TC-559 | should render Manager/CC Owner tab toggle | Medium | fail | page.test.tsx |
+| TC-560 | should render CC Owner tab | Medium | fail | page.test.tsx |
+| TC-561 | should render filter bar with period dropdown | Medium | fail | page.test.tsx |
+| TC-562 | should render approval queue component | Medium | fail | page.test.tsx |
+| TC-563 | should render search input | Medium | fail | page.test.tsx |
+
+## Frontend > Budget
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-564 | should render the page title | Medium | pass | page.test.tsx |
+| TC-565 | should render overview cards | Medium | pass | page.test.tsx |
+| TC-566 | should render budget metrics | Medium | pass | page.test.tsx |
+| TC-567 | should render budget table or empty state | Medium | pass | page.test.tsx |
+
+## Frontend > Charge Codes
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-341 | should render "Assigned Users" heading | Medium | pass | AccessManager.test.tsx |
+| TC-342 | should render the Add button | Medium | pass | AccessManager.test.tsx |
+| TC-343 | should render assigned user names | Medium | pass | AccessManager.test.tsx |
+| TC-344 | should render assigned user emails | Medium | pass | AccessManager.test.tsx |
+| TC-345 | should show empty state when no users assigned | Medium | pass | AccessManager.test.tsx |
+| TC-346 | should toggle add user panel when Add button is clicked | Medium | fail | AccessManager.test.tsx |
+| TC-347 | should show available users in add panel (excludes already a | Medium | fail | AccessManager.test.tsx |
+| TC-348 | should call api.put when a user is added | Medium | fail | AccessManager.test.tsx |
+| TC-349 | should call onUpdate after adding a user | Medium | fail | AccessManager.test.tsx |
+| TC-350 | should render remove buttons for each assigned user | Medium | pass | AccessManager.test.tsx |
+| TC-351 | should call api.put with removeUserIds when remove is clicke | Medium | pass | AccessManager.test.tsx |
+| TC-352 | should render "Create Charge Code" title | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-353 | should render Name field | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-354 | should render Level dropdown in create mode | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-355 | should render Program Name field | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-356 | should render Cost Center field | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-357 | should render Budget field | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-358 | should render Valid From and Valid To date fields | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-359 | should render Billable checkbox checked by default | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-360 | should render Cancel and Create buttons | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-361 | should call onOpenChange(false) when Cancel is clicked | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-362 | should call api.post when form is submitted | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-363 | should call onSuccess after successful create | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-364 | should render "Edit Charge Code" title | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-365 | should populate Name field with existing value | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-366 | should not render Level dropdown in edit mode | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-367 | should render Update button instead of Create | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-368 | should uncheck Billable checkbox when editData.isBillable is | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-369 | should call api.put when form is submitted in edit mode | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-370 | should display error message when api.post fails | Medium | fail | ChargeCodeForm.test.tsx |
+| TC-371 | should not render dialog when open is false | Medium | pass | ChargeCodeForm.test.tsx |
+| TC-372 | should show empty state when tree is empty | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-373 | should render top-level program nodes | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-374 | should render PRG level badges for programs | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-375 | should render correct level badges for each level | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-376 | should display budget amount when provided | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-377 | should not display budget amount when not provided | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-378 | should start top-level nodes collapsed by default | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-379 | should show chevron-right icon for collapsed nodes with chil | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-380 | should expand a collapsed node when chevron is clicked | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-381 | should collapse an expanded node when chevron is clicked aga | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-382 | should call onSelect with the node id when a node is clicked | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-383 | should visually highlight the selected node | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-384 | should not highlight unselected nodes | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-385 | should render project nodes nested under program after expan | Medium | pass | ChargeCodeTree.test.tsx |
+| TC-386 | should render nodes with increasing indentation for depth | Medium | fail | ChargeCodeTree.test.tsx |
+| TC-575 | should render toolbar with search input | Medium | pass | page.test.tsx |
+| TC-576 | should render Create New Code button | Medium | fail | page.test.tsx |
+| TC-577 | should render charge code tree panel | Medium | pass | page.test.tsx |
+| TC-578 | should render detail panel on right side | Medium | pass | page.test.tsx |
+| TC-579 | should render the page heading | Medium | pass | page.test.tsx |
+
+## Frontend > Components
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-491 | should render the select trigger with placeholder | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-492 | should render select items for each unused code | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-493 | should not render items for already-used codes | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-494 | should display charge code IDs in items | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-495 | should display charge code names in items | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-496 | should render Billable badge for billable codes | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-497 | should render Non-billable badge for non-billable codes | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-498 | should call onSelect with code when selection is made | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-499 | should render a message when all codes are in use | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-500 | should not render the select trigger when all codes are used | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-501 | should render all-in-use message when available codes is emp | Medium | pass | ChargeCodeSelector.test.tsx |
+| TC-502 | should render disabled cell with dash when value is 0 | Medium | pass | EntryCell.test.tsx |
+| TC-503 | should render disabled cell with formatted value when value  | Medium | pass | EntryCell.test.tsx |
+| TC-504 | should not render an interactive button when disabled | Medium | pass | EntryCell.test.tsx |
+| TC-505 | should render empty string when value is 0 | Medium | pass | EntryCell.test.tsx |
+| TC-506 | should render formatted value when value > 0 | Medium | pass | EntryCell.test.tsx |
+| TC-507 | should switch to input mode when button is clicked | Medium | pass | EntryCell.test.tsx |
+| TC-508 | should populate input with current value on focus when value | Medium | pass | EntryCell.test.tsx |
+| TC-509 | should show empty input on focus when value is 0 | Medium | pass | EntryCell.test.tsx |
+| TC-510 | should call onChange with parsed value on blur | Medium | pass | EntryCell.test.tsx |
+| TC-511 | should call onChange with 0 on blur when input is invalid | Medium | pass | EntryCell.test.tsx |
+| TC-512 | should cap value at 24 when entered value exceeds 24 | Medium | pass | EntryCell.test.tsx |
+| TC-513 | should call onChange with 0 when negative value entered | Medium | pass | EntryCell.test.tsx |
+| TC-514 | should call onNavigate with "right" when Tab is pressed | Medium | pass | EntryCell.test.tsx |
+| TC-515 | should call onNavigate with "down" when Enter is pressed | Medium | pass | EntryCell.test.tsx |
+| TC-516 | should exit editing mode on Escape | Medium | pass | EntryCell.test.tsx |
+| TC-517 | should apply billable class when isBillable is true and valu | Medium | pass | EntryCell.test.tsx |
+| TC-518 | should show note icon on hover when value > 0 | Medium | pass | EntryCell.test.tsx |
+| TC-519 | should not show note icon on hover when value is 0 | Medium | pass | EntryCell.test.tsx |
+| TC-520 | should render dialog with correct title containing charge co | Medium | pass | EntryNoteDialog.test.tsx |
+| TC-521 | should render Save Note button | Medium | pass | EntryNoteDialog.test.tsx |
+| TC-522 | should render Cancel button | Medium | pass | EntryNoteDialog.test.tsx |
+| TC-523 | should call onSave with textarea value when Save Note is cli | Medium | pass | EntryNoteDialog.test.tsx |
+| TC-524 | should call onOpenChange(false) when Cancel is clicked | Medium | pass | EntryNoteDialog.test.tsx |
+| TC-525 | should pre-populate textarea with existing description | Medium | pass | EntryNoteDialog.test.tsx |
+| TC-526 | should not render dialog content when open is false | Medium | pass | EntryNoteDialog.test.tsx |
+| TC-527 | should render the charge code column header | Medium | pass | TimesheetGrid.test.tsx |
+| TC-528 | should render day headers (Mon through Sun) | Medium | pass | TimesheetGrid.test.tsx |
+| TC-529 | should render charge code names in rows | Medium | pass | TimesheetGrid.test.tsx |
+| TC-530 | should render charge code IDs | Medium | pass | TimesheetGrid.test.tsx |
+| TC-531 | should show empty state message when no rows | Medium | pass | TimesheetGrid.test.tsx |
+| TC-532 | should render billable badge for billable charge codes | Medium | pass | TimesheetGrid.test.tsx |
+| TC-533 | should render non-billable badge for non-billable charge cod | Medium | pass | TimesheetGrid.test.tsx |
+| TC-534 | should display Daily Total label in footer | Medium | pass | TimesheetGrid.test.tsx |
+| TC-535 | should calculate correct daily total for Monday (8 + 4 = 12) | Medium | pass | TimesheetGrid.test.tsx |
+| TC-536 | should display Required row | Medium | pass | TimesheetGrid.test.tsx |
+| TC-537 | should display Variance row | Medium | pass | TimesheetGrid.test.tsx |
+| TC-538 | should show negative variance for days under 8 hours | Medium | pass | TimesheetGrid.test.tsx |
+| TC-539 | should show checkmark for days meeting target hours | Medium | pass | TimesheetGrid.test.tsx |
+| TC-540 | should display Total column header | Medium | pass | TimesheetGrid.test.tsx |
+| TC-541 | should show remove button when onRemoveRow is provided and n | Medium | pass | TimesheetGrid.test.tsx |
+| TC-542 | should not show remove button when disabled | Medium | pass | TimesheetGrid.test.tsx |
+
+## Frontend > Dashboard
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-387 | should render the "Chargeability Trend" heading | Medium | pass | ChargeabilityTrend.test.tsx |
+| TC-388 | should render loading skeleton while data is loading | Medium | pass | ChargeabilityTrend.test.tsx |
+| TC-389 | should render "No data available yet" when months array is e | Medium | pass | ChargeabilityTrend.test.tsx |
+| TC-390 | should render chart when data is available | Medium | pass | ChargeabilityTrend.test.tsx |
+| TC-391 | should display YTD chargeability percentage when data is ava | Medium | pass | ChargeabilityTrend.test.tsx |
+| TC-392 | should render "Program Distribution" heading | Medium | pass | ProgramDistribution.test.tsx |
+| TC-393 | should render loading skeleton while data is loading | Medium | pass | ProgramDistribution.test.tsx |
+| TC-394 | should render "No data available yet" when no entries for cu | Medium | pass | ProgramDistribution.test.tsx |
+| TC-395 | should render pie chart when data is available | Medium | pass | ProgramDistribution.test.tsx |
+| TC-396 | should show program names in legend | Medium | pass | ProgramDistribution.test.tsx |
+| TC-397 | should show "Current Period" and "YTD" toggle buttons | Medium | pass | ProgramDistribution.test.tsx |
+| TC-398 | should switch to YTD view when YTD button is clicked | Medium | pass | ProgramDistribution.test.tsx |
+| TC-399 | should display hours and percentage for each program | Medium | pass | ProgramDistribution.test.tsx |
+
+## Frontend > Layout
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-408 | should render the bell button with aria-label | Medium | pass | NotificationBell.test.tsx |
+| TC-409 | should render the bell icon SVG | Medium | pass | NotificationBell.test.tsx |
+| TC-410 | should show badge with total count of budget + chargeability | Medium | fail | NotificationBell.test.tsx |
+| TC-411 | should show badge with count equal to budget alerts only whe | Medium | fail | NotificationBell.test.tsx |
+| TC-412 | should not render badge when both alert arrays are empty | Medium | fail | NotificationBell.test.tsx |
+| TC-413 | should open popover when bell button is clicked | Medium | pass | NotificationBell.test.tsx |
+| TC-414 | should close popover when bell button is clicked again | Medium | pass | NotificationBell.test.tsx |
+| TC-415 | should show alert names inside popover after opening | Medium | fail | NotificationBell.test.tsx |
+| TC-416 | should show severity dot elements for alerts | Medium | fail | NotificationBell.test.tsx |
+| TC-417 | should show "No notifications" message when popover opens wi | Medium | fail | NotificationBell.test.tsx |
+| TC-418 | should limit displayed alerts to top 5 sorted by severity | Medium | fail | NotificationBell.test.tsx |
+| TC-419 | should render "View alerts" link when alerts exist | Medium | fail | NotificationBell.test.tsx |
+| TC-420 | should NOT render "View alerts" button when no alerts exist | Medium | fail | NotificationBell.test.tsx |
+| TC-421 | should call router.push("/reports") when "View alerts" is cl | Medium | fail | NotificationBell.test.tsx |
+
+## Frontend > Pages
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-294 | should render status banner with week period | Medium | pass | page.test.tsx |
+| TC-295 | should render 4 metric cards | Medium | pass | page.test.tsx |
+| TC-296 | should render Recent Entries section | Medium | pass | page.test.tsx |
+| TC-297 | should render Alerts & Notifications section | Medium | pass | page.test.tsx |
+| TC-298 | should render quick action Log Time button | Medium | fail | page.test.tsx |
+| TC-299 | should render My Codes quick action | Medium | pass | page.test.tsx |
+| TC-300 | should render progress bar tracking area | Medium | pass | page.test.tsx |
+| TC-400 | should render the logo/branding | Medium | pass | page.test.tsx |
+| TC-401 | should render email input | Medium | pass | page.test.tsx |
+| TC-402 | should render password input | Medium | pass | page.test.tsx |
+| TC-403 | should render Sign In button | Medium | pass | page.test.tsx |
+| TC-404 | should render Microsoft SSO button | Medium | pass | page.test.tsx |
+| TC-405 | should render Forgot password link | Medium | pass | page.test.tsx |
+| TC-406 | should render "or" divider | Medium | pass | page.test.tsx |
+| TC-407 | should render subtitle text | Medium | pass | page.test.tsx |
+| TC-580 | should render user info section | Medium | pass | page.test.tsx |
+| TC-581 | should render email field | Medium | pass | page.test.tsx |
+| TC-582 | should render role badge or field | Medium | pass | page.test.tsx |
+| TC-583 | should render edit profile button or form | Medium | pass | page.test.tsx |
+| TC-584 | should render password change section | Medium | pass | page.test.tsx |
+| TC-585 | should render department field | Medium | pass | page.test.tsx |
+| TC-586 | should render the page title | Medium | pass | page.test.tsx |
+| TC-587 | should render theme toggle section | Medium | pass | page.test.tsx |
+| TC-588 | should render Light and Dark theme options | Medium | pass | page.test.tsx |
+| TC-589 | should render notification preferences section | Medium | pass | page.test.tsx |
+| TC-590 | should render email notification toggle | Medium | pass | page.test.tsx |
+| TC-591 | should render timezone settings | Medium | pass | page.test.tsx |
+| TC-598 | should render the page title | Medium | pass | page.test.tsx |
+| TC-599 | should render year navigation | Medium | pass | page.test.tsx |
+| TC-600 | should render prev/next navigation buttons | Medium | pass | page.test.tsx |
+| TC-601 | should render month names in calendar grid | Medium | pass | page.test.tsx |
+| TC-602 | should render holiday list section | Medium | pass | page.test.tsx |
+| TC-603 | should render Add Holiday button | Medium | pass | page.test.tsx |
+| TC-604 | should render the page title | Medium | pass | page.test.tsx |
+| TC-605 | should render Add Rate button | Medium | pass | page.test.tsx |
+| TC-606 | should render rate table column headers | Medium | pass | page.test.tsx |
+| TC-607 | should render Add Rate button or empty state | Medium | pass | page.test.tsx |
+| TC-608 | should render the page title | Medium | pass | page.test.tsx |
+| TC-609 | should render user management card | Medium | pass | page.test.tsx |
+| TC-610 | should render search input | Medium | pass | page.test.tsx |
+| TC-611 | should render user table with column headers | Medium | pass | page.test.tsx |
+| TC-612 | should render mock user data in table | Medium | pass | page.test.tsx |
+
+## Frontend > Reports
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-422 | should render ResponsiveContainer | Medium | pass | ActivityPie.test.tsx |
+| TC-423 | should render PieChart | Medium | pass | ActivityPie.test.tsx |
+| TC-424 | should render Pie with correct item count | Medium | pass | ActivityPie.test.tsx |
+| TC-425 | should render Pie with hours dataKey | Medium | pass | ActivityPie.test.tsx |
+| TC-426 | should render Pie with category nameKey | Medium | pass | ActivityPie.test.tsx |
+| TC-427 | should render as donut (innerRadius > 0) | Medium | pass | ActivityPie.test.tsx |
+| TC-428 | should render Cell components for each item | Medium | pass | ActivityPie.test.tsx |
+| TC-429 | should render Legend | Medium | pass | ActivityPie.test.tsx |
+| TC-430 | should render Tooltip | Medium | pass | ActivityPie.test.tsx |
+| TC-431 | should render empty state message | Medium | pass | ActivityPie.test.tsx |
+| TC-432 | should not render pie chart when data is empty | Medium | pass | ActivityPie.test.tsx |
+| TC-433 | should render Severity column header | Medium | pass | AlertList.test.tsx |
+| TC-434 | should render Charge Code column header | Medium | pass | AlertList.test.tsx |
+| TC-435 | should render Budget column header | Medium | pass | AlertList.test.tsx |
+| TC-436 | should render Actual column header | Medium | pass | AlertList.test.tsx |
+| TC-437 | should render Overrun column header | Medium | pass | AlertList.test.tsx |
+| TC-438 | should render all alert names | Medium | pass | AlertList.test.tsx |
+| TC-439 | should render charge code IDs | Medium | pass | AlertList.test.tsx |
+| TC-440 | should render formatted budget amounts | Medium | pass | AlertList.test.tsx |
+| TC-441 | should render severity indicators for all alerts | Medium | pass | AlertList.test.tsx |
+| TC-442 | should sort by severity by default (red first) | Medium | pass | AlertList.test.tsx |
+| TC-443 | should sort by overrun when Overrun header is clicked | Medium | pass | AlertList.test.tsx |
+| TC-444 | should sort by severity when Severity header is clicked | Medium | pass | AlertList.test.tsx |
+| TC-445 | should show root cause when row is clicked and rootCauseActi | Medium | pass | AlertList.test.tsx |
+| TC-446 | should collapse expanded row when clicked again | Medium | pass | AlertList.test.tsx |
+| TC-447 | should not show expanded row for alert with no rootCauseActi | Medium | pass | AlertList.test.tsx |
+| TC-448 | should render empty state message when no alerts | Medium | pass | AlertList.test.tsx |
+| TC-449 | should render ResponsiveContainer | Medium | pass | BudgetChart.test.tsx |
+| TC-450 | should render BarChart with data | Medium | pass | BudgetChart.test.tsx |
+| TC-451 | should render Actual bar | Medium | pass | BudgetChart.test.tsx |
+| TC-452 | should render Budget bar | Medium | pass | BudgetChart.test.tsx |
+| TC-453 | should render Legend | Medium | pass | BudgetChart.test.tsx |
+| TC-454 | should render Tooltip | Medium | pass | BudgetChart.test.tsx |
+| TC-455 | should render CartesianGrid | Medium | pass | BudgetChart.test.tsx |
+| TC-456 | should render empty state message when no data | Medium | pass | BudgetChart.test.tsx |
+| TC-457 | should not render bar chart when data is empty | Medium | pass | BudgetChart.test.tsx |
+| TC-458 | should render ResponsiveContainer | Medium | pass | ChargeabilityGauge.test.tsx |
+| TC-459 | should render BarChart | Medium | pass | ChargeabilityGauge.test.tsx |
+| TC-460 | should render a reference line for the target | Medium | pass | ChargeabilityGauge.test.tsx |
+| TC-461 | should render target label on reference line | Medium | pass | ChargeabilityGauge.test.tsx |
+| TC-462 | should render rate bar | Medium | pass | ChargeabilityGauge.test.tsx |
+| TC-463 | should render empty state message | Medium | pass | ChargeabilityGauge.test.tsx |
+| TC-464 | should not render bar chart when data is empty | Medium | pass | ChargeabilityGauge.test.tsx |
+| TC-465 | should render Cell components for each member | Medium | pass | ChargeabilityGauge.test.tsx |
+| TC-466 | should render stat cards with correct labels | Medium | pass | FinancialPL.test.tsx |
+| TC-467 | should render stat card values | Medium | pass | FinancialPL.test.tsx |
+| TC-468 | should render team P/L table headers | Medium | fail | FinancialPL.test.tsx |
+| TC-469 | should render team names in the table | Medium | pass | FinancialPL.test.tsx |
+| TC-470 | should render chargeability percentages | Medium | pass | FinancialPL.test.tsx |
+| TC-471 | should render subtext with chargeability comparison | Medium | pass | FinancialPL.test.tsx |
+| TC-472 | should pass period and team as query params | Medium | pass | FinancialPL.test.tsx |
+| TC-473 | should not pass team param when team is "all" | Medium | pass | FinancialPL.test.tsx |
+| TC-474 | should show total row when multiple teams exist | Medium | pass | FinancialPL.test.tsx |
+| TC-475 | should not render team table when byTeam is empty | Medium | pass | FinancialPL.test.tsx |
+| TC-476 | should render "P/L Summary" tab trigger | Medium | pass | FinancialPL.test.tsx |
+| TC-477 | should render "Alerts" tab trigger | Medium | pass | FinancialPL.test.tsx |
+| TC-478 | should show stat cards when default tab (P/L Summary) is act | Medium | pass | FinancialPL.test.tsx |
+| TC-479 | should show Alerts heading when Alerts tab is clicked | Medium | pass | FinancialPL.test.tsx |
+| TC-480 | should show alert name in AlertList when Alerts tab is activ | Medium | pass | FinancialPL.test.tsx |
+| TC-481 | should show count in Alerts tab label when budget alerts are | Medium | pass | FinancialPL.test.tsx |
+| TC-482 | should show "Alerts" without count when no alerts are provid | Medium | pass | FinancialPL.test.tsx |
+| TC-483 | should render ResponsiveContainer | Medium | pass | UtilizationChart.test.tsx |
+| TC-484 | should render BarChart with correct item count | Medium | pass | UtilizationChart.test.tsx |
+| TC-485 | should render rate bar with Utilization name | Medium | pass | UtilizationChart.test.tsx |
+| TC-486 | should render XAxis with department dataKey | Medium | pass | UtilizationChart.test.tsx |
+| TC-487 | should render Cell components for color coding | Medium | pass | UtilizationChart.test.tsx |
+| TC-488 | should render Tooltip | Medium | pass | UtilizationChart.test.tsx |
+| TC-489 | should render empty state message | Medium | pass | UtilizationChart.test.tsx |
+| TC-490 | should not render bar chart when data is empty | Medium | pass | UtilizationChart.test.tsx |
+| TC-568 | should render the page title | Medium | pass | page.test.tsx |
+| TC-569 | should render filter bar | Medium | pass | page.test.tsx |
+| TC-570 | should render KPI cards | Medium | pass | page.test.tsx |
+| TC-571 | should render Budget Chart component | Medium | pass | page.test.tsx |
+| TC-572 | should render Chargeability Gauge component | Medium | pass | page.test.tsx |
+| TC-573 | should render Activity Pie component | Medium | pass | page.test.tsx |
+| TC-574 | should render FinancialPL section with tabs | Medium | pass | page.test.tsx |
+
+## Frontend > Time Entry
+
+| ID | Title | Priority | Status | File |
+|----|-------|----------|--------|------|
+| TC-543 | should render the select dropdown | Medium | pass | PeriodSelector.test.tsx |
+| TC-544 | should render select trigger with correct width | Medium | pass | PeriodSelector.test.tsx |
+| TC-545 | should render 104 week options | Medium | pass | PeriodSelector.test.tsx |
+| TC-546 | should pass current week start value to select | Medium | fail | PeriodSelector.test.tsx |
+| TC-547 | should include "Week" in option labels | Medium | pass | PeriodSelector.test.tsx |
+| TC-548 | should include year in option labels | Medium | pass | PeriodSelector.test.tsx |
+| TC-549 | should list weeks in descending order (most recent first) | Medium | pass | PeriodSelector.test.tsx |
+| TC-550 | should render the "+ Request New CC" trigger button | Medium | pass | RequestChargeCode.test.tsx |
+| TC-551 | should open dialog when trigger button is clicked | Medium | pass | RequestChargeCode.test.tsx |
+| TC-552 | should show "Request Charge Code Access" title when dialog o | Medium | pass | RequestChargeCode.test.tsx |
+| TC-553 | should render search input in dialog | Medium | pass | RequestChargeCode.test.tsx |
+| TC-554 | should show charge code results when query returns data | Medium | pass | RequestChargeCode.test.tsx |
+| TC-555 | should show "Billable" badge for billable charge codes | Medium | pass | RequestChargeCode.test.tsx |
+| TC-556 | should show "Non-billable" badge for non-billable charge cod | Medium | pass | RequestChargeCode.test.tsx |
+| TC-557 | should show "Send Request" button disabled when reason is em | Medium | pass | RequestChargeCode.test.tsx |
+| TC-592 | should render period navigator with prev/next controls | Medium | pass | page.test.tsx |
+| TC-593 | should render timesheet grid component | Medium | pass | page.test.tsx |
+| TC-594 | should render actions bar with Save Draft button | Medium | pass | page.test.tsx |
+| TC-595 | should render Submit button | Medium | pass | page.test.tsx |
+| TC-596 | should render Add Charge Code button | Medium | pass | page.test.tsx |
+| TC-597 | should render the page title | Medium | pass | page.test.tsx |
+
+## E2E > Time Entry > Copy Period
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-613 | E2E-CR05-01: Copy from Last Period loads previous charge codes | High | Employee logged in (wichai), previous week has entries | 1. Navigate to /time-entry 2. Click 'Copy from last period' 3. Observe rows loaded | Grid shows rows from previous period OR copy button available; API accepts copy request | Role: employee (wichai) | frontend/e2e/cr1-remaining.spec.ts | pass |
+
+## E2E > Charge Codes > Access Request
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-614 | E2E-CR07-01: Employee can request charge code access | High | Employee logged in (nattaya), active programs exist | 1. Navigate to /charge-codes 2. Click 'Request Access' 3. Search for program 4. Select it 5. Submit | Request dialog closes OR success toast; POST /charge-code-requests returns 200 or 401 | Role: employee (nattaya) | frontend/e2e/cr1-remaining.spec.ts | pass |
+| TC-615 | E2E-CR07-02: Employee cannot approve their own charge code request (NEGATIVE) | High | Employee (nattaya) has a pending request, logged in as nattaya | 1. Navigate to /charge-codes 2. Locate pending request 3. Attempt to approve own request | No approve button visible OR action returns error; API returns 200 or 401 | Role: employee (nattaya) | frontend/e2e/cr1-remaining.spec.ts | pass |
+
+## E2E > Budget > Drill-Down
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-616 | E2E-CR08-01: Budget drill-down shows child charge codes | High | Admin logged in (tachongrak), programs with children exist | 1. Navigate to /budget 2. Click program row to expand 3. Verify children appear | Child charge codes visible with budget figures; API GET /charge-codes/budget-detail returns 200 or 401 | Role: admin (tachongrak) | frontend/e2e/cr1-remaining.spec.ts | pass |
+
+## E2E > Approvals > Search
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-617 | E2E-CR12-01: Approvals search filters by employee name or charge code | High | Charge manager logged in (wichai), pending timesheets exist | 1. Navigate to /approvals 2. Type employee name in search 3. Observe filtered results | List filters to matching employees OR search input visible; API GET /approvals/pending returns 200 or 401 | Role: charge_manager (wichai) | frontend/e2e/cr1-remaining.spec.ts | pass |
+
+## E2E > Budget > Filter
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-618 | E2E-CR16-01: Multi-select budget filter shows only selected programs | High | Admin logged in (tachongrak), multiple programs exist | 1. Navigate to /budget 2. Open program filter 3. Select specific programs 4. Verify list filters | Budget list shows only selected programs OR multi-select control visible; GET /budgets/summary returns 200 or 401 | Role: admin (tachongrak) | frontend/e2e/cr1-remaining.spec.ts | pass |
+
+## E2E > Time Entry > Vacation Blocking
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-619 | E2E-BUG05-01: Vacation day blocks non-vacation hour input | High | Employee logged in (nattaya), has approved vacation on a specific date | 1. Navigate to /time-entry 2. Navigate to week containing vacation day 3. Attempt to enter hours on vacation date | Input blocked/disabled for vacation day; API GET /calendar/vacations returns 200 or 401 | Role: employee (nattaya) | frontend/e2e/cr1-remaining.spec.ts | pass |
+
+## E2E > Data Integrity
+
+| ID | Title | Priority | Preconditions | Steps | Expected Result | Test Data | File | Status |
+|----|-------|----------|---------------|-------|-----------------|-----------|------|--------|
+| TC-620 | E2E-BUG04-01: No test data pollution in database | Medium | Admin logged in (tachongrak), DB is accessible | 1. Call GET /charge-codes/tree 2. Check for Test-Program-* entries 3. Call GET /cost-rates 4. Check for L-TEST-* entries | No test data entries; API returns 200 or 401; cleanup confirmed | Role: admin (tachongrak) | frontend/e2e/cr1-remaining.spec.ts | pass |
