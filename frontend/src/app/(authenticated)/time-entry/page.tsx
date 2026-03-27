@@ -341,7 +341,7 @@ export default function TimeEntryPage() {
   }, [weekStart, activeRows, gridData, submitMutation, vacationDates, holidayDates]);
 
   const canEdit =
-    !timesheet?.status || ['draft', 'rejected', 'submitted', 'approved'].includes(timesheet.status);
+    !timesheet?.status || ['draft', 'rejected'].includes(timesheet.status);
 
   // Auto-save every 30 seconds
   useEffect(() => {
