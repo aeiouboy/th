@@ -279,40 +279,72 @@ test('BF-TE-04: Timesheet ที่ Submit แล้ว — fields ต้อง 
 
 test('BF-TE-05: Copy from Previous Week', async ({ page }) => {
   // Business Rule: copy charge code rows จากสัปดาห์ก่อน
+  // Previous week (Mar 23-29) = Submitted with entries → copy into current week (Mar 30) = Draft empty
 
-  // Step 1: หา Draft week ที่ว่าง
+  // Reset DB ก่อน — tests ก่อนหน้าอาจสร้าง entries ในสัปดาห์นี้แล้ว
+  await resetWichaiTimesheets();
+
+  // Step 1: ใช้ PeriodSelector navigate ตรงไปสัปดาห์ที่ reset เป็น Draft + empty
+  // Mar 9-15 (id: 0fc79007) = Draft empty หลัง reset, previous = Mar 2-8 มี 4 charge codes
   await page.goto('/time-entry');
   await page.waitForLoadState('load');
   await expect(page.getByText(/Week of/i)).toBeVisible({ timeout: 30000 });
   await page.waitForSelector('text=Loading timesheet', { state: 'hidden', timeout: 15000 }).catch(() => {});
 
+  // ใช้ PeriodSelector dropdown เลือก 2026-03-09 (Mar 9-15)
+  const selectTrigger = page.locator('button[data-slot="select-trigger"]').first();
+  await selectTrigger.click();
+  await page.waitForTimeout(500);
+  const mar9Option = page.locator('[role="option"]').filter({ hasText: /Mar 9/ });
+  await expect(mar9Option).toBeVisible({ timeout: 5000 });
+  await mar9Option.click();
+  await page.waitForTimeout(2000);
+  await page.waitForSelector('text=Loading timesheet', { state: 'hidden', timeout: 15000 }).catch(() => {});
+
   const draftBadge = page.locator('[data-slot="badge"]:has-text("Draft")');
+  const noChargeMsg = page.getByText(/No charge codes added/i);
 
-  // หา Draft week ที่มี "No charge codes" + "Copy from Last Period"
-  for (let i = 0; i < 6; i++) {
-    const isDraft = await draftBadge.isVisible({ timeout: 2000 }).catch(() => false);
-    const hasCopy = await page.getByText(/Copy from Last Period/i).isVisible({ timeout: 1000 }).catch(() => false);
-    if (isDraft && hasCopy) break;
-
-    const prevBtn = page.locator('main button:has(svg), .max-w-\\[1200px\\] button:has(svg)').first();
-    if (!(await prevBtn.isDisabled().catch(() => true))) {
-      await prevBtn.click();
-      await page.waitForTimeout(1500);
-      await page.waitForSelector('text=Loading timesheet', { state: 'hidden', timeout: 15000 }).catch(() => {});
-    }
-  }
+  // ยืนยันว่า Draft + ว่าง + มีปุ่ม Copy
+  await expect(draftBadge).toBeVisible({ timeout: 5000 });
+  await expect(noChargeMsg).toBeVisible({ timeout: 5000 });
 
   await snap(page, 'bf-te-05', '01-empty-new-week');
 
-  // Step 2: คลิก Copy from Last Period
+  // Step 2: คลิก Copy from Last Period — capture API response
   const copyBtn = page.getByText(/Copy from Last Period/i);
   await expect(copyBtn).toBeVisible({ timeout: 5000 });
-  await copyBtn.click();
-  await page.waitForTimeout(3000);
 
-  // ✅ charge code rows ต้องปรากฏ
-  const hasCopied = await page.getByText(/copied/i).isVisible({ timeout: 5000 }).catch(() => false);
-  const hasCells = await page.locator('button.cursor-text').count() > 0;
-  expect(hasCopied || hasCells).toBe(true);
+  // Capture the copy API response
+  const [copyResponse] = await Promise.all([
+    page.waitForResponse((r) => r.url().includes('copy-from-previous'), { timeout: 15000 }).catch(() => null),
+    copyBtn.click(),
+  ]);
+  if (copyResponse) {
+    const status = copyResponse.status();
+    const body = await copyResponse.text().catch(() => 'no body');
+    console.log(`Copy API: ${status} ${body}`);
+  } else {
+    console.log('Copy API: NO RESPONSE captured');
+  }
+
+  // รอ "Copying..." หายไป (UI แสดงระหว่าง API call)
+  const copyingLabel = page.getByText(/Copying/i);
+  await copyingLabel.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+
+  // ❌ ต้องไม่มี error toast
+  const errorToast = page.locator('[role="status"], [data-sonner-toast]').filter({ hasText: /error|already|fail/i });
+  const hasError = await errorToast.isVisible({ timeout: 2000 }).catch(() => false);
+  if (hasError) {
+    const errorText = await errorToast.textContent().catch(() => 'unknown error');
+    await snap(page, 'bf-te-05', '02-error-toast');
+    expect(hasError, `Copy failed with error: ${errorText}`).toBe(false);
+  }
+
+  // รอ React Query refetch หลัง invalidation (ไม่ reload — reload จะ reset weekStart กลับ current week)
+  // ✅ charge code rows ต้องปรากฏ (ไม่มี "No charge codes" อีกแล้ว)
+  await expect(noChargeMsg).not.toBeVisible({ timeout: 15000 });
+  const cellCount = await page.locator('button.cursor-text').count();
+  expect(cellCount, 'Charge code rows should appear after copy').toBeGreaterThan(0);
+
   await snap(page, 'bf-te-05', '02-copied-from-previous');
 });

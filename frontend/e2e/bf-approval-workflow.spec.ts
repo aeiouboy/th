@@ -211,21 +211,21 @@ test('BF-AP-02: Manager Reject Timesheet — Employee เห็น Rejected Stat
     const option = employeePage.locator('[role="option"], [data-radix-select-item], [cmdk-item]').first();
     await expect(option).toBeVisible({ timeout: 5000 });
     await option.click();
-    await employeePage.waitForTimeout(1500);
+    await employeePage.waitForTimeout(2000);
+    // ยืนยันว่า charge code ถูก add จริง
+    await expect(noChargeMsg).not.toBeVisible({ timeout: 10000 });
   }
 
   // กรอก 8 ชม. วันจันทร์ (click cell button → input → fill)
   const cellBtn = employeePage.locator('button.cursor-text').first();
-  if (await cellBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-    await cellBtn.click();
-    await employeePage.waitForTimeout(300);
-    const input = employeePage.locator('input[inputmode="decimal"]');
-    if (await input.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await input.fill('8');
-      await input.blur();
-      await employeePage.waitForTimeout(500);
-    }
-  }
+  await expect(cellBtn).toBeVisible({ timeout: 5000 });
+  await cellBtn.click();
+  await employeePage.waitForTimeout(300);
+  const input = employeePage.locator('input[inputmode="decimal"]');
+  await expect(input).toBeVisible({ timeout: 3000 });
+  await input.fill('8');
+  await input.blur();
+  await employeePage.waitForTimeout(500);
 
   // Save → รอเสร็จ → Submit → รอเสร็จ
   const saveDraftBtn = employeePage.getByRole('button', { name: /Save Draft/i });
