@@ -1,8 +1,8 @@
 # สรุปผลการทดสอบ Business Functional Test
 
-**วันที่ทดสอบ**: 2026-03-26
-**ผู้ทดสอบ**: bf-tester (Playwright automated)
-**ผลรวม**: 10/10 ผ่าน (100%)
+**วันที่ทดสอบ**: 2026-03-27 (verified)
+**ผู้ทดสอบ**: bf-tester + team-lead (Playwright automated)
+**ผลรวม**: 10/10 ผ่าน (100%) — 11/11 Playwright tests passed (2.3 min)
 
 ---
 

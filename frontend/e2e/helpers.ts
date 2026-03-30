@@ -54,6 +54,10 @@ export async function takeScreenshotMobile(page: Page, pageName: string) {
 /**
  * Make an authenticated API request to the backend.
  * Uses the page's request context which carries cookies/auth from storageState.
+ *
+ * Handles two cookie formats produced by @supabase/ssr:
+ *   - New (0.9.x default): single cookie "sb-...-auth-token" = "base64-<base64url-json>"
+ *   - Old (manual inject): chunked "sb-...-auth-token.0", ".1", ... = plain JSON parts
  */
 export async function apiRequest(
   page: Page,
@@ -64,20 +68,33 @@ export async function apiRequest(
   const baseUrl = `${BACKEND_URL}/api/v1`;
   const url = `${baseUrl}${apiPath}`;
 
-  // Extract the access token from cookies
+  const AUTH_BASE = 'sb-lchxtkiceeyqjksganwr-auth-token';
   const cookies = await page.context().cookies();
-  const authCookies = cookies
-    .filter((c) => c.name.startsWith('sb-lchxtkiceeyqjksganwr-auth-token.'))
-    .sort((a, b) => a.name.localeCompare(b.name));
 
   let accessToken = '';
-  if (authCookies.length > 0) {
-    const sessionJson = authCookies.map((c) => c.value).join('');
+
+  // Try new format: single base key cookie with "base64-<base64url>" value
+  const baseCookie = cookies.find((c) => c.name === AUTH_BASE);
+  if (baseCookie?.value.startsWith('base64-')) {
     try {
-      const session = JSON.parse(sessionJson);
-      accessToken = session.access_token;
-    } catch {
-      // If cookies aren't valid JSON, try localStorage via page eval
+      const b64 = baseCookie.value.slice('base64-'.length);
+      // base64url → standard base64 → decode
+      const jsonStr = Buffer.from(b64.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8');
+      const session = JSON.parse(jsonStr);
+      accessToken = session.access_token ?? '';
+    } catch { /* fall through to chunk format */ }
+  }
+
+  // Fallback: old chunked plain-JSON format (.0, .1, ...)
+  if (!accessToken) {
+    const authCookies = cookies
+      .filter((c) => c.name.startsWith(AUTH_BASE + '.'))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    if (authCookies.length > 0) {
+      try {
+        const session = JSON.parse(authCookies.map((c) => c.value).join(''));
+        accessToken = session.access_token ?? '';
+      } catch { /* no token available */ }
     }
   }
 
@@ -147,4 +164,28 @@ export function getCurrentMondayStr(): string {
 export function getCurrentPeriod(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/**
+ * Reset wichai's timesheet state for test isolation.
+ * - Mar 30 (current week): Draft + empty entries
+ * - Mar 23-29: Submitted (for read-only tests)
+ * - Mar 9-15: Draft + empty (for Copy test)
+ */
+export async function resetWichaiTimesheets(): Promise<void> {
+  // Dynamic import to avoid bundling postgres in frontend
+  const postgres = (await import('postgres')).default;
+  const sql = postgres(process.env.SUPABASE_DB_URL || 'postgresql://postgres.lchxtkiceeyqjksganwr:ReNmU48rKkQCB9X7@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres');
+  try {
+    // Current week Mar 30: Draft + empty
+    await sql`UPDATE timesheets SET status = 'draft', submitted_at = NULL, rejection_comment = NULL WHERE id = 'da63e7e1-a4a4-4081-9139-86cab1be78a4'`;
+    await sql`DELETE FROM timesheet_entries WHERE timesheet_id = 'da63e7e1-a4a4-4081-9139-86cab1be78a4'`;
+    // Mar 23-29: ensure Submitted
+    await sql`UPDATE timesheets SET status = 'submitted' WHERE id = '867bd3e1-4b8b-4a4b-9dd8-c4c11eb34dac' AND status != 'submitted'`;
+    // Mar 9-15: Draft + empty
+    await sql`UPDATE timesheets SET status = 'draft', submitted_at = NULL WHERE id = '0fc79007-8d22-48da-8e88-140e485e2c45'`;
+    await sql`DELETE FROM timesheet_entries WHERE timesheet_id = '0fc79007-8d22-48da-8e88-140e485e2c45'`;
+  } finally {
+    await sql.end();
+  }
 }
