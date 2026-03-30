@@ -172,14 +172,20 @@ test.describe('BF-CC-02: Admin สร้าง Charge Code', () => {
     // ✅ PASS CRITERIA (Negative): ระบบแสดง validation error
     // "A project must have a parent" หรือข้อความ error ที่เกี่ยวข้อง
     // ตรวจหา error indicator (class สีแดง) หรือ error text ใน dialog
-    const errorIndicator = dialog.locator('[class*="error"], [class*="text-red"], [class*="destructive"]').first();
-    const errorText = dialog.getByText(/required|parent|must have|error/i).first();
-    // อย่างน้อย 1 อย่างต้อง visible: error indicator หรือ dialog ยังเปิดอยู่ (= ไม่ submit สำเร็จ)
-    const hasError = (await errorIndicator.isVisible({ timeout: 3000 }).catch(() => false)) ||
-      (await errorText.isVisible({ timeout: 2000 }).catch(() => false));
-    // ถ้าไม่มี error แต่ dialog ยังเปิดอยู่ = form ไม่ submit (ก็ถือว่า validation ทำงาน)
+    const errorIndicator = dialog.locator('[class*="error"], [class*="text-red"], [class*="destructive"], [class*="invalid"], [aria-invalid="true"]').first();
+    const errorText = dialog.getByText(/required|parent|must have|error|invalid/i).first();
+    const requiredMarker = dialog.locator('[class*="required"], label:has-text("*")').first();
+
+    const hasErrorStyle = await errorIndicator.isVisible({ timeout: 3000 }).catch(() => false);
+    const hasErrorText = await errorText.isVisible({ timeout: 2000 }).catch(() => false);
+    const hasRequiredMarker = await requiredMarker.isVisible({ timeout: 1000 }).catch(() => false);
+
+    // Dialog ต้องยังเปิดอยู่ (form ไม่ submit สำเร็จ)
     const dialogStillOpen = await dialog.isVisible().catch(() => false);
-    expect(hasError || dialogStillOpen).toBe(true);
+    expect(dialogStillOpen, 'Dialog should remain open — form must not submit successfully without parent').toBe(true);
+    // ต้องมี visual error indicator อย่างน้อย 1 อย่าง
+    expect(hasErrorStyle || hasErrorText || hasRequiredMarker,
+      'Should show validation error (red text, error message, or required indicator) in dialog').toBe(true);
 
     await snap(page, 'bf-cc-02', '03-validation-error');
 

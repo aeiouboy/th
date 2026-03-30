@@ -126,32 +126,52 @@ test('BF-AP-01: Full Approval Cycle — Employee Submit → Manager Approve → 
 
   await managerPage.goto('/approvals');
   await managerPage.waitForLoadState('load');
-  await managerPage.waitForTimeout(2000); // รอ data load
+  await expect(managerPage).not.toHaveURL(/login/);
+
+  // กด Pending Approvals tab — charge_manager default เป็น Team Status
+  const pendingTab = managerPage.locator('button[role="tab"]').filter({ hasText: 'Pending Approvals' });
+  await expect(pendingTab).toBeVisible({ timeout: 10000 });
+  await pendingTab.click();
+  await managerPage.waitForTimeout(1000);
+
+  // รอ ApprovalQueue render จริง (ต้องเห็น Approve/Reject action buttons)
+  const approveBtnAlt = managerPage.locator('[title="Approve"]').first();
+  const rejectBtnCheck = managerPage.locator('[title="Reject"]').first();
+  // Retry click tab ถ้า content ยังไม่เปลี่ยน
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (await approveBtnAlt.isVisible({ timeout: 3000 }).catch(() => false)) break;
+    if (await rejectBtnCheck.isVisible({ timeout: 1000 }).catch(() => false)) break;
+    await pendingTab.click();
+    await managerPage.waitForTimeout(2000);
+  }
 
   await snap(managerPage, 'bf-ap-01', '02-manager-sees-pending');
 
-  // ✅ PASS CRITERIA: หน้า Approvals โหลดสำเร็จ (nattaya มีสิทธิ์เข้าถึง)
-  await expect(managerPage).not.toHaveURL(/login/);
-
   // Step 3: [Manager] Approve timesheet
-  // Action: หาปุ่ม Approve แล้วคลิก
   const approveBtn = managerPage
     .getByRole('button', { name: /^Approve$/i })
     .first();
-  const approveBtnAlt = managerPage.locator('[title="Approve"]').first();
 
   const approveVisible =
     (await approveBtn.isVisible({ timeout: 5000 }).catch(() => false)) ||
     (await approveBtnAlt.isVisible({ timeout: 2000 }).catch(() => false));
 
   // ✅ PASS CRITERIA: ต้องเห็น Approve button (มี pending timesheet)
-  // ถ้าไม่มี pending timesheets แสดงว่า data state ไม่พร้อม — snap evidence ไว้
-  if (approveVisible) {
-    const btnToClick = (await approveBtn.isVisible().catch(() => false)) ? approveBtn : approveBtnAlt;
-    await btnToClick.click();
-    await managerPage.waitForTimeout(3000);
-    // ✅ PASS CRITERIA: timesheet ถูก approve (หายจาก pending หรือ status เปลี่ยน)
-  }
+  await expect(approveBtn.or(approveBtnAlt)).toBeVisible({ timeout: 10000 });
+
+  const btnToClick = (await approveBtn.isVisible().catch(() => false)) ? approveBtn : approveBtnAlt;
+  // Count pending rows before approve
+  const pendingRowsBefore = await managerPage.locator('tr, [data-slot="card"]').filter({ hasText: /Wichai|wichai/i }).count().catch(() => -1);
+  await btnToClick.click();
+  await managerPage.waitForTimeout(3000);
+
+  // ✅ PASS CRITERIA: timesheet ถูก approve — row หายจาก pending หรือ status เปลี่ยนเป็น Approved
+  const approvedIndicator = managerPage.getByText(/Approved/i).first();
+  const pendingRowsAfter = await managerPage.locator('tr, [data-slot="card"]').filter({ hasText: /Wichai|wichai/i }).count().catch(() => -1);
+  const rowDisappeared = pendingRowsBefore > 0 && pendingRowsAfter < pendingRowsBefore;
+  const hasApprovedText = await approvedIndicator.isVisible({ timeout: 5000 }).catch(() => false);
+  expect(rowDisappeared || hasApprovedText, 'Approve action should change status or remove from pending').toBe(true);
+
   await snap(managerPage, 'bf-ap-01', '03-manager-approved');
 
   await managerCtx.close();
@@ -318,6 +338,10 @@ test('BF-AP-02: Manager Reject Timesheet — Employee เห็น Rejected Stat
   // รอ Loading timesheet... หายไป
   await employeePage2.waitForSelector('text=Loading timesheet', { state: 'hidden', timeout: 30000 }).catch(() => {});
   await employeePage2.waitForTimeout(2000);
+
+  // ✅ PASS CRITERIA: Employee ต้องเห็น Rejected badge
+  const rejectedBadge = employeePage2.locator('[data-slot="badge"]:has-text("Rejected")');
+  await expect(rejectedBadge).toBeVisible({ timeout: 10000 });
 
   await snap(employeePage2, 'bf-ap-02', '04-employee-sees-rejected');
   await employeeCtx2.close();
