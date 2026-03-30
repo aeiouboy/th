@@ -188,115 +188,129 @@ test('BF-AP-01: Full Approval Cycle — Employee Submit → Manager Approve → 
 });
 
 test('BF-AP-02: Manager Reject Timesheet — Employee เห็น Rejected Status + เหตุผล', async ({ browser }) => {
-  // สถานการณ์: Employee Submit แล้ว Manager Reject พร้อมเหตุผล
   // Business Rule: Reject ต้องมีเหตุผล, employee ต้องเห็นเหตุผล
 
-  // === Step 1: [Employee wichai] Submit timesheet ===
+  // Reset DB — AP-01 อาจเปลี่ยน state ไปแล้ว
+  await resetWichaiTimesheets();
+
+  // === Step 1: [Employee wichai] เพิ่ม charge code, กรอกเวลา, Submit ===
   const employeeCtx = await browser.newContext({ storageState: authFile('wichai') });
   const employeePage = await employeeCtx.newPage();
 
   await employeePage.goto('/time-entry');
   await employeePage.waitForLoadState('load');
   await expect(employeePage.getByText(/Week of/i)).toBeVisible({ timeout: 30000 });
-  await employeePage.locator('text=Loading timesheet').waitFor({ state: 'hidden', timeout: 30000 }).catch(() => {});
+  await employeePage.waitForSelector('text=Loading timesheet', { state: 'hidden', timeout: 30000 }).catch(() => {});
 
-  // กรอกชั่วโมงถ้ายังว่าง
-  const editableCells = employeePage.locator('input[type="number"], input[inputmode="decimal"]');
-  const cellCount = await editableCells.count();
-  if (cellCount > 0) {
-    const firstCell = editableCells.first();
-    const isEnabled = await firstCell.isEnabled().catch(() => false);
-    if (isEnabled) {
-      await firstCell.click();
-      await firstCell.fill('8');
-      await firstCell.blur();
+  // เพิ่ม charge code ถ้ายังไม่มี
+  const noChargeMsg = employeePage.getByText(/No charge codes added/i);
+  if (await noChargeMsg.isVisible({ timeout: 2000 }).catch(() => false)) {
+    const addBtn = employeePage.locator('button', { hasText: /Add Charge Code/i }).first();
+    await addBtn.click();
+    await employeePage.waitForTimeout(1000);
+    const option = employeePage.locator('[role="option"], [data-radix-select-item], [cmdk-item]').first();
+    await expect(option).toBeVisible({ timeout: 5000 });
+    await option.click();
+    await employeePage.waitForTimeout(1500);
+  }
+
+  // กรอก 8 ชม. วันจันทร์ (click cell button → input → fill)
+  const cellBtn = employeePage.locator('button.cursor-text').first();
+  if (await cellBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await cellBtn.click();
+    await employeePage.waitForTimeout(300);
+    const input = employeePage.locator('input[inputmode="decimal"]');
+    if (await input.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await input.fill('8');
+      await input.blur();
       await employeePage.waitForTimeout(500);
-
-      const saveDraftBtn = employeePage.getByRole('button', { name: /Save Draft/i });
-      const saveEnabled = await saveDraftBtn.isEnabled().catch(() => false);
-      if (saveEnabled) {
-        await saveDraftBtn.click();
-        await employeePage.waitForTimeout(1500);
-      }
     }
   }
 
-  const submitBtn = employeePage.getByRole('button', { name: /^Submit$/i });
-  const submitVisible = await submitBtn.isVisible({ timeout: 5000 }).catch(() => false);
-  if (submitVisible) {
-    const isEnabled = await submitBtn.isEnabled().catch(() => false);
-    if (isEnabled) {
-      await submitBtn.click();
-      await employeePage.waitForTimeout(2000);
-      const confirmBtn = employeePage.getByRole('button', { name: /Submit Anyway|Confirm|Yes/i });
-      const confirmVisible = await confirmBtn.isVisible({ timeout: 2000 }).catch(() => false);
-      if (confirmVisible) {
-        await confirmBtn.click();
-        await employeePage.waitForTimeout(1500);
-      }
-    }
+  // Save → รอเสร็จ → Submit → รอเสร็จ
+  const saveDraftBtn = employeePage.getByRole('button', { name: /Save Draft/i });
+  if (await saveDraftBtn.isEnabled().catch(() => false)) {
+    await saveDraftBtn.click();
+    await employeePage.locator('text=Saving').waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+    await employeePage.waitForTimeout(1000);
   }
+
+  const submitBtn = employeePage.getByRole('button', { name: /Submit/i }).last();
+  await expect(submitBtn).toBeVisible({ timeout: 5000 });
+  await expect(submitBtn).toBeEnabled({ timeout: 5000 });
+  await submitBtn.click();
+  const confirmBtn = employeePage.getByRole('button', { name: /Submit Anyway|Confirm|Yes/i });
+  if (await confirmBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await confirmBtn.click();
+  }
+
+  // รอ badge เปลี่ยนเป็น Submitted (ไม่ใช่รอ text "Submitting" หาย)
+  const submittedBadge = employeePage.locator('[data-slot="badge"]:has-text("Submitted")');
+  await expect(submittedBadge).toBeVisible({ timeout: 30000 });
 
   await snap(employeePage, 'bf-ap-02', '01-submitted');
   await employeeCtx.close();
 
-  // === Step 2: [Manager nattaya] Reject พร้อมเหตุผล ===
+  // === Step 2: [Manager nattaya] เข้า Approvals → รอ data load → Reject ===
   const managerCtx = await browser.newContext({ storageState: authFile('nattaya') });
   const managerPage = await managerCtx.newPage();
 
   await managerPage.goto('/approvals');
   await managerPage.waitForLoadState('load');
-  await managerPage.waitForTimeout(2000);
+  // รอ data load จริง — กด Pending Approvals tab แล้วรอเห็น employee data
+  // กด Pending Approvals tab → รอ queue load
+  // Tab เป็น button[role="tab"] — ต้องกดจริงๆ ไม่ใช่แค่ click text
+  const pendingTab = managerPage.locator('button[role="tab"]').filter({ hasText: 'Pending Approvals' });
+  await expect(pendingTab).toBeVisible({ timeout: 10000 });
+  await pendingTab.click();
+  await managerPage.waitForTimeout(3000);
 
-  // คลิก Reject button
+  // รอ Reject button ปรากฏ (= pending queue loaded)
   const rejectBtn = managerPage.locator('[title="Reject"]').first();
-  const rejectBtnAlt = managerPage
-    .getByRole('button', { name: /Reject with Comment/i })
-    .first();
+  const rejectBtnAlt = managerPage.locator('button', { hasText: /Reject with Comment/i }).first();
 
-  const rejectVisible =
-    (await rejectBtn.isVisible({ timeout: 5000 }).catch(() => false)) ||
-    (await rejectBtnAlt.isVisible({ timeout: 2000 }).catch(() => false));
-
-  if (rejectVisible) {
-    const btnToClick = (await rejectBtn.isVisible().catch(() => false)) ? rejectBtn : rejectBtnAlt;
-    await btnToClick.click();
-    await managerPage.waitForTimeout(1000);
-
-    await snap(managerPage, 'bf-ap-02', '02-rejection-dialog');
-
-    // กรอก rejection reason
-    const reasonInput = managerPage.locator('textarea[placeholder*="reason"], textarea').first();
-    const inputVisible = await reasonInput.isVisible({ timeout: 3000 }).catch(() => false);
-    if (inputVisible) {
-      await reasonInput.fill('ชั่วโมงไม่ถูกต้อง');
-
-      // คลิก Confirm Reject
-      const confirmRejectBtn = managerPage.getByRole('button', { name: /Confirm Reject/i });
-      await confirmRejectBtn.click();
-      await managerPage.waitForTimeout(2000);
-      // ✅ PASS CRITERIA: rejection dialog ปิด, timesheet หายจาก pending
-      await snap(managerPage, 'bf-ap-02', '03-rejected');
-    } else {
-      await snap(managerPage, 'bf-ap-02', '03-rejected');
-    }
-  } else {
-    // ไม่มี pending timesheets
-    await snap(managerPage, 'bf-ap-02', '02-rejection-dialog');
-    await snap(managerPage, 'bf-ap-02', '03-rejected');
+  // รอ element ใดก็ตามที่เป็น reject action
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (await rejectBtn.isVisible({ timeout: 3000 }).catch(() => false)) break;
+    if (await rejectBtnAlt.isVisible({ timeout: 1000 }).catch(() => false)) break;
+    // อาจต้อง re-click tab
+    await pendingTab.click();
+    await managerPage.waitForTimeout(2000);
   }
+  await expect(rejectBtn.or(rejectBtnAlt)).toBeVisible({ timeout: 10000 });
+
+  // คลิก "Reject with Comment" (เปิด dialog พร้อม textarea)
+  const btnToClick = (await rejectBtnAlt.isVisible().catch(() => false)) ? rejectBtnAlt : rejectBtn;
+  await btnToClick.click();
+  await managerPage.waitForTimeout(1000);
+
+  await snap(managerPage, 'bf-ap-02', '02-rejection-dialog');
+
+  // กรอก rejection reason
+  const reasonInput = managerPage.locator('textarea').first();
+  await expect(reasonInput).toBeVisible({ timeout: 5000 });
+  await reasonInput.fill('ชั่วโมงไม่ถูกต้อง');
+
+  // คลิก Confirm Reject
+  const confirmRejectBtn = managerPage.getByRole('button', { name: /Confirm Reject/i });
+  await expect(confirmRejectBtn).toBeEnabled({ timeout: 5000 });
+  await confirmRejectBtn.click();
+  await managerPage.waitForTimeout(3000);
+  await snap(managerPage, 'bf-ap-02', '03-rejected');
 
   await managerCtx.close();
 
-  // === Step 3: [Employee wichai] เห็น rejected status พร้อมเหตุผล ===
+  // === Step 3: [Employee wichai] เห็น rejected status ===
   const employeeCtx2 = await browser.newContext({ storageState: authFile('wichai') });
   const employeePage2 = await employeeCtx2.newPage();
 
   await employeePage2.goto('/time-entry');
   await employeePage2.waitForLoadState('load');
   await expect(employeePage2.getByText(/Week of/i)).toBeVisible({ timeout: 30000 });
+  // รอ Loading timesheet... หายไป
+  await employeePage2.waitForSelector('text=Loading timesheet', { state: 'hidden', timeout: 30000 }).catch(() => {});
+  await employeePage2.waitForTimeout(2000);
 
-  // ✅ PASS CRITERIA: employee เห็น rejected status หรือเหตุผล
   await snap(employeePage2, 'bf-ap-02', '04-employee-sees-rejected');
   await employeeCtx2.close();
 });
