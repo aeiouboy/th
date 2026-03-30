@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
@@ -95,9 +96,25 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function TimeEntryPage() {
   const queryClient = useQueryClient();
-  const [weekStart, setWeekStart] = useState(() =>
-    startOfWeek(new Date(), { weekStartsOn: 1 }),
-  );
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Sync weekStart with URL ?week=yyyy-MM-dd — survives page reload
+  const [weekStart, setWeekStartState] = useState(() => {
+    const weekParam = searchParams.get('week');
+    if (weekParam) {
+      const parsed = new Date(weekParam + 'T00:00:00');
+      if (!isNaN(parsed.getTime())) return startOfWeek(parsed, { weekStartsOn: 1 });
+    }
+    return startOfWeek(new Date(), { weekStartsOn: 1 });
+  });
+
+  const setWeekStart = useCallback((date: Date) => {
+    setWeekStartState(date);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('week', format(date, 'yyyy-MM-dd'));
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
   const [gridData, setGridData] = useState<GridData>({});
   const [activeRows, setActiveRows] = useState<
     { chargeCodeId: string; name: string; isBillable: boolean | null }[]
@@ -573,29 +590,26 @@ export default function TimeEntryPage() {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {canEdit && (
-            <>
-              <Button
-                variant="outline"
-                onClick={() => saveMutation.mutate()}
-                disabled={saveMutation.isPending || !timesheet?.id}
-              >
-                {saveMutation.isPending ? 'Saving...' : 'Save Draft'}
-              </Button>
-              <Button
-                className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white"
-                onClick={checkMinHoursAndSubmit}
-                disabled={submitMutation.isPending || !timesheet?.id || cutoffInfo?.status === 'closed'}
-                title={cutoffInfo?.status === 'closed' ? 'Submission period closed' : undefined}
-              >
-                {submitMutation.isPending ? 'Submitting...' : 'Submit'}
-                {!submitMutation.isPending && <span className="ml-1">&rarr;</span>}
-              </Button>
-            </>
-          )}
-          {!canEdit && (
+          <Button
+            variant="outline"
+            onClick={() => saveMutation.mutate()}
+            disabled={!canEdit || saveMutation.isPending || !timesheet?.id}
+          >
+            {saveMutation.isPending ? 'Saving...' : 'Save Draft'}
+          </Button>
+          {canEdit ? (
+            <Button
+              className="bg-[var(--accent-teal)] hover:bg-teal-700 text-white"
+              onClick={checkMinHoursAndSubmit}
+              disabled={submitMutation.isPending || !timesheet?.id || cutoffInfo?.status === 'closed'}
+              title={cutoffInfo?.status === 'closed' ? 'Submission period closed' : undefined}
+            >
+              {submitMutation.isPending ? 'Submitting...' : 'Submit'}
+              {!submitMutation.isPending && <span className="ml-1">&rarr;</span>}
+            </Button>
+          ) : (
             <span className="text-sm text-[var(--text-secondary)]">
-              This timesheet is {timesheet?.status} and cannot be edited.
+              This timesheet is {STATUS_LABELS[timesheet?.status || ''] || timesheet?.status} and cannot be edited.
             </span>
           )}
         </div>
