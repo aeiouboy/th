@@ -91,11 +91,10 @@ async function navigateToDraftWeekWithChargeCode(page: Page) {
  * EntryCell: <button> (view) → click → <input type="text" inputMode="decimal"> (edit)
  */
 async function fillCell(page: Page, rowIndex: number, dayIndex: number, value: string) {
-  // Grid rows: each charge code row has 5-7 cell buttons (Mon-Sun)
-  // The cell buttons are inside the grid, after the charge code label
-  // Find all clickable cells (buttons with cursor-text class within the grid)
+  // Grid rows: each charge code row has 5 clickable cells (Mon-Fri only)
+  // Sat/Sun cells are disabled (not button.cursor-text) — so 5 cells per row
   const cellButtons = page.locator('button.cursor-text');
-  const targetIndex = rowIndex * 7 + dayIndex; // 7 days per row (Mon-Sun)
+  const targetIndex = rowIndex * 5 + dayIndex; // 5 weekdays per row (Mon-Fri)
 
   const cellBtn = cellButtons.nth(targetIndex);
   if (await cellBtn.isVisible({ timeout: 3000 }).catch(() => false)) {

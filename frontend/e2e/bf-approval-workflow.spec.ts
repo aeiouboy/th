@@ -295,7 +295,15 @@ test('BF-AP-02: Manager Reject Timesheet — Employee เห็น Rejected Stat
   const confirmRejectBtn = managerPage.getByRole('button', { name: /Confirm Reject/i });
   await expect(confirmRejectBtn).toBeEnabled({ timeout: 5000 });
   await confirmRejectBtn.click();
-  await managerPage.waitForTimeout(3000);
+
+  // รอ dialog ปิด + data refetch เสร็จ (skeleton หาย)
+  await managerPage.locator('text=Reject Timesheet').waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+  // รอ skeleton animation หาย — เช็คว่าไม่มี animate-pulse elements
+  await managerPage.waitForFunction(
+    () => !document.querySelector('[class*="animate-pulse"]'),
+    { timeout: 15000 }
+  ).catch(() => {});
+  await managerPage.waitForTimeout(2000);
   await snap(managerPage, 'bf-ap-02', '03-rejected');
 
   await managerCtx.close();
