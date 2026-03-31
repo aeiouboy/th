@@ -258,15 +258,18 @@ export default function AuthenticatedLayout({
             )}
           </nav>
 
-          {/* Help */}
+          {/* Help — opens in new tab since it's outside authenticated layout */}
           <div className="mt-auto px-2 pb-2">
-            <NavItem
+            <a
               href="/user-manual"
-              label="Help"
-              icon={BookOpen}
-              active={isActive('/user-manual')}
-              collapsed={collapsed}
-            />
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-3 mx-2 px-3 py-2 text-sm transition-colors relative rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/40`}
+              title={collapsed ? 'Help' : undefined}
+            >
+              <BookOpen className="w-4 h-4 shrink-0" />
+              {!collapsed && <span>Help</span>}
+            </a>
           </div>
 
           {/* Footer */}
