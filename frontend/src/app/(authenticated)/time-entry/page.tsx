@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
@@ -95,6 +95,21 @@ const STATUS_LABELS: Record<string, string> = {
 
 
 export default function TimeEntryPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-20 text-[var(--text-muted)]">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 border-2 border-[var(--accent-teal)] border-t-transparent rounded-full animate-spin" />
+          Loading timesheet...
+        </div>
+      </div>
+    }>
+      <TimeEntryContent />
+    </Suspense>
+  );
+}
+
+function TimeEntryContent() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const router = useRouter();

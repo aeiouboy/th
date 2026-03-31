@@ -224,6 +224,136 @@ describe('CalendarService', () => {
       expect(result.status).toBe('approved');
     });
   });
+
+  describe('createVacation - half-day validation', () => {
+    it('should throw BadRequestException when half-day leave spans multiple days', async () => {
+      await expect(
+        service.createVacation('u1', '2026-03-09', '2026-03-10', 'half_am'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should allow half-day leave for a single day', async () => {
+      const vacation = {
+        id: 2,
+        userId: 'u1',
+        startDate: '2026-03-09',
+        endDate: '2026-03-09',
+        leaveType: 'half_am',
+        status: 'pending',
+      };
+      db.insert.mockReturnValueOnce({
+        values: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockResolvedValue([vacation]),
+      });
+
+      const result = await service.createVacation('u1', '2026-03-09', '2026-03-09', 'half_am');
+      expect(result.status).toBe('pending');
+      expect(result.leaveType).toBe('half_am');
+    });
+
+    it('should create a full-day vacation request', async () => {
+      const vacation = {
+        id: 3,
+        userId: 'u1',
+        startDate: '2026-03-09',
+        endDate: '2026-03-13',
+        leaveType: 'full_day',
+        status: 'pending',
+      };
+      db.insert.mockReturnValueOnce({
+        values: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockResolvedValue([vacation]),
+      });
+
+      const result = await service.createVacation('u1', '2026-03-09', '2026-03-13', 'full_day');
+      expect(result.status).toBe('pending');
+      expect(result.leaveType).toBe('full_day');
+    });
+  });
+
+  describe('rejectVacation', () => {
+    it('should reject a pending vacation request', async () => {
+      const vacation = { id: 1, userId: 'u1', status: 'pending' };
+      const requester = { id: 'u1', managerId: 'manager-1' };
+      const updated = { ...vacation, status: 'rejected', approvedBy: 'manager-1' };
+
+      db.select
+        .mockReturnValueOnce(buildLimitChain([vacation]))
+        .mockReturnValueOnce(buildLimitChain([requester]));
+      db.update.mockReturnValueOnce(buildUpdateChain([updated]));
+
+      const result = await service.rejectVacation(1, 'manager-1');
+      expect(result.status).toBe('rejected');
+    });
+
+    it('should throw NotFoundException when vacation does not exist', async () => {
+      db.select.mockReturnValueOnce(buildLimitChain([]));
+      await expect(service.rejectVacation(999, 'manager-1')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException when vacation is not pending', async () => {
+      const vacation = { id: 1, userId: 'u1', status: 'approved' };
+      db.select.mockReturnValueOnce(buildLimitChain([vacation]));
+      await expect(service.rejectVacation(1, 'manager-1')).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw ForbiddenException when rejector is not the manager', async () => {
+      const vacation = { id: 1, userId: 'u1', status: 'pending' };
+      const requester = { id: 'u1', managerId: 'other-manager' };
+
+      db.select
+        .mockReturnValueOnce(buildLimitChain([vacation]))
+        .mockReturnValueOnce(buildLimitChain([requester]));
+
+      await expect(service.rejectVacation(1, 'wrong-manager')).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe('getMyVacations', () => {
+    it('should return user vacations', async () => {
+      const vacations = [
+        { id: 1, userId: 'u1', startDate: '2026-03-09', endDate: '2026-03-13', status: 'approved' },
+        { id: 2, userId: 'u1', startDate: '2026-04-01', endDate: '2026-04-01', status: 'pending' },
+      ];
+      db.select.mockReturnValueOnce(buildWhereChain(vacations));
+
+      const result = await service.getMyVacations('u1');
+      expect(result).toHaveLength(2);
+      expect(result[0].userId).toBe('u1');
+      expect(result[1].status).toBe('pending');
+    });
+  });
+
+  describe('getPendingVacationsForManager', () => {
+    it('should return empty array when manager has no direct reports', async () => {
+      db.select.mockReturnValueOnce(buildWhereChain([]));
+
+      const result = await service.getPendingVacationsForManager('manager-1');
+      expect(result).toEqual([]);
+    });
+
+    it('should return pending vacations for managed users', async () => {
+      // First select: get managed users
+      db.select.mockReturnValueOnce(buildWhereChain([{ id: 'u1' }, { id: 'u2' }]));
+      // Second select: get pending vacations with inner join
+      const pendingVacations = [
+        {
+          vacation: { id: 1, userId: 'u1', status: 'pending', startDate: '2026-04-01', endDate: '2026-04-03' },
+          user: { id: 'u1', fullName: 'User One', email: 'u1@test.com' },
+        },
+      ];
+      db.select.mockReturnValueOnce({
+        from: jest.fn().mockReturnThis(),
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue(pendingVacations),
+      });
+
+      const result = await service.getPendingVacationsForManager('manager-1');
+      expect(result).toHaveLength(1);
+      expect(result[0].vacation.status).toBe('pending');
+      expect(result[0].user.fullName).toBe('User One');
+    });
+  });
 });
 
 // Helpers
