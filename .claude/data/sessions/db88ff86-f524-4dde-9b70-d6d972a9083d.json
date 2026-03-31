@@ -2,7 +2,8 @@
   "session_id": "db88ff86-f524-4dde-9b70-d6d972a9083d",
   "prompts": [
     "/deploy",
-    "all"
+    "all",
+    "continue"
   ],
   "agent_name": "Nebula"
 }

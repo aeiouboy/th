@@ -10,18 +10,14 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "setup",
         "name": "setup",
         "testDir": "/Users/tachongrak/Projects/ts/frontend/e2e",
@@ -35,9 +31,7 @@
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "desktop",
         "name": "desktop",
         "testDir": "/Users/tachongrak/Projects/ts/frontend/e2e",
@@ -51,9 +45,7 @@
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "mobile",
         "name": "mobile",
         "testDir": "/Users/tachongrak/Projects/ts/frontend/e2e",
@@ -89,61 +81,23 @@
     "version": "1.58.2",
     "workers": 1,
     "webServer": {
-      "command": "pnpm dev --port 3000",
-      "url": "http://localhost:3000",
+      "command": "pnpm dev --port 3002",
+      "url": "http://localhost:3002",
       "reuseExistingServer": true,
       "timeout": 120000
     }
   },
-  "suites": [
+  "suites": [],
+  "errors": [
     {
-      "title": "auth.setup.ts",
-      "file": "auth.setup.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "authenticate all users",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 360000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "setup",
-              "projectName": "setup",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 40698,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-03-31T08:23:15.673Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "17e3fe6f4d9d8bd79c6b-3453aab771e18646c9cc",
-          "file": "auth.setup.ts",
-          "line": 5,
-          "column": 6
-        }
-      ]
+      "message": "Error: Process from config.webServer was not able to start. Exit code: 1",
+      "stack": "Error: Process from config.webServer was not able to start. Exit code: 1"
     }
   ],
-  "errors": [],
   "stats": {
-    "startTime": "2026-03-31T08:23:14.968Z",
-    "duration": 42461.640999999996,
-    "expected": 1,
+    "startTime": "2026-03-31T13:36:56.255Z",
+    "duration": 3918.694,
+    "expected": 0,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

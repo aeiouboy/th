@@ -1,0 +1,140 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - img "RIS" [ref=e5]
+      - navigation [ref=e6]:
+        - link "Dashboard" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - link "Time Entry" [ref=e13] [cursor=pointer]:
+          - /url: /time-entry
+          - img [ref=e14]
+        - link "Calendar" [ref=e17] [cursor=pointer]:
+          - /url: /calendar
+          - img [ref=e18]
+      - link "Help" [ref=e21] [cursor=pointer]:
+        - /url: /user-manual
+        - img [ref=e22]
+    - generic [ref=e25]:
+      - banner [ref=e26]:
+        - generic [ref=e27]:
+          - button "Expand sidebar" [ref=e28]:
+            - img [ref=e29]
+          - heading "Time Entry" [level=1] [ref=e31]
+        - generic [ref=e32]:
+          - button "Notifications" [ref=e34]:
+            - img [ref=e35]
+            - generic [ref=e38]: "12"
+          - button "WS" [ref=e39] [cursor=pointer]:
+            - generic [ref=e41]: WS
+      - main [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - button [ref=e47]:
+                - img
+              - generic [ref=e48]:
+                - heading "Week of Mar 30 – 5, 2026" [level=2] [ref=e49]
+                - paragraph [ref=e50]: March 2026
+              - button "Cannot navigate to future weeks" [disabled]:
+                - img
+              - combobox [ref=e51]:
+                - generic [ref=e52]: 2026-03-30
+                - img: ▼
+              - textbox [ref=e53]: 2026-03-30
+            - generic [ref=e55]: Submitted
+          - table [ref=e58]:
+            - rowgroup [ref=e59]:
+              - row "Charge Code Mon 30 Tue 31 Wed 1 Thu 2 Fri 3 Sat 4 Sun 5 TOTAL" [ref=e60]:
+                - columnheader "Charge Code" [ref=e61]
+                - columnheader "Mon 30" [ref=e62]:
+                  - generic [ref=e63]: Mon
+                  - generic [ref=e64]: "30"
+                - columnheader "Tue 31" [ref=e65]:
+                  - generic [ref=e66]: Tue
+                  - generic [ref=e67]: "31"
+                - columnheader "Wed 1" [ref=e68]:
+                  - generic [ref=e69]: Wed
+                  - generic [ref=e70]: "1"
+                - columnheader "Thu 2" [ref=e71]:
+                  - generic [ref=e72]: Thu
+                  - generic [ref=e73]: "2"
+                - columnheader "Fri 3" [ref=e74]:
+                  - generic [ref=e75]: Fri
+                  - generic [ref=e76]: "3"
+                - columnheader "Sat 4" [ref=e77]:
+                  - generic [ref=e78]: Sat
+                  - generic [ref=e79]: "4"
+                - columnheader "Sun 5" [ref=e80]:
+                  - generic [ref=e81]: Sun
+                  - generic [ref=e82]: "5"
+                - columnheader "TOTAL" [ref=e83]
+            - rowgroup [ref=e84]:
+              - row "ACT-001 Order Service billable 8.00 - - - - - - 8.00" [ref=e85]:
+                - cell "ACT-001 Order Service billable" [ref=e86]:
+                  - generic [ref=e87]:
+                    - generic [ref=e88]:
+                      - generic [ref=e89]: ACT-001
+                      - generic [ref=e90]: Order Service
+                    - generic [ref=e91]: billable
+                - cell "8.00" [ref=e92]:
+                  - generic [ref=e93]: "8.00"
+                - cell "-" [ref=e94]:
+                  - generic [ref=e95]: "-"
+                - cell "-" [ref=e96]:
+                  - generic [ref=e97]: "-"
+                - cell "-" [ref=e98]:
+                  - generic [ref=e99]: "-"
+                - cell "-" [ref=e100]:
+                  - generic [ref=e101]: "-"
+                - cell "-" [ref=e102]:
+                  - generic [ref=e103]: "-"
+                - cell "-" [ref=e104]:
+                  - generic [ref=e105]: "-"
+                - cell "8.00" [ref=e106]
+            - rowgroup [ref=e107]:
+              - row "Daily Total 8.00 0.00 0.00 0.00 0.00 0.00 0.00 8.00" [ref=e108]:
+                - cell "Daily Total" [ref=e109]
+                - cell "8.00" [ref=e110]
+                - cell "0.00" [ref=e111]
+                - cell "0.00" [ref=e112]
+                - cell "0.00" [ref=e113]
+                - cell "0.00" [ref=e114]
+                - cell "0.00" [ref=e115]
+                - cell "0.00" [ref=e116]
+                - cell "8.00" [ref=e117]
+              - row "Required 8.00 8.00 8.00 8.00 8.00 - - 40.00" [ref=e118]:
+                - cell "Required" [ref=e119]
+                - cell "8.00" [ref=e120]
+                - cell "8.00" [ref=e121]
+                - cell "8.00" [ref=e122]
+                - cell "8.00" [ref=e123]
+                - cell "8.00" [ref=e124]
+                - cell "-" [ref=e125]
+                - cell "-" [ref=e126]
+                - cell "40.00" [ref=e127]
+              - row "Variance ✓ -8.0 -8.0 -8.0 -8.0 - - -32.0" [ref=e128]:
+                - cell "Variance" [ref=e129]
+                - cell "✓" [ref=e130]
+                - cell "-8.0" [ref=e131]
+                - cell "-8.0" [ref=e132]
+                - cell "-8.0" [ref=e133]
+                - cell "-8.0" [ref=e134]
+                - cell "-" [ref=e135]
+                - cell "-" [ref=e136]
+                - cell "-32.0" [ref=e137]
+          - generic [ref=e138]:
+            - generic [ref=e140]: Auto-saves every 30s
+            - generic [ref=e141]:
+              - button "Save Draft" [disabled]
+              - generic [ref=e142]: This timesheet is Submitted and cannot be edited.
+    - button "Open chat" [ref=e143] [cursor=pointer]:
+      - img [ref=e144]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e151] [cursor=pointer]:
+    - img [ref=e152]
+  - alert [ref=e155]
+```

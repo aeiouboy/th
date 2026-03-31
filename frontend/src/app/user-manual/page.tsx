@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Table,
@@ -82,20 +82,48 @@ function Section({ id, title, num, icon: Icon, children, defaultOpen = false }: 
   );
 }
 
-/* ── Styled img with caption ─────────────────── */
-function Screenshot({ src, alt }: { src: string; alt: string }) {
+/* ── Lightbox ────────────────────────────────── */
+function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
   return (
-    <figure className="my-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm cursor-pointer"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 text-white bg-black/50 rounded-full w-10 h-10 flex items-center justify-center text-xl hover:bg-black/70 transition-colors cursor-pointer"
+        aria-label="Close"
+      >
+        ×
+      </button>
       <img
         src={src}
         alt={alt}
-        className="w-full rounded-lg border border-[var(--border-default)] shadow-sm"
-        loading="lazy"
+        className="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl object-contain"
+        onClick={(e) => e.stopPropagation()}
       />
-      <figcaption className="mt-1.5 text-xs text-[var(--text-muted)] text-center">
-        {alt}
-      </figcaption>
-    </figure>
+    </div>
+  );
+}
+
+/* ── Styled img with caption + lightbox ──────── */
+function Screenshot({ src, alt }: { src: string; alt: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <figure className="my-4 cursor-pointer group" onClick={() => setOpen(true)}>
+        <img
+          src={src}
+          alt={alt}
+          className="w-full rounded-lg border border-[var(--border-default)] shadow-sm group-hover:shadow-md group-hover:border-teal-300 transition-all"
+          loading="lazy"
+        />
+        <figcaption className="mt-1.5 text-xs text-[var(--text-muted)] text-center group-hover:text-teal-600 transition-colors">
+          {alt} — กดเพื่อขยาย
+        </figcaption>
+      </figure>
+      {open && <Lightbox src={src} alt={alt} onClose={() => setOpen(false)} />}
+    </>
   );
 }
 
@@ -241,6 +269,7 @@ export default function UserManualPage() {
       {/* ─── 2. การเข้าใช้งาน ─────────────────────── */}
       <Section id="login" num="2" title="การเข้าใช้งาน" icon={Users}>
         <h4 className="font-semibold">2.1 เข้าสู่ระบบ (Login)</h4>
+        <Screenshot src="/manual/01-login-page.png" alt="หน้าเข้าสู่ระบบ (Login)" />
         <ol className="list-decimal list-inside space-y-1 ml-2">
           <li>เปิดเว็บไซต์ระบบ Timesheet ขององค์กร</li>
           <li>กรอก <strong>อีเมล</strong> ในช่องแรก (ตัวอย่าง: you@central.co.th)</li>
@@ -251,6 +280,8 @@ export default function UserManualPage() {
           </li>
           <li>กดปุ่มสีเขียว <strong>&quot;Sign In&quot;</strong></li>
         </ol>
+
+        <Screenshot src="/manual/02-login-filled.png" alt="กรอกอีเมลและรหัสผ่าน" />
 
         <p className="mt-3"><strong>วิธีเข้าสู่ระบบอื่น:</strong></p>
         <ul className="list-disc list-inside space-y-1 ml-2">

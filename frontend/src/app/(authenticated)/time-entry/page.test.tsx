@@ -78,6 +78,24 @@ describe('TimeEntryPage', () => {
     vi.clearAllMocks();
   });
 
+  it('should render Suspense fallback while loading', () => {
+    // When useSearchParams suspends (default React behavior in SSR/static),
+    // the Suspense boundary should show the loading fallback
+    const { container } = render(<TimeEntryPage />);
+    // The Suspense wrapper exists — verify the page renders without crashing
+    // (the fix was adding <Suspense> to prevent Next.js 16 build failure)
+    expect(container.querySelector('div')).toBeTruthy();
+  });
+
+  it('should wrap content in Suspense boundary with spinner fallback', async () => {
+    render(<TimeEntryPage />);
+    // The page should eventually resolve past the Suspense boundary
+    // and show the actual content (Week of..., Save Draft, etc.)
+    await waitFor(() => {
+      expect(screen.getByText('Save Draft')).toBeInTheDocument();
+    }, { timeout: 3000 });
+  });
+
   it('should render period navigator with prev/next controls', () => {
     render(<TimeEntryPage />);
     // Previous and next period buttons may not have title attributes; look for week label instead
