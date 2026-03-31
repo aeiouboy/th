@@ -206,6 +206,10 @@ export default function ReportsPage() {
     return options;
   }, []);
 
+  const handleExportPdf = () => {
+    window.print();
+  };
+
   const handleExportCsv = () => {
     const rows = [['Severity', 'Charge Code', 'Name', 'Budget', 'Actual', 'Forecast']];
     for (const a of budgetAlerts) {
@@ -232,7 +236,7 @@ export default function ReportsPage() {
               <FileDown className="w-3.5 h-3.5 mr-1.5" />
               Export CSV
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={handleExportPdf}>
               <FileText className="w-3.5 h-3.5 mr-1.5" />
               Export PDF
             </Button>
@@ -244,7 +248,7 @@ export default function ReportsPage() {
         <TabsList variant="line" className="mb-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="by-program">By Program</TabsTrigger>
-          <TabsTrigger value="by-cost-center">By Cost Center</TabsTrigger>
+          <TabsTrigger value="by-cost-center">By Department</TabsTrigger>
           <TabsTrigger value="by-person">By Person</TabsTrigger>
         </TabsList>
 
@@ -253,13 +257,15 @@ export default function ReportsPage() {
             {/* Filter bar */}
             <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
               <Select value={selectedProgram} onValueChange={(v) => v && setSelectedProgram(v)}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-[160px] max-w-[200px]">
                   <SelectValue placeholder="Program" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-w-[300px]">
                   <SelectItem value="all">All Programs</SelectItem>
                   {programs.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    <SelectItem key={p.id} value={p.id}>
+                      <span className="truncate block max-w-[250px]">{p.name}</span>
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

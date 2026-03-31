@@ -309,6 +309,13 @@ export class ChargeCodesService {
     descendantIds.add(id);
     const allRelevantIds = descendantIds;
 
+    // Build entries cost map (actual cost from timesheet entries per charge code)
+    const entryCostMap = new Map<string, number>();
+    for (const entry of entries) {
+      const cost = Number(entry.totalCost ?? 0);
+      entryCostMap.set(entry.chargeCodeId, (entryCostMap.get(entry.chargeCodeId) ?? 0) + cost);
+    }
+
     // Build budget tree
     const buildBudgetTree = (parentId: string): any[] => {
       return allCodes
@@ -316,7 +323,9 @@ export class ChargeCodesService {
         .map((c) => {
           const b = budgetMap.get(c.id);
           const budget = Number(b?.budgetAmount ?? c.budgetAmount ?? 0);
-          const actual = Number(b?.actualSpent ?? 0);
+          const budgetActual = Number(b?.actualSpent ?? 0);
+          const entryActual = entryCostMap.get(c.id) ?? 0;
+          const actual = budgetActual > 0 ? budgetActual : entryActual;
           return {
             id: c.id,
             name: c.name,
@@ -356,8 +365,26 @@ export class ChargeCodesService {
     const totalHours = Array.from(personMap.values()).reduce((s, p) => s + p.hours, 0);
 
     const codeBudget = budgetMap.get(id);
-    const topBudget = Number(codeBudget?.budgetAmount ?? code.budgetAmount ?? 0);
-    const topActual = Number(codeBudget?.actualSpent ?? 0);
+    const ownBudget = Number(codeBudget?.budgetAmount ?? code.budgetAmount ?? 0);
+
+    // Aggregate budget + actual from all descendants if own budget is 0
+    const aggregateFromTree = (nodes: any[]): { budget: number; actual: number } => {
+      let budget = 0;
+      let actual = 0;
+      for (const node of nodes) {
+        budget += node.budget;
+        actual += node.actual;
+        const childAgg = aggregateFromTree(node.children);
+        budget += childAgg.budget;
+        actual += childAgg.actual;
+      }
+      return { budget, actual };
+    };
+
+    const children = buildBudgetTree(id);
+    const childAgg = aggregateFromTree(children);
+    const topBudget = ownBudget > 0 ? ownBudget : childAgg.budget;
+    const topActual = childAgg.actual || Number(codeBudget?.actualSpent ?? 0);
 
     return {
       budget: topBudget,

@@ -99,10 +99,10 @@ function BudgetTreeNode({ node, depth = 0 }: { node: BudgetNode; depth?: number 
           <span className={cn('text-xs font-mono w-12 text-right', getProgressTextColor(node.percentage))}>
             {node.percentage}%
           </span>
-          <span className="text-xs font-mono text-[var(--text-secondary)] w-20 text-right">
+          <span className="text-xs font-mono text-[var(--text-secondary)] w-28 text-right">
             {formatCurrency(node.actual)}
           </span>
-          <span className="text-xs font-mono text-[var(--text-muted)] w-20 text-right">
+          <span className="text-xs font-mono text-[var(--text-muted)] w-28 text-right">
             / {formatCurrency(node.budget)}
           </span>
         </div>

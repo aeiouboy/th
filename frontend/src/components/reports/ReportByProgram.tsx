@@ -95,14 +95,18 @@ export function ReportByProgram() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <Select value={selectedProgram} onValueChange={(v) => v && setSelectedProgram(v)}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[200px] max-w-[200px]">
             <SelectValue placeholder="เลือก Program">
-              {selectedProgram ? (programs.find((p) => p.id === selectedProgram)?.name ?? selectedProgram) : 'เลือก Program'}
+              <span className="truncate block max-w-[160px]">
+                {selectedProgram ? (programs.find((p) => p.id === selectedProgram)?.name ?? selectedProgram) : 'เลือก Program'}
+              </span>
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-w-[300px]">
             {programs.map((p) => (
-              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+              <SelectItem key={p.id} value={p.id}>
+                <span className="truncate block max-w-[250px]">{p.name}</span>
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>

@@ -577,12 +577,25 @@ export default function UserManualPage() {
           <TableBody>
             <TableRow><TableCell className="font-medium">Overview</TableCell><TableCell>ภาพรวม — กราฟ Budget vs Actual, Chargeability, Activity Distribution</TableCell></TableRow>
             <TableRow><TableCell className="font-medium">By Program</TableCell><TableCell>รายละเอียดแยกตามโปรแกรม</TableCell></TableRow>
-            <TableRow><TableCell className="font-medium">By Cost Center</TableCell><TableCell>แยกตามหน่วยงาน (สำหรับฝ่ายการเงิน)</TableCell></TableRow>
+            <TableRow><TableCell className="font-medium">By Department</TableCell><TableCell>แยกตามหน่วยงาน/แผนก (สำหรับฝ่ายการเงิน)</TableCell></TableRow>
             <TableRow><TableCell className="font-medium">By Person</TableCell><TableCell>ค้นหาชื่อ → ดูชั่วโมง อัตรา charge งาน</TableCell></TableRow>
           </TableBody>
         </Table>
 
-        <p className="mt-3">กดปุ่ม <strong>&quot;Export...&quot;</strong> มุมขวาบน → เลือก Export CSV หรือ Export PDF</p>
+        <h4 className="font-semibold mt-4">9.3 By Program</h4>
+        <Screenshot src="/manual/06-02-reports-by-program.png" alt="Reports — By Program: Budget vs Actual แยกตามโปรแกรม" />
+        <p>เลือกโปรแกรมจาก dropdown → ดู Budget vs Actual chart, Task Distribution, Team Distribution</p>
+
+        <h4 className="font-semibold mt-4">9.4 By Department</h4>
+        <Screenshot src="/manual/06-03-reports-by-department.png" alt="Reports — By Department: Chargeability ของแผนก" />
+        <p>เลือกแผนกจาก dropdown → ดู Chargeability gauge, Charge Distribution by Program, Team Members</p>
+
+        <h4 className="font-semibold mt-4">9.5 By Person</h4>
+        <Screenshot src="/manual/06-04-reports-by-person.png" alt="Reports — By Person: ชั่วโมงทำงานรายบุคคล" />
+        <p>เลือกบุคคล → ดู KPI cards, Monthly Hours by Program (stacked bar chart), Project Summary table</p>
+
+        <h4 className="font-semibold mt-4">9.6 ส่งออกข้อมูล (Export)</h4>
+        <p>กดปุ่ม <strong>&quot;Export CSV&quot;</strong> → ดาวน์โหลดเป็นตาราง (เปิดใน Excel ได้) หรือ <strong>&quot;Export PDF&quot;</strong> → พิมพ์เป็น PDF</p>
       </Section>
 
       {/* ─── 10. Budget ──────────────────────────── */}

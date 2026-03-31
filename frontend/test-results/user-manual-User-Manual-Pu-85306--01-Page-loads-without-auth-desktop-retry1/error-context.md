@@ -1,0 +1,256 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - link "กลับสู่ระบบหลัก" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - img [ref=e4]
+      - text: กลับสู่ระบบหลัก
+    - generic [ref=e6]:
+      - heading "คู่มือการใช้งานระบบ Timesheet" [level=1] [ref=e7]
+      - paragraph [ref=e8]: RIS Timesheet & Cost Allocation System — เวอร์ชัน 4.1 ภาษาไทย
+      - generic [ref=e10]: "อัปเดต: 31 มีนาคม 2026"
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]: ใครควรอ่านส่วนไหน
+        - generic [ref=e14]: คู่มือนี้ครอบคลุมทุกบทบาท — ใช้ตารางเพื่อข้ามไปยังส่วนที่เกี่ยวข้องกับคุณ
+      - table [ref=e17]:
+        - rowgroup [ref=e18]:
+          - row "บทบาท สัญลักษณ์ ส่วนที่ควรอ่าน" [ref=e19]:
+            - columnheader "บทบาท" [ref=e20]
+            - columnheader "สัญลักษณ์" [ref=e21]
+            - columnheader "ส่วนที่ควรอ่าน" [ref=e22]
+        - rowgroup [ref=e23]:
+          - row "พนักงานทั่วไป (Employee) 👤 บทที่ 1–5 ภาพรวม, เข้าสู่ระบบ, Dashboard, กรอกเวลา, AI · 8 ปฏิทิน · 11 ตั้งค่า · 14 สรุปขั้นตอน" [ref=e24]:
+            - cell "พนักงานทั่วไป (Employee)" [ref=e25]
+            - cell "👤" [ref=e26]
+            - cell "บทที่ 1–5 ภาพรวม, เข้าสู่ระบบ, Dashboard, กรอกเวลา, AI · 8 ปฏิทิน · 11 ตั้งค่า · 14 สรุปขั้นตอน" [ref=e27]
+          - row "หัวหน้างาน (Charge Manager) 👔 ทุกส่วนของพนักงาน + บทที่ 6 อนุมัติ · 7 รหัสงาน" [ref=e28]:
+            - cell "หัวหน้างาน (Charge Manager)" [ref=e29]
+            - cell "👔" [ref=e30]
+            - cell "ทุกส่วนของพนักงาน + บทที่ 6 อนุมัติ · 7 รหัสงาน" [ref=e31]
+          - row "ผู้ดูแลระบบ (Admin) ⚙️ ทุกส่วน รวมถึง บทที่ 9 รายงาน · 10 งบประมาณ · 12 จัดการระบบ · 13 สิทธิ์" [ref=e32]:
+            - cell "ผู้ดูแลระบบ (Admin)" [ref=e33]
+            - cell "⚙️" [ref=e34]
+            - cell "ทุกส่วน รวมถึง บทที่ 9 รายงาน · 10 งบประมาณ · 12 จัดการระบบ · 13 สิทธิ์" [ref=e35]
+          - row "PMO / Finance 📊 ทุกส่วนของพนักงาน + บทที่ 7 รหัสงาน · 9 รายงาน · 10 งบประมาณ" [ref=e36]:
+            - cell "PMO / Finance" [ref=e37]
+            - cell "📊" [ref=e38]
+            - cell "ทุกส่วนของพนักงาน + บทที่ 7 รหัสงาน · 9 รายงาน · 10 งบประมาณ" [ref=e39]
+    - generic [ref=e40]:
+      - generic [ref=e42]: สารบัญ
+      - generic [ref=e44]:
+        - link "1. ภาพรวมระบบ" [ref=e45] [cursor=pointer]:
+          - /url: "#overview"
+          - img [ref=e46]
+          - generic [ref=e48]: "1."
+          - generic [ref=e49]: ภาพรวมระบบ
+        - link "2. การเข้าใช้งาน" [ref=e50] [cursor=pointer]:
+          - /url: "#login"
+          - img [ref=e51]
+          - generic [ref=e56]: "2."
+          - generic [ref=e57]: การเข้าใช้งาน
+        - link "3. หน้าหลัก (Dashboard)" [ref=e58] [cursor=pointer]:
+          - /url: "#dashboard"
+          - img [ref=e59]
+          - generic [ref=e64]: "3."
+          - generic [ref=e65]: หน้าหลัก (Dashboard)
+        - link "4. การกรอกเวลา (Time Entry)" [ref=e66] [cursor=pointer]:
+          - /url: "#time-entry"
+          - img [ref=e67]
+          - generic [ref=e70]: "4."
+          - generic [ref=e71]: การกรอกเวลา (Time Entry)
+        - link "5. ฟีเจอร์ AI" [ref=e72] [cursor=pointer]:
+          - /url: "#ai"
+          - img [ref=e73]
+          - generic [ref=e76]: "5."
+          - generic [ref=e77]: ฟีเจอร์ AI
+        - link "6. การอนุมัติ (Approval)" [ref=e78] [cursor=pointer]:
+          - /url: "#approval"
+          - img [ref=e79]
+          - generic [ref=e82]: "6."
+          - generic [ref=e83]: การอนุมัติ (Approval)
+        - link "7. รหัสงาน (Charge Codes)" [ref=e84] [cursor=pointer]:
+          - /url: "#charge-codes"
+          - img [ref=e85]
+          - generic [ref=e88]: "7."
+          - generic [ref=e89]: รหัสงาน (Charge Codes)
+        - link "8. ปฏิทินและวันลา" [ref=e90] [cursor=pointer]:
+          - /url: "#calendar"
+          - img [ref=e91]
+          - generic [ref=e93]: "8."
+          - generic [ref=e94]: ปฏิทินและวันลา
+        - link "9. รายงาน (Reports)" [ref=e95] [cursor=pointer]:
+          - /url: "#reports"
+          - img [ref=e96]
+          - generic [ref=e98]: "9."
+          - generic [ref=e99]: รายงาน (Reports)
+        - link "10. งบประมาณ (Budget)" [ref=e100] [cursor=pointer]:
+          - /url: "#budget"
+          - img [ref=e101]
+          - generic [ref=e103]: "10."
+          - generic [ref=e104]: งบประมาณ (Budget)
+        - link "11. การตั้งค่า (Settings)" [ref=e105] [cursor=pointer]:
+          - /url: "#settings"
+          - img [ref=e106]
+          - generic [ref=e109]: "11."
+          - generic [ref=e110]: การตั้งค่า (Settings)
+        - link "12. จัดการระบบ (Admin)" [ref=e111] [cursor=pointer]:
+          - /url: "#admin"
+          - img [ref=e112]
+          - generic [ref=e115]: "12."
+          - generic [ref=e116]: จัดการระบบ (Admin)
+        - link "13. สิทธิ์การใช้งานตามบทบาท" [ref=e117] [cursor=pointer]:
+          - /url: "#permissions"
+          - img [ref=e118]
+          - generic [ref=e123]: "13."
+          - generic [ref=e124]: สิทธิ์การใช้งานตามบทบาท
+        - link "14. สรุปขั้นตอนประจำสัปดาห์" [ref=e125] [cursor=pointer]:
+          - /url: "#weekly"
+          - img [ref=e126]
+          - generic [ref=e128]: "14."
+          - generic [ref=e129]: สรุปขั้นตอนประจำสัปดาห์
+    - separator [ref=e130]
+    - generic [ref=e131]:
+      - generic [ref=e133] [cursor=pointer]:
+        - img [ref=e135]
+        - generic [ref=e137]: บทที่ 1. ภาพรวมระบบ
+        - img [ref=e138]
+      - generic [ref=e140]:
+        - paragraph [ref=e141]: ระบบ Timesheet เป็นเครื่องมือบันทึกเวลาทำงานและจัดสรรต้นทุนขององค์กร ใช้งานผ่านเว็บเบราว์เซอร์ได้ทุกอุปกรณ์
+        - heading "ระบบนี้ทำอะไรได้:" [level=4] [ref=e142]
+        - table [ref=e144]:
+          - rowgroup [ref=e145]:
+            - row "ความสามารถ รายละเอียด" [ref=e146]:
+              - columnheader "ความสามารถ" [ref=e147]
+              - columnheader "รายละเอียด" [ref=e148]
+          - rowgroup [ref=e149]:
+            - row "บันทึกเวลา กรอกชั่วโมงทำงานรายสัปดาห์ แยกตามรหัสงาน (Charge Code)" [ref=e150]:
+              - cell "บันทึกเวลา" [ref=e151]
+              - cell "กรอกชั่วโมงทำงานรายสัปดาห์ แยกตามรหัสงาน (Charge Code)" [ref=e152]
+            - row "ส่ง-อนุมัติ ส่งใบบันทึกเวลาให้หัวหน้าตรวจสอบและอนุมัติ" [ref=e153]:
+              - cell "ส่ง-อนุมัติ" [ref=e154]
+              - cell "ส่งใบบันทึกเวลาให้หัวหน้าตรวจสอบและอนุมัติ" [ref=e155]
+            - row "ปฏิทินและวันลา ดูวันหยุด วันลา และขอลาพักร้อน" [ref=e156]:
+              - cell "ปฏิทินและวันลา" [ref=e157]
+              - cell "ดูวันหยุด วันลา และขอลาพักร้อน" [ref=e158]
+            - row "ติดตามงบประมาณ เปรียบเทียบงบที่ตั้งไว้กับค่าใช้จ่ายจริง" [ref=e159]:
+              - cell "ติดตามงบประมาณ" [ref=e160]
+              - cell "เปรียบเทียบงบที่ตั้งไว้กับค่าใช้จ่ายจริง" [ref=e161]
+            - row "รายงาน วิเคราะห์ต้นทุน อัตรา chargeability แยกตามโปรแกรม/หน่วยงาน/บุคคล" [ref=e162]:
+              - cell "รายงาน" [ref=e163]
+              - cell "วิเคราะห์ต้นทุน อัตรา chargeability แยกตามโปรแกรม/หน่วยงาน/บุคคล" [ref=e164]
+            - row "การแจ้งเตือน แจ้งเตือนกำหนดส่ง สถานะอนุมัติ และงบประมาณ" [ref=e165]:
+              - cell "การแจ้งเตือน" [ref=e166]
+              - cell "แจ้งเตือนกำหนดส่ง สถานะอนุมัติ และงบประมาณ" [ref=e167]
+        - heading "เมนูหลักทางซ้ายมือ (Sidebar):" [level=4] [ref=e168]
+        - table [ref=e170]:
+          - rowgroup [ref=e171]:
+            - row "ไอคอน หน้า ผู้ที่เห็น" [ref=e172]:
+              - columnheader "ไอคอน" [ref=e173]
+              - columnheader "หน้า" [ref=e174]
+              - columnheader "ผู้ที่เห็น" [ref=e175]
+          - rowgroup [ref=e176]:
+            - row "🏠 Dashboard หน้าหลัก ทุกคน" [ref=e177]:
+              - cell "🏠 Dashboard" [ref=e178]
+              - cell "หน้าหลัก" [ref=e179]
+              - cell "ทุกคน" [ref=e180]
+            - row "🕐 Time Entry บันทึกเวลา ทุกคน" [ref=e181]:
+              - cell "🕐 Time Entry" [ref=e182]
+              - cell "บันทึกเวลา" [ref=e183]
+              - cell "ทุกคน" [ref=e184]
+            - row "📅 Calendar ปฏิทินและวันลา ทุกคน" [ref=e185]:
+              - cell "📅 Calendar" [ref=e186]
+              - cell "ปฏิทินและวันลา" [ref=e187]
+              - cell "ทุกคน" [ref=e188]
+            - row "🏷️ Charge Codes รหัสงาน หัวหน้า, ผู้ดูแล" [ref=e189]:
+              - cell "🏷️ Charge Codes" [ref=e190]
+              - cell "รหัสงาน" [ref=e191]
+              - cell "หัวหน้า, ผู้ดูแล" [ref=e192]
+            - row "✅ Approvals อนุมัติ หัวหน้า, ผู้ดูแล" [ref=e193]:
+              - cell "✅ Approvals" [ref=e194]
+              - cell "อนุมัติ" [ref=e195]
+              - cell "หัวหน้า, ผู้ดูแล" [ref=e196]
+            - row "📊 Reports รายงาน ผู้บริหาร, การเงิน" [ref=e197]:
+              - cell "📊 Reports" [ref=e198]
+              - cell "รายงาน" [ref=e199]
+              - cell "ผู้บริหาร, การเงิน" [ref=e200]
+            - row "💰 Budget งบประมาณ ผู้บริหาร, การเงิน" [ref=e201]:
+              - cell "💰 Budget" [ref=e202]
+              - cell "งบประมาณ" [ref=e203]
+              - cell "ผู้บริหาร, การเงิน" [ref=e204]
+            - row "👥 Admin จัดการผู้ใช้/ปฏิทิน/อัตรา ผู้ดูแลระบบ" [ref=e205]:
+              - cell "👥 Admin" [ref=e206]
+              - cell "จัดการผู้ใช้/ปฏิทิน/อัตรา" [ref=e207]
+              - cell "ผู้ดูแลระบบ" [ref=e208]
+            - row "⚙️ Settings ตั้งค่า ทุกคน" [ref=e209]:
+              - cell "⚙️ Settings" [ref=e210]
+              - cell "ตั้งค่า" [ref=e211]
+              - cell "ทุกคน" [ref=e212]
+    - generic [ref=e215] [cursor=pointer]:
+      - img [ref=e217]
+      - generic [ref=e222]: บทที่ 2. การเข้าใช้งาน
+      - img [ref=e223]
+    - generic [ref=e227] [cursor=pointer]:
+      - img [ref=e229]
+      - generic [ref=e234]: บทที่ 3. หน้าหลัก (Dashboard)
+      - img [ref=e235]
+    - generic [ref=e239] [cursor=pointer]:
+      - img [ref=e241]
+      - generic [ref=e244]: บทที่ 4. การกรอกเวลา (Time Entry)
+      - img [ref=e245]
+    - generic [ref=e249] [cursor=pointer]:
+      - img [ref=e251]
+      - generic [ref=e254]: บทที่ 5. ฟีเจอร์ AI (AI-Powered Features)
+      - img [ref=e255]
+    - generic [ref=e259] [cursor=pointer]:
+      - img [ref=e261]
+      - generic [ref=e264]: บทที่ 6. การอนุมัติ (Approval Workflow)
+      - img [ref=e265]
+    - generic [ref=e269] [cursor=pointer]:
+      - img [ref=e271]
+      - generic [ref=e274]: บทที่ 7. รหัสงาน (Charge Codes)
+      - img [ref=e275]
+    - generic [ref=e279] [cursor=pointer]:
+      - img [ref=e281]
+      - generic [ref=e283]: บทที่ 8. ปฏิทินและวันลา
+      - img [ref=e284]
+    - generic [ref=e288] [cursor=pointer]:
+      - img [ref=e290]
+      - generic [ref=e292]: บทที่ 9. รายงาน (Reports & Analytics)
+      - img [ref=e293]
+    - generic [ref=e297] [cursor=pointer]:
+      - img [ref=e299]
+      - generic [ref=e301]: บทที่ 10. งบประมาณ (Budget)
+      - img [ref=e302]
+    - generic [ref=e306] [cursor=pointer]:
+      - img [ref=e308]
+      - generic [ref=e311]: บทที่ 11. การตั้งค่า (Settings)
+      - img [ref=e312]
+    - generic [ref=e316] [cursor=pointer]:
+      - img [ref=e318]
+      - generic [ref=e321]: บทที่ 12. จัดการระบบ (Admin)
+      - img [ref=e322]
+    - generic [ref=e326] [cursor=pointer]:
+      - img [ref=e328]
+      - generic [ref=e333]: บทที่ 13. สิทธิ์การใช้งานตามบทบาท
+      - img [ref=e334]
+    - generic [ref=e338] [cursor=pointer]:
+      - img [ref=e340]
+      - generic [ref=e342]: บทที่ 14. สรุปขั้นตอนประจำสัปดาห์
+      - img [ref=e343]
+    - generic [ref=e345]:
+      - paragraph [ref=e346]:
+        - text: ต้องการความช่วยเหลือเพิ่มเติม? ติดต่อฝ่าย IT หรือใช้
+        - img [ref=e347]
+        - text: AI Chatbot ในระบบ
+      - link "เข้าสู่ระบบ Timesheet" [ref=e349] [cursor=pointer]:
+        - /url: /
+        - img [ref=e350]
+        - text: เข้าสู่ระบบ Timesheet
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e357] [cursor=pointer]:
+    - img [ref=e358]
+  - alert [ref=e361]
+```

@@ -1,0 +1,7 @@
+{
+  "session_id": "bfa93c9a-873d-412b-8890-fe2001cd9548",
+  "prompts": [
+    "[AUTO-TEST] ## Auto-triggered: Write tests for new commits in Timesheet\n\n### Recent Commits\n- d0589768: fix: Help sidebar link opens user manual in new tab\n\n### Changed Source Files (1)\n- frontend/src/app/(authenticated)/layout.tsx\n\n\n### Instructions\n1. Read the changed files to understand what was modified\n2. Write/update tests to cover the new/changed functionality\n3. Focus on the most critical paths \u2014 don't test every line\n4. Tests should pass with: `cd frontend && npx playwright test`\n5. Report: files created/modified, test count, coverage summary"
+  ],
+  "agent_name": "Cipher"
+}

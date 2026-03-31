@@ -135,6 +135,37 @@ test.describe('System CR-18/19/20/21 + BUG-01/02/03', () => {
     await takeScreenshots(page, 'admin-users');
   });
 
+  test('E2E-SYS-05: Help sidebar link opens user manual in new tab', async ({ page }) => {
+    // Navigate to any authenticated page
+    await page.goto('/');
+    await page.waitForLoadState('load');
+    await expect(page.locator('main')).toBeVisible({ timeout: 25000 });
+
+    // Find the Help link in sidebar
+    const helpLink = page.locator('a[href="/user-manual"]');
+    await expect(helpLink).toBeVisible({ timeout: 5000 });
+
+    // Verify it has target="_blank" for new tab behavior
+    await expect(helpLink).toHaveAttribute('target', '_blank');
+    await expect(helpLink).toHaveAttribute('rel', /noopener/);
+
+    // Verify clicking opens a new tab (popup)
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent('page'),
+      helpLink.click(),
+    ]);
+
+    // New tab should navigate to /user-manual
+    await newPage.waitForLoadState('load');
+    expect(newPage.url()).toContain('/user-manual');
+
+    // Original page should still be on dashboard (not navigated away)
+    expect(page.url()).not.toContain('/user-manual');
+
+    await snap(page, 'e2e-sys-05', 'help-opens-new-tab');
+    await newPage.close();
+  });
+
   test('E2E-BUG-01: Auth state listener invalidates cache on sign out (CR-18)', async ({ page }) => {
     // Step 1: Navigate to dashboard (authenticated)
     await page.goto('/');

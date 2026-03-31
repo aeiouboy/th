@@ -109,8 +109,14 @@ export default function AuthenticatedLayout({
     const supabase = supabaseRef.current;
     if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
         queryClient.invalidateQueries();
+        // Re-fetch user profile when auth state changes
+        api.get<{ role: string; fullName: string | null; avatarUrl: string | null }>('/users/me').then((profile) => {
+          setUserRole(profile.role);
+          setUserName(profile.fullName ?? null);
+          setAvatarUrl(profile.avatarUrl ?? null);
+        }).catch(() => {});
       }
     });
     return () => subscription.unsubscribe();
@@ -159,6 +165,7 @@ export default function AuthenticatedLayout({
   };
 
   const pageTitle = () => {
+    if (pathname === '/settings') return 'Settings';
     const allItems = [...mainNavItems, ...insightNavItems, ...adminNavItems];
     const current = allItems.find((item) => isActive(item.href));
     return current?.label || 'Dashboard';

@@ -95,14 +95,16 @@ export function ReportByCostCenter() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <Select value={selectedCenter} onValueChange={(v) => v && setSelectedCenter(v)}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="เลือก Cost Center">
-              {selectedCenter || 'เลือก Cost Center'}
+          <SelectTrigger className="w-[200px] max-w-[200px]">
+            <SelectValue placeholder="เลือก Department">
+              <span className="truncate block max-w-[160px]">{selectedCenter || 'เลือก Department'}</span>
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-w-[300px]">
             {departments.map((d) => (
-              <SelectItem key={d} value={d}>{d}</SelectItem>
+              <SelectItem key={d} value={d}>
+                <span className="truncate block max-w-[250px]">{d}</span>
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -123,7 +125,7 @@ export function ReportByCostCenter() {
 
       {!selectedCenter ? (
         <div className="text-center py-12 text-[var(--text-muted)] text-sm">
-          Select a cost center to view the report
+          Select a department to view the report
         </div>
       ) : isLoading ? (
         <div className="space-y-4">

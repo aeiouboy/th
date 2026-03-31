@@ -29,6 +29,9 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
+    // Sign out existing session first to prevent stale user data
+    await supabase.auth.signOut().catch(() => {});
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,

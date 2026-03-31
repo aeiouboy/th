@@ -125,6 +125,11 @@ export default function ChargeCodesPage() {
     if (selectedId) loadSelected(selectedId);
   };
 
+  const getNodeStatus = (node: ChargeCodeNode): 'active' | 'expired' => {
+    if (!node.validTo) return 'active';
+    return new Date(node.validTo + 'T23:59:59') >= new Date() ? 'active' : 'expired';
+  };
+
   const filterTree = (nodes: ChargeCodeNode[]): ChargeCodeNode[] => {
     return nodes
       .map((node) => {
@@ -135,12 +140,16 @@ export default function ChargeCodesPage() {
           node.id.toLowerCase().includes(search.toLowerCase());
         const matchesLevel =
           levelFilter === 'all' || node.level === levelFilter;
+        const matchesStatus =
+          statusFilter === 'all' || getNodeStatus(node) === statusFilter;
         const matchesBillable =
           billableFilter === 'all' ||
           (billableFilter === 'true' && node.isBillable) ||
           (billableFilter === 'false' && !node.isBillable);
-        const matchesMyCodes = !myCodesOnly || myCodeIds.has(node.id);
-        const selfMatch = matchesSearch && matchesLevel && matchesBillable && matchesMyCodes;
+        // When user is actively searching, skip myCodesOnly filter so
+        // parent nodes (e.g. program-level codes) are not excluded
+        const matchesMyCodes = !myCodesOnly || !!search || myCodeIds.has(node.id);
+        const selfMatch = matchesSearch && matchesLevel && matchesStatus && matchesBillable && matchesMyCodes;
 
         if (selfMatch || children.length > 0) {
           return { ...node, children };
@@ -326,6 +335,7 @@ export default function ChargeCodesPage() {
                 <div className="space-y-5">
                   {/* Key-Value Pairs */}
                   <div className="grid grid-cols-2 gap-3">
+                    <InfoItem label="Charge Code" value={selected.id} />
                     <InfoItem label="Level" value={selected.level ? selected.level.charAt(0).toUpperCase() + selected.level.slice(1) : '-'} />
                     <InfoItem label="Owner" value={selected.ownerName || '-'} />
                     <InfoItem label="Approver" value={selected.approverName || '-'} />

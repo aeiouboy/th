@@ -16,6 +16,8 @@ const sampleTree: ChargeCodeNode[] = [
     parentId: null,
     budgetAmount: '100000',
     isBillable: true,
+    validFrom: '2026-01-01',
+    validTo: '2026-12-31',
     children: [
       {
         id: 'PRJ-001',
@@ -24,6 +26,8 @@ const sampleTree: ChargeCodeNode[] = [
         parentId: 'PRG-001',
         budgetAmount: '50000',
         isBillable: true,
+        validFrom: '2026-01-01',
+        validTo: '2026-12-31',
         children: [
           {
             id: 'ACT-001',
@@ -32,6 +36,8 @@ const sampleTree: ChargeCodeNode[] = [
             parentId: 'PRJ-001',
             budgetAmount: null,
             isBillable: true,
+            validFrom: null,
+            validTo: null,
             children: [],
           },
         ],
@@ -45,6 +51,8 @@ const sampleTree: ChargeCodeNode[] = [
     parentId: null,
     budgetAmount: null,
     isBillable: false,
+    validFrom: null,
+    validTo: null,
     children: [],
   },
 ];

@@ -1,0 +1,7 @@
+{
+  "session_id": "48443396-9ad5-4b41-be6a-f9b4e6ccf027",
+  "prompts": [
+    "[AUTO-TEST] ## Auto-triggered: Write tests for new commits in Timesheet\n\n### Recent Commits\n- 63da0b32: fix: user manual screenshots + lightbox + public route\n\n### Changed Source Files (1)\n- frontend/src/app/user-manual/page.tsx\n\n\n### Instructions\n1. Read the changed files to understand what was modified\n2. Write/update tests to cover the new/changed functionality\n3. Focus on the most critical paths \u2014 don't test every line\n4. Tests should pass with: `cd frontend && npx playwright test`\n5. Report: files created/modified, test count, coverage summary"
+  ],
+  "agent_name": "Helix"
+}

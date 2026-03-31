@@ -36,7 +36,7 @@ export class UsersController {
   }
 
   @Get()
-  @Roles('admin', 'charge_manager')
+  @Roles('admin', 'charge_manager', 'pmo', 'finance')
   @ApiQuery({ name: 'limit', required: false, description: 'Max results (default 100, max 500)' })
   @ApiQuery({ name: 'offset', required: false, description: 'Offset for pagination (default 0)' })
   findAll(

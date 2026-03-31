@@ -1,0 +1,114 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - img "RIS" [ref=e5]
+      - navigation [ref=e6]:
+        - link "Dashboard" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - link "Time Entry" [ref=e13] [cursor=pointer]:
+          - /url: /time-entry
+          - img [ref=e14]
+        - link "Calendar" [ref=e17] [cursor=pointer]:
+          - /url: /calendar
+          - img [ref=e18]
+        - link "Charge Codes" [ref=e20] [cursor=pointer]:
+          - /url: /charge-codes
+          - img [ref=e21]
+        - link "Approvals" [ref=e24] [cursor=pointer]:
+          - /url: /approvals
+          - img [ref=e25]
+      - link "Help" [ref=e29] [cursor=pointer]:
+        - /url: /user-manual
+        - img [ref=e30]
+    - generic [ref=e33]:
+      - banner [ref=e34]:
+        - generic [ref=e35]:
+          - button "Expand sidebar" [ref=e36]:
+            - img [ref=e37]
+          - heading "Approvals" [level=1] [ref=e39]
+        - generic [ref=e40]:
+          - button "Notifications" [ref=e42]:
+            - img [ref=e43]
+            - generic [ref=e46]: "100"
+          - button "NK" [ref=e47] [cursor=pointer]:
+            - generic [ref=e49]: NK
+      - main [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e53]:
+            - heading "Approvals" [level=1] [ref=e54]
+            - paragraph [ref=e55]: Review and approve submitted timesheets
+          - generic [ref=e56]:
+            - combobox [ref=e57]:
+              - generic [ref=e58]: 2026-03
+              - img: ▼
+            - textbox [ref=e59]: 2026-03
+            - combobox [ref=e60]:
+              - generic [ref=e61]: all
+              - img: ▼
+            - textbox [ref=e62]: all
+            - generic [ref=e63]:
+              - img [ref=e64]
+              - textbox "Search by name, email, or department..." [ref=e67]
+          - generic [ref=e68]:
+            - tablist [ref=e69]:
+              - tab "Team Status 1" [selected] [ref=e70]:
+                - text: Team Status
+                - generic [ref=e71]: "1"
+              - tab "Pending Approvals" [active] [ref=e72]
+              - tab "Vacations" [ref=e73]
+              - tab "History" [ref=e74]
+            - tabpanel "Team Status 1" [ref=e75]:
+              - generic [ref=e76]:
+                - generic [ref=e77]:
+                  - generic [ref=e78]: Mar 30 — Apr 5
+                  - generic [ref=e79]: 5 working days · 40h target
+                  - generic [ref=e80]:
+                    - img [ref=e81]
+                    - text: 1 member with incomplete logging
+                - table [ref=e84]:
+                  - rowgroup [ref=e85]:
+                    - row "Employee Status Hours Logged Progress Incomplete Days" [ref=e86]:
+                      - columnheader "Employee" [ref=e87]
+                      - columnheader "Status" [ref=e88]
+                      - columnheader "Hours Logged" [ref=e89]
+                      - columnheader "Progress" [ref=e90]
+                      - columnheader "Incomplete Days" [ref=e91]
+                  - rowgroup [ref=e92]:
+                    - row "Wichai Srisuk wichai.s@central.co.th Approved 40 / 40h 100% All complete" [ref=e93]:
+                      - cell "Wichai Srisuk wichai.s@central.co.th" [ref=e94]:
+                        - generic [ref=e95]: Wichai Srisuk
+                        - generic [ref=e96]: wichai.s@central.co.th
+                      - cell "Approved" [ref=e97]:
+                        - generic [ref=e98]: Approved
+                      - cell "40 / 40h" [ref=e99]:
+                        - text: "40"
+                        - generic [ref=e100]: / 40h
+                      - cell "100%" [ref=e101]:
+                        - generic [ref=e105]: 100%
+                      - cell "All complete" [ref=e106]
+                    - row "Ploy Rattanaporn ploy.r@central.co.th Approved 0 / 40h 0% 5 / 5 days" [ref=e107]:
+                      - cell "Ploy Rattanaporn ploy.r@central.co.th" [ref=e108]:
+                        - generic [ref=e109]: Ploy Rattanaporn
+                        - generic [ref=e110]: ploy.r@central.co.th
+                      - cell "Approved" [ref=e111]:
+                        - generic [ref=e112]: Approved
+                      - cell "0 / 40h" [ref=e113]:
+                        - text: "0"
+                        - generic [ref=e114]: / 40h
+                      - cell "0%" [ref=e115]:
+                        - generic [ref=e118]: 0%
+                      - cell "5 / 5 days" [ref=e119]:
+                        - generic [ref=e120]:
+                          - img [ref=e121]
+                          - text: 5 / 5 days
+    - button "Open chat" [ref=e123] [cursor=pointer]:
+      - img [ref=e124]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e131] [cursor=pointer]:
+    - img [ref=e132]
+  - alert [ref=e135]
+```

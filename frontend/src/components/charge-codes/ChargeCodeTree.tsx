@@ -17,6 +17,8 @@ export interface ChargeCodeNode {
   parentId: string | null;
   budgetAmount: string | null;
   isBillable: boolean | null;
+  validFrom: string | null;
+  validTo: string | null;
   children: ChargeCodeNode[];
 }
 
