@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Table,
@@ -13,6 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
+  ArrowLeft,
   BookOpen,
   ChevronDown,
   ChevronRight,
@@ -28,6 +29,7 @@ import {
   Bot,
   MessageSquare,
 } from 'lucide-react';
+import Link from 'next/link';
 
 /* ── Table of Contents data ──────────────────── */
 const tocSections = [
@@ -140,6 +142,15 @@ function Tip({ children }: { children: React.ReactNode }) {
 export default function UserManualPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 px-6 py-10 sm:px-10 lg:px-16">
+      {/* Back to app */}
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        กลับสู่ระบบหลัก
+      </Link>
+
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-bold text-[var(--text-primary)]">
@@ -731,8 +742,15 @@ export default function UserManualPage() {
       </Section>
 
       {/* Footer */}
-      <div className="text-center text-sm text-[var(--text-muted)] py-8">
+      <div className="text-center text-sm text-[var(--text-muted)] py-8 space-y-4">
         <p>ต้องการความช่วยเหลือเพิ่มเติม? ติดต่อฝ่าย IT หรือใช้ <MessageSquare className="w-4 h-4 inline" /> AI Chatbot ในระบบ</p>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm transition-colors shadow-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          เข้าสู่ระบบ Timesheet
+        </Link>
       </div>
     </div>
   );
