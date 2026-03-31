@@ -12,8 +12,8 @@ test.describe('Budget Module', () => {
     // StatCards are behind loading gate; wait for data to load
     await expect(page.getByText('Total budget')).toBeVisible({ timeout: 30000 });
 
-    // "Total Spent" metric should be visible
-    await expect(page.getByText('Total spent')).toBeVisible();
+    // "Actual spent" metric should be visible
+    await expect(page.getByText('Actual spent')).toBeVisible();
 
     // Verify API returns data
     const response = await apiRequest(page, 'GET', '/budgets/summary');

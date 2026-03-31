@@ -781,6 +781,224 @@ Tachongrak (admin, ไม่มี manager)
 
 ---
 
-*อัปเดตล่าสุด: 2026-03-18*
+## CR-01: Chargeability YTD in Dashboard KPI Card
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Dashboard → KPI Cards
+
+Card "Chargeability" แสดงค่า YTD (Year-to-Date) แทนค่ารายสัปดาห์อย่างเดียว trend delta เทียบกับเดือนก่อน endpoint ที่ใช้: `GET /dashboard/chargeability-ytd`
+
+---
+
+## CR-02: Chargeability Trend Line Chart on Dashboard
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Dashboard → Charts Section
+
+Component: `ChargeabilityTrend.tsx` — แสดง line chart ของ chargeability รายเดือน (YTD) ใช้ Recharts `LineChart` ข้อมูลจาก `GET /dashboard/chargeability-ytd` response field `months[]`
+
+---
+
+## CR-03: Program Distribution Pie Chart on Dashboard
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Dashboard → Charts Section
+
+Component: `ProgramDistribution.tsx` — แสดง pie chart สัดส่วน hours ต่อ program (Current Period / YTD) ข้อมูลจาก `GET /dashboard/program-distribution` มี toggle สลับ view
+
+---
+
+## CR-04: Period Selector in Time Entry
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Time Entry → Period Selector
+
+Component: `PeriodSelector.tsx` — dropdown แสดง 52 สัปดาห์ของปีปัจจุบัน + ปีก่อน ในรูปแบบ "Week 12 (Mar 17–21)" เมื่อเลือก week ที่ต่างออกไป grid จะโหลด timesheet ของ period นั้น
+
+---
+
+## CR-05: Copy from Last Period
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Time Entry → Copy from Last Period Button
+
+ปุ่ม "Copy from Last Period" คัดลอก charge code rows ทั้งหมดจาก period ก่อนหน้าลง draft ปัจจุบัน ไม่คัดลอกชั่วโมง (เฉพาะ charge code structure) endpoint: `POST /timesheets/:id/copy-from-previous`
+
+---
+
+## CR-06: Vacation Hours (System Row — Auto-Fill)
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Time Entry → Grid
+
+ระบบแสดง row LEAVE-001 (vacation) อัตโนมัติเมื่อ employee มี approved vacation request ในช่วง period นั้น ชั่วโมงถูก auto-fill ตาม `leave_type`:
+- `full_day` → 8h
+- `half_am` / `half_pm` → 4h
+
+Vacation row แสดงสีเทา อ่านอย่างเดียว (ไม่กรอกเอง) การขอลาทำผ่าน Admin → Calendar เดิม
+
+---
+
+## CR-07: Request Charge Code Access
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Time Entry → "+ Add Charge Code" → "Request New CC"
+
+Component: `RequestChargeCode.tsx` — dialog ให้ employee ค้นหา charge code ที่ไม่ได้รับ assign แล้วส่ง request พร้อม reason ไปให้ CC Owner อนุมัติ
+
+Endpoints:
+- `POST /charge-codes/:id/request-access` — ส่ง request ใหม่
+- `GET /charge-codes/access-requests/list` — ดูรายการ requests (สำหรับ CC Owner/Admin)
+- `PATCH /charge-codes/access-requests/:id` — อนุมัติหรือปฏิเสธ request
+
+ข้อมูลเก็บในตาราง `charge_code_requests` (ตารางใหม่)
+
+---
+
+## CR-08: Charge Code Budget Detail Panel
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Charge Codes → แท็บ "Budget Detail"
+
+Component: `BudgetDetail.tsx` — แสดง budget vs actual breakdown ลงไปถึง child charge codes พร้อม progress bar ในแต่ละระดับ ข้อมูลจาก `GET /charge-codes/:id/budget-detail`
+
+---
+
+## CR-09: Team Breakdown in Charge Code Budget Detail
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Charge Codes → Budget Detail → Team Breakdown section
+
+Component: `charge-codes/TeamBreakdown.tsx` — ส่วนล่างของ Budget Detail panel แสดงตาราง hours, cost, และ % ต่อ team (จัดกลุ่มตาม department) พร้อม expand ดูรายบุคคล
+
+---
+
+## CR-10: Improved Charge Code Tree UX
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Charge Codes → Tree panel ซ้าย
+
+Component: `ChargeCodeTree.tsx` (updated) — ปรับ layout ให้ aligned column: ID | Name | Budget ใช้ indentation ที่อ่านง่าย มีปุ่ม expand/collapse per level และปุ่ม `+` สำหรับสร้าง child
+
+---
+
+## CR-11: Cascade Access to Child Charge Codes
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Charge Codes → Access tab → "Cascade Access" button
+
+ปุ่ม "Cascade Access" ใน Access tab ให้ Owner/Admin propagate รายชื่อ assigned users ลงไปยัง child charge codes ทุกระดับ ใน single transaction endpoint: `POST /charge-codes/:id/cascade-access`
+
+---
+
+## CR-12: Fix Approvals Search
+
+**สถานะ**: ✅ รองรับ (แก้ใน 2026-03-20)
+**เมนู**: Approvals → Pending Approvals
+
+แก้ bug ช่อง search ใน Approvals page ที่กรองได้ไม่ถูกต้อง — search ทำงานตาม employee name และ charge code ID แล้ว
+
+---
+
+## CR-13: Report by Program
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Reports → แท็บ "By Program"
+
+Component: `ReportByProgram.tsx` — เลือก program จาก dropdown แล้วดู budget vs actual, task distribution, และ team distribution ของ program นั้น endpoint: `GET /reports/by-program?programId=xxx&period=xxx`
+
+---
+
+## CR-14: Report by Cost Center
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Reports → แท็บ "By Cost Center"
+
+Component: `ReportByCostCenter.tsx` — กรอง cost center → ดู chargeability, charge distribution (billable vs non-billable), และรายการ charge codes ภายใน cost center endpoint: `GET /reports/by-cost-center?costCenter=xxx&period=xxx`
+
+---
+
+## CR-15: Report by Person
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Reports → แท็บ "By Person"
+
+Component: `ReportByPerson.tsx` — เลือก employee → ดู monthly hours history, project summary, vacation days, total hours endpoint: `GET /reports/by-person?userId=xxx&period=xxx`
+
+---
+
+## CR-16: Budget Multi-Select Filter
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Budget Tracking → Filter bar
+
+Component: `MultiSelectFilter.tsx` — dropdown multi-select สำหรับกรอง charge codes หลายรายการพร้อมกัน `GET /budgets?chargeCodeIds=id1,id2,id3` ส่ง comma-separated list
+
+---
+
+## CR-17: Budget Team Breakdown
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Budget Tracking → Team Breakdown tab/section
+
+Component: `budget/TeamBreakdown.tsx` — แสดง cost breakdown ต่อ team สำหรับ budget ที่เลือก ข้อมูลจาก `GET /budgets/:id/team-breakdown`
+
+---
+
+## CR-18: Fix Auth State — TanStack Query Cache Invalidation
+
+**สถานะ**: ✅ รองรับ (แก้ใน 2026-03-20)
+**เมนู**: ทุกหน้า (layout level)
+
+แก้ bug: หลัง logout + re-login profile data ไม่อัพเดท (ยังแสดง user เดิม) แก้โดยใช้ `onAuthStateChange` listener ที่ invalidate TanStack Query cache ทั้งหมดเมื่อ auth state เปลี่ยน
+
+---
+
+## CR-19: RIS Logo in Sidebar
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Layout → Sidebar header
+
+ใส่ RIS (Retail Information System) logo ใน SVG format ที่ `public/ris-logo.svg` แสดงใน sidebar header แทน text placeholder
+
+---
+
+## CR-20: Profile Photo / Avatar Initials Fix (BUG-01)
+
+**สถานะ**: ✅ รองรับ (แก้ใน 2026-03-20)
+**เมนู**: Layout → Topbar avatar
+
+แก้ bug BUG-01: Avatar แสดง "U" แทน initials จริง ตอนนี้ derive initials จาก `profile.full_name` เช่น "Wichai Sukjai" → "WS"
+
+---
+
+## CR-21: Scalability — Performance Indexes
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Database / Infrastructure
+
+เพิ่ม 6 performance indexes เพื่อรองรับ 200 users, 100 projects, 5 ปีข้อมูล:
+
+| Index | Table | Columns |
+|-------|-------|---------|
+| `idx_timesheet_entries_user_date` | `timesheet_entries` | `(user_id, date)` |
+| `idx_timesheet_entries_charge_code` | `timesheet_entries` | `(charge_code_id)` |
+| `idx_timesheets_period` | `timesheets` | `(period_start, period_end)` |
+| `idx_charge_codes_parent` | `charge_codes` | `(parent_id)` |
+| `idx_profiles_manager` | `profiles` | `(manager_id)` |
+| `idx_profiles_department` | `profiles` | `(department)` |
+
+---
+
+## CR-22: Scalability — Pagination for Charge Codes
+
+**สถานะ**: ✅ รองรับ (เพิ่มใน 2026-03-20)
+**เมนู**: Charge Codes list
+
+`GET /charge-codes` รองรับ query params `?limit=&offset=` สำหรับ pagination เพื่อรองรับ large datasets (100+ projects) ค่า default: limit=50, offset=0
+
+---
+
+*อัปเดตล่าสุด: 2026-03-20*
 
 

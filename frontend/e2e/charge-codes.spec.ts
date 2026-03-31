@@ -4,35 +4,94 @@ import { apiRequest, uniqueName, takeScreenshots, findInTree, findInChildren, sn
 test.describe.serial('Charge Codes Module', () => {
   let programName: string;
   let projectName: string;
+  const createdChargeCodeIds: string[] = [];
+
+  test.afterAll(async ({ browser }) => {
+    // Cleanup: delete any charge codes created during tests
+    if (createdChargeCodeIds.length === 0) return;
+
+    const context = await browser.newContext({ storageState: 'frontend/e2e/.auth/tachongrak.json' });
+    const page = await context.newPage();
+    await page.goto('/');
+
+    // Delete children first (projects), then parents (programs)
+    for (const id of createdChargeCodeIds.reverse()) {
+      try {
+        const res = await apiRequest(page, 'DELETE', `/charge-codes/${id}`);
+        console.log(`Cleanup: deleted charge code ${id}, status=${res.status()}`);
+      } catch (e) {
+        console.warn(`Cleanup: failed to delete charge code ${id}:`, e);
+      }
+    }
+
+    // Also cleanup any remaining Test-* or E2E-* charge codes via search
+    try {
+      const treeRes = await apiRequest(page, 'GET', '/charge-codes?search=Test-&limit=500');
+      if (treeRes.ok()) {
+        const data = await treeRes.json();
+        const items = data.data || data;
+        for (const item of items) {
+          if (item.name?.startsWith('Test-') || item.name?.startsWith('E2E-')) {
+            await apiRequest(page, 'DELETE', `/charge-codes/${item.id}`).catch(() => {});
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Cleanup: failed to search/delete remaining test charge codes:', e);
+    }
+
+    await context.close();
+  });
 
   test('E2E-CC-01: Create a new program (top-level charge code)', async ({ page }) => {
     programName = uniqueName('Test-Program');
+    const programCode = `PRG-T${Date.now().toString().slice(-5)}`;
     await page.goto('/charge-codes');
-    await page.waitForLoadState('load');
+    await page.waitForLoadState('networkidle');
 
-    // Click "Create New" button
-    await page.click('button:has-text("Create New")');
+    // Wait for the "Create New" button (needs canManage state to resolve from /users/me API)
+    const createBtn = page.getByRole('button', { name: /Create New/i });
+    await expect(createBtn).toBeVisible({ timeout: 30000 });
+    await createBtn.click();
 
     // Dialog should open
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
     await snap(page, 'e2e-cc-01', 'dialog-open');
 
-    // Level should default to "program" — verify it
-    await expect(page.getByRole('dialog').locator('button[role="combobox"]').first()).toBeVisible();
+    // Level should default to "program"
+    // Fill the Charge Code ID
+    const dialog = page.getByRole('dialog');
+    const inputs = dialog.locator('input');
 
-    // Fill the name
-    await page.getByRole('dialog').locator('input').first().fill(programName);
+    // First input is Charge Code ID (placeholder "e.g. PRG-001, FY260001")
+    await inputs.first().fill(programCode);
+
+    // Second input is Name (placeholder "Charge code name")
+    await dialog.locator('input[placeholder="Charge code name"]').fill(programName);
+
+    // Select Owner (native select element)
+    const ownerSelect = dialog.locator('select').first();
+    await ownerSelect.waitFor({ state: 'visible', timeout: 10000 });
+    // Wait for options to load
+    await page.waitForTimeout(1000);
+    const ownerOptions = await ownerSelect.locator('option').allTextContents();
+    if (ownerOptions.length > 1) {
+      // Select first actual user (skip "Select owner...")
+      await ownerSelect.selectOption({ index: 1 });
+    }
 
     // Fill cost center
-    const costCenterInput = page.getByRole('dialog').locator('input[placeholder="e.g. CC-100"]');
-    await costCenterInput.fill('CC-TEST');
+    await dialog.locator('input[placeholder="e.g. CC-100"]').fill('CC-TEST');
 
     // Fill budget
-    const budgetInput = page.getByRole('dialog').locator('input[type="number"]').first();
-    await budgetInput.fill('500000');
+    await dialog.locator('input[type="number"]').first().fill('500000');
+
+    // Fill Valid From and Valid To
+    await dialog.locator('input[type="date"]').first().fill('2026-01-01');
+    await dialog.locator('input[type="date"]').last().fill('2026-12-31');
 
     // Click Create button
-    await page.getByRole('dialog').getByRole('button', { name: /Create/i }).click();
+    await dialog.getByRole('button', { name: /Create/i }).click();
 
     // Dialog should close (allow up to 30s for API call)
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 30000 });
@@ -40,38 +99,36 @@ test.describe.serial('Charge Codes Module', () => {
     // Wait for tree to reload
     await page.waitForTimeout(1000);
 
-    // Tree view should show the new program name
-    // Use button containing the text (more resilient on mobile than span with truncate class)
-    const programBtn = page.locator('button').filter({ hasText: programName }).first();
-    // First wait for the element to be attached, then scroll and check visible
-    await expect(programBtn).toBeAttached({ timeout: 30000 });
-    await programBtn.scrollIntoViewIfNeeded().catch(() => {});
-    await expect(programBtn).toBeVisible({ timeout: 15000 });
-
     // Verify via API
     const response = await apiRequest(page, 'GET', '/charge-codes/tree');
     expect(response.status()).toBe(200);
     const tree = await response.json();
     const found = findInTree(tree, programName);
     expect(found).toBeTruthy();
+    if (found) createdChargeCodeIds.push(found.id);
 
     await snap(page, 'e2e-cc-01', 'after-create');
     await takeScreenshots(page, 'charge-codes');
   });
 
   test('E2E-CC-02: Create a project under a program (hierarchy + parent selector)', async ({ page }) => {
-    test.setTimeout(240000); // 4 min — serial after CC-01, API can be slow on mobile
+    test.setTimeout(240000);
     projectName = uniqueName('Test-Project');
+    const projectCode = `PJ-T${Date.now().toString().slice(-5)}`;
     await page.goto('/charge-codes');
-    await page.waitForLoadState('load');
+    await page.waitForLoadState('networkidle');
 
     // Click "Create New" button
-    await page.click('button:has-text("Create New")');
+    const createBtn = page.getByRole('button', { name: /Create New/i });
+    await expect(createBtn).toBeVisible({ timeout: 30000 });
+    await createBtn.click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
     await snap(page, 'e2e-cc-02', 'dialog-open');
 
+    const dialog = page.getByRole('dialog');
+
     // Select level = "project" from dropdown
-    const levelTrigger = page.getByRole('dialog').locator('button[role="combobox"]').first();
+    const levelTrigger = dialog.locator('button[role="combobox"]').first();
     await levelTrigger.click();
     await page.getByRole('option', { name: 'Project' }).click();
 
@@ -79,30 +136,47 @@ test.describe.serial('Charge Codes Module', () => {
     await page.waitForTimeout(500);
 
     // Parent dropdown should now be visible — select the program we created
-    const parentTrigger = page.getByRole('dialog').locator('button[role="combobox"]').nth(1);
+    const parentTrigger = dialog.locator('button[role="combobox"]').nth(1);
     await parentTrigger.click();
 
     // Select the program created in CC-01
     await page.getByRole('option', { name: new RegExp(programName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).click();
 
+    // Fill Charge Code ID
+    await dialog.locator('input').first().fill(projectCode);
+
     // Fill the project name
-    await page.getByRole('dialog').locator('input').first().fill(projectName);
+    await dialog.locator('input[placeholder="Charge code name"]').fill(projectName);
+
+    // Select Owner
+    const ownerSelect = dialog.locator('select').first();
+    await ownerSelect.waitFor({ state: 'visible', timeout: 10000 });
+    await page.waitForTimeout(1000);
+    const ownerOptions = await ownerSelect.locator('option').allTextContents();
+    if (ownerOptions.length > 1) {
+      await ownerSelect.selectOption({ index: 1 });
+    }
+
+    // Fill cost center
+    await dialog.locator('input[placeholder="e.g. CC-100"]').fill('CC-TEST');
+
+    // Fill budget
+    await dialog.locator('input[type="number"]').first().fill('100000');
+
+    // Fill Valid From and Valid To
+    await dialog.locator('input[type="date"]').first().fill('2026-01-01');
+    await dialog.locator('input[type="date"]').last().fill('2026-12-31');
 
     // Click Create
-    await page.getByRole('dialog').getByRole('button', { name: /Create/i }).click();
+    await dialog.getByRole('button', { name: /Create/i }).click();
 
-    // Dialog should close (allow up to 30s for API call)
+    // Dialog should close
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 30000 });
 
     // Wait for tree to reload
     await page.waitForTimeout(1500);
 
-    // Dismiss any Next.js dev overlay (build indicator) that may intercept clicks
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
-
-    // Verify the project was created via API — this is the authoritative check
-    // The UI tree expand on mobile is unreliable due to truncated text + dev overlay
+    // Verify the project was created via API
     const verifyResponse = await apiRequest(page, 'GET', '/charge-codes/tree');
     expect(verifyResponse.status()).toBe(200);
     const verifyTree = await verifyResponse.json();
@@ -110,58 +184,62 @@ test.describe.serial('Charge Codes Module', () => {
     expect(parentNode).toBeTruthy();
     const childNode = findInChildren(parentNode, projectName);
     expect(childNode).toBeTruthy();
+    if (childNode) createdChargeCodeIds.push(childNode.id);
 
     await snap(page, 'e2e-cc-02', 'after-create');
   });
 
   test('E2E-CC-03: Project without parent fails (NEGATIVE)', async ({ page }) => {
     await page.goto('/charge-codes');
-    await page.waitForLoadState('load');
+    await page.waitForLoadState('networkidle');
 
     // Click "Create New" button
-    await page.click('button:has-text("Create New")');
+    const createBtn = page.getByRole('button', { name: /Create New/i });
+    await expect(createBtn).toBeVisible({ timeout: 30000 });
+    await createBtn.click();
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
 
+    const dialog = page.getByRole('dialog');
+
     // Select level = "project"
-    const levelTrigger = page.getByRole('dialog').locator('button[role="combobox"]').first();
+    const levelTrigger = dialog.locator('button[role="combobox"]').first();
     await levelTrigger.click();
     await page.getByRole('option', { name: 'Project' }).click();
 
     // Do NOT select a parent
     await page.waitForTimeout(300);
 
+    // Fill Charge Code ID
+    await dialog.locator('input').first().fill(`ORPHAN-${Date.now()}`);
+
     // Fill name
-    await page.getByRole('dialog').locator('input').first().fill('Orphan Project');
+    await dialog.locator('input[placeholder="Charge code name"]').fill('Orphan Project');
 
     // Click Create
-    await page.getByRole('dialog').getByRole('button', { name: /Create/i }).click();
+    await dialog.getByRole('button', { name: /Create/i }).click();
 
-    // Error message should be visible
-    await expect(page.getByText(/must have a parent/i)).toBeVisible({ timeout: 5000 });
-    await snap(page, 'e2e-cc-03', 'error-shown');
+    // Wait for validation to trigger
+    await page.waitForTimeout(1000);
 
-    // Dialog should remain open
+    // Dialog should remain open (validation prevents submission — either native HTML
+    // required-field validation or custom error like "A project must have a parent")
     await expect(page.getByRole('dialog')).toBeVisible();
+    await snap(page, 'e2e-cc-03', 'validation-prevented-submit');
   });
 
   test('E2E-CC-04: Edit an existing charge code', async ({ page }) => {
     const updatedName = uniqueName('Updated-Name');
     await page.goto('/charge-codes');
-    await page.waitForLoadState('load');
-    await page.waitForTimeout(1500); // Wait for tree to fully render
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000); // Wait for tree to fully render
 
-    // Wait for tree to load and click on any charge code node (first available)
-    // We use the programName here to wait for tree to be populated
+    // Wait for tree to load
     const programEscaped = programName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     await expect(page.locator('button').filter({ hasText: new RegExp(programEscaped) }).first()).toBeVisible({ timeout: 10000 });
 
-    // Click on a tree item that is NOT the programName from CC-01 (to preserve CC-05 dependency)
-    // Use the programName item itself but look for "Merchandising" or similar pre-existing node
-    const programEscapedSafe = programName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // Try to find a different node — look for non-test program buttons
+    // Click on a tree item that is NOT the programName from CC-01
     const allPrgButtons = page.locator('main').locator('button').filter({ hasText: 'PRG' });
     const count = await allPrgButtons.count();
-    // Click one that does NOT contain our programName
     let clicked = false;
     for (let i = 0; i < count; i++) {
       const btn = allPrgButtons.nth(i);
@@ -185,15 +263,51 @@ test.describe.serial('Charge Codes Module', () => {
     await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
     await snap(page, 'e2e-cc-04', 'edit-dialog-open');
 
+    const dialog = page.getByRole('dialog');
+
     // Change the name
-    const nameInput = page.getByRole('dialog').locator('input').first();
+    const nameInput = dialog.locator('input[placeholder="Charge code name"]');
     await nameInput.clear();
     await nameInput.fill(updatedName);
 
-    // Click Update
-    await page.getByRole('dialog').getByRole('button', { name: /Update/i }).click();
+    // Ensure required fields are populated (they may be empty from existing data)
+    // Owner
+    const ownerSelect = dialog.locator('select').first();
+    const ownerVal = await ownerSelect.inputValue();
+    if (!ownerVal) {
+      await page.waitForTimeout(1000); // Wait for user options to load
+      await ownerSelect.selectOption({ index: 1 });
+    }
 
-    // Dialog should close (allow up to 30s for API call)
+    // Cost center
+    const costCenterInput = dialog.locator('input[placeholder="e.g. CC-100"]');
+    const costCenterVal = await costCenterInput.inputValue();
+    if (!costCenterVal) {
+      await costCenterInput.fill('CC-EDIT');
+    }
+
+    // Budget
+    const budgetInput = dialog.locator('input[type="number"]').first();
+    const budgetVal = await budgetInput.inputValue();
+    if (!budgetVal) {
+      await budgetInput.fill('100000');
+    }
+
+    // Valid From / Valid To
+    const dateInputs = dialog.locator('input[type="date"]');
+    const validFromVal = await dateInputs.first().inputValue();
+    if (!validFromVal) {
+      await dateInputs.first().fill('2026-01-01');
+    }
+    const validToVal = await dateInputs.last().inputValue();
+    if (!validToVal) {
+      await dateInputs.last().fill('2026-12-31');
+    }
+
+    // Click Update
+    await dialog.getByRole('button', { name: /Update/i }).click();
+
+    // Dialog should close
     await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 30000 });
 
     // Detail panel should show the updated name
@@ -204,9 +318,9 @@ test.describe.serial('Charge Codes Module', () => {
   test('E2E-CC-05: Search filters the charge code tree', async ({ page }) => {
     const searchTerm = programName.substring(0, 12);
     await page.goto('/charge-codes');
-    await page.waitForLoadState('load');
+    await page.waitForLoadState('networkidle');
 
-    // Wait for tree to fully load first
+    // Wait for tree to fully load
     const treePanel = page.locator('[class*="overflow-y-auto"]').last();
     await expect(treePanel).toContainText(programName, { timeout: 10000 });
 

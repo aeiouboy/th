@@ -46,6 +46,7 @@ vi.mock('lucide-react', () => ({
   Loader2Icon: () => <span data-testid="loader-icon" />,
   EyeIcon: () => <span data-testid="eye-icon" />,
   EyeOffIcon: () => <span data-testid="eye-off-icon" />,
+  CameraIcon: () => <span data-testid="camera-icon" />,
   // Extra icons the page might use
   User: () => <span data-testid="user-icon" />,
   Mail: () => <span data-testid="mail-icon" />,
@@ -57,6 +58,7 @@ vi.mock('lucide-react', () => ({
   Loader2: () => <span data-testid="loader-icon" />,
   Eye: () => <span data-testid="eye-icon" />,
   EyeOff: () => <span data-testid="eye-off-icon" />,
+  Camera: () => <span data-testid="camera-icon" />,
 }));
 
 // Mock UI components
@@ -105,6 +107,9 @@ vi.mock('@/components/ui/card', () => ({
 vi.mock('@/components/ui/avatar', () => ({
   Avatar: ({ children, className }: { children?: React.ReactNode; className?: string }) => (
     <div className={className}>{children}</div>
+  ),
+  AvatarImage: ({ src, alt }: { src?: string; alt?: string }) => (
+    <img src={src} alt={alt} />
   ),
   AvatarFallback: ({ children, className }: { children?: React.ReactNode; className?: string }) => (
     <span className={className}>{children}</span>

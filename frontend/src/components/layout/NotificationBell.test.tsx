@@ -14,7 +14,14 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
+    patch: vi.fn().mockResolvedValue({}),
   },
+}));
+
+// Mock @/lib/utils
+vi.mock('@/lib/utils', () => ({
+  timeAgo: (_date: string) => 'just now',
+  cn: (...args: string[]) => args.filter(Boolean).join(' '),
 }));
 
 // Mock lucide-react Bell icon
@@ -72,14 +79,22 @@ function createWrapper() {
   );
 }
 
+// Default mock: admin user with 3 unread notifications and alerts
+function setupDefaultMocks() {
+  (api.get as ReturnType<typeof vi.fn>).mockImplementation((path: string) => {
+    if (path === '/users/me') return Promise.resolve({ role: 'admin' });
+    if (path.includes('budget-alerts')) return Promise.resolve(mockBudgetAlerts);
+    if (path.includes('chargeability-alerts')) return Promise.resolve(mockChargeabilityAlerts);
+    if (path.includes('unread-count')) return Promise.resolve({ count: 3 });
+    if (path.includes('notifications')) return Promise.resolve([]);
+    return Promise.resolve([]);
+  });
+}
+
 describe('NotificationBell', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (api.get as ReturnType<typeof vi.fn>).mockImplementation((path: string) => {
-      if (path.includes('budget-alerts')) return Promise.resolve(mockBudgetAlerts);
-      if (path.includes('chargeability-alerts')) return Promise.resolve(mockChargeabilityAlerts);
-      return Promise.resolve([]);
-    });
+    setupDefaultMocks();
   });
 
   describe('UNIT-BELL-01: Bell icon renders', () => {
@@ -95,38 +110,48 @@ describe('NotificationBell', () => {
     });
   });
 
-  describe('UNIT-BELL-02: Badge shows correct count when alerts exist', () => {
-    it('should show badge with total count of budget + chargeability alerts', async () => {
+  describe('UNIT-BELL-02: Badge shows correct count when unread notifications exist', () => {
+    it('should show badge with unread notification count (from DB)', async () => {
+      // Badge = unreadCount (DB notifications only), not alertCount
       render(<NotificationBell />, { wrapper: createWrapper() });
-      // Total = 2 budget + 1 chargeability = 3
       const badge = await screen.findByText('3');
       expect(badge).toBeInTheDocument();
     });
 
-    it('should show badge with count equal to budget alerts only when no chargeability alerts', async () => {
+    it('should show badge with count from unread-count endpoint', async () => {
       (api.get as ReturnType<typeof vi.fn>).mockImplementation((path: string) => {
+        if (path === '/users/me') return Promise.resolve({ role: 'admin' });
+        if (path.includes('unread-count')) return Promise.resolve({ count: 5 });
         if (path.includes('budget-alerts')) return Promise.resolve(mockBudgetAlerts);
+        if (path.includes('chargeability-alerts')) return Promise.resolve([]);
+        if (path.includes('notifications')) return Promise.resolve([]);
         return Promise.resolve([]);
       });
       render(<NotificationBell />, { wrapper: createWrapper() });
-      const badge = await screen.findByText('2');
+      const badge = await screen.findByText('5');
       expect(badge).toBeInTheDocument();
     });
   });
 
-  describe('UNIT-BELL-03: Badge hidden when no alerts', () => {
-    it('should not render badge when both alert arrays are empty', async () => {
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValue([]);
-      render(<NotificationBell />, { wrapper: createWrapper() });
-      // Wait for all 4 queries to settle (budget-alerts, chargeability-alerts, unread-count, unread-preview)
-      await waitFor(() => {
-        expect(api.get).toHaveBeenCalledTimes(4);
+  describe('UNIT-BELL-03: Badge hidden when no unread notifications', () => {
+    it('should not render badge when unread count is 0', async () => {
+      (api.get as ReturnType<typeof vi.fn>).mockImplementation((path: string) => {
+        if (path === '/users/me') return Promise.resolve({ role: 'admin' });
+        if (path.includes('unread-count')) return Promise.resolve({ count: 0 });
+        if (path.includes('budget-alerts')) return Promise.resolve([]);
+        if (path.includes('chargeability-alerts')) return Promise.resolve([]);
+        if (path.includes('notifications')) return Promise.resolve([]);
+        return Promise.resolve([]);
       });
-      // Badge should not be present (totalCount === 0)
+      render(<NotificationBell />, { wrapper: createWrapper() });
+      // Wait for queries to settle
+      await waitFor(() => {
+        expect(api.get).toHaveBeenCalled();
+      }, { timeout: 2000 });
+      // Badge should not be present (badgeCount === 0)
       expect(screen.queryByText('0')).not.toBeInTheDocument();
       // No numeric badge rendered
       const button = screen.getByRole('button', { name: /notifications/i });
-      // The badge span has specific classes; check it doesn't appear
       const badge = button.querySelector('span');
       expect(badge).toBeNull();
     });
@@ -162,7 +187,7 @@ describe('NotificationBell', () => {
     it('should show alert names inside popover after opening', async () => {
       render(<NotificationBell />, { wrapper: createWrapper() });
 
-      // Wait for data to load
+      // Wait for data to load (badge appears)
       await screen.findByText('3');
 
       const button = screen.getByRole('button', { name: /notifications/i });
@@ -182,17 +207,22 @@ describe('NotificationBell', () => {
 
       // Severity dots are rendered as colored spans; check at least one alert detail is shown
       await waitFor(() => {
-        const details = screen.getAllByText(/budget overrun|chargeability/i);
+        const details = screen.getAllByText(/budget|chargeability/i);
         expect(details.length).toBeGreaterThan(0);
       });
     });
 
     it('should show "No notifications" message when popover opens with empty data', async () => {
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValue([]);
+      (api.get as ReturnType<typeof vi.fn>).mockImplementation((path: string) => {
+        if (path === '/users/me') return Promise.resolve({ role: 'employee' });
+        if (path.includes('unread-count')) return Promise.resolve({ count: 0 });
+        if (path.includes('notifications')) return Promise.resolve([]);
+        return Promise.resolve([]);
+      });
       render(<NotificationBell />, { wrapper: createWrapper() });
 
-      // Wait for all 4 queries to settle
-      await waitFor(() => expect(api.get).toHaveBeenCalledTimes(4));
+      // Wait for queries to settle
+      await waitFor(() => expect(api.get).toHaveBeenCalled(), { timeout: 2000 });
 
       const button = screen.getByRole('button', { name: /notifications/i });
       fireEvent.click(button);
@@ -201,7 +231,7 @@ describe('NotificationBell', () => {
     });
 
     it('should limit displayed alerts to top 5 sorted by severity', async () => {
-      // Provide 6 alerts — only 5 should appear
+      // Provide 6 alerts — only 5 should appear in the list
       const manyAlerts = Array.from({ length: 6 }, (_, i) => ({
         chargeCodeId: `PRJ-00${i}`,
         name: `Project ${i}`,
@@ -212,7 +242,11 @@ describe('NotificationBell', () => {
         rootCauseActivity: null,
       }));
       (api.get as ReturnType<typeof vi.fn>).mockImplementation((path: string) => {
+        if (path === '/users/me') return Promise.resolve({ role: 'admin' });
         if (path.includes('budget-alerts')) return Promise.resolve(manyAlerts);
+        if (path.includes('chargeability-alerts')) return Promise.resolve([]);
+        if (path.includes('unread-count')) return Promise.resolve({ count: 6 });
+        if (path.includes('notifications')) return Promise.resolve([]);
         return Promise.resolve([]);
       });
 
@@ -230,33 +264,18 @@ describe('NotificationBell', () => {
     });
   });
 
-  describe('UNIT-BELL-06: "View alerts" link points to /reports', () => {
-    it('should render "View alerts" link when alerts exist', async () => {
+  describe('UNIT-BELL-06: "View all notifications" link navigates to /notifications', () => {
+    it('should render "View all notifications" footer link', async () => {
       render(<NotificationBell />, { wrapper: createWrapper() });
-      await screen.findByText('3');
 
       const button = screen.getByRole('button', { name: /notifications/i });
       fireEvent.click(button);
 
-      // Button text is "View alerts" (not "View all alerts")
-      expect(await screen.findByText(/view alerts/i)).toBeInTheDocument();
+      // Footer always has "View all notifications"
+      expect(await screen.findByText(/view all notifications/i)).toBeInTheDocument();
     });
 
-    it('should NOT render "View alerts" button when no alerts exist', async () => {
-      (api.get as ReturnType<typeof vi.fn>).mockResolvedValue([]);
-      render(<NotificationBell />, { wrapper: createWrapper() });
-
-      // Wait for all 4 queries to settle
-      await waitFor(() => expect(api.get).toHaveBeenCalledTimes(4));
-
-      const button = screen.getByRole('button', { name: /notifications/i });
-      fireEvent.click(button);
-
-      // "View alerts" button is only shown when topAlerts.length > 0
-      expect(screen.queryByText(/^view alerts$/i)).not.toBeInTheDocument();
-    });
-
-    it('should call router.push("/reports") when "View alerts" is clicked', async () => {
+    it('should call router.push("/notifications") when "View all notifications" is clicked', async () => {
       const mockPush = vi.fn();
       vi.mocked(await import('next/navigation')).useRouter = () => ({ push: mockPush });
 
@@ -266,10 +285,10 @@ describe('NotificationBell', () => {
       const button = screen.getByRole('button', { name: /notifications/i });
       fireEvent.click(button);
 
-      const viewAlertsBtn = await screen.findByText(/view alerts/i);
-      fireEvent.click(viewAlertsBtn);
+      const viewAllBtn = await screen.findByText(/view all notifications/i);
+      fireEvent.click(viewAllBtn);
 
-      expect(mockPush).toHaveBeenCalledWith('/reports');
+      expect(mockPush).toHaveBeenCalledWith('/notifications');
     });
   });
 });

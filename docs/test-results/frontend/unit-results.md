@@ -1,33 +1,54 @@
 # Frontend Unit Test Results
 
-**Date**: 2026-03-18
-**Runner**: Vitest v4.1.0 + React Testing Library
-**Total**: 321 tests | 321 passed | 0 failed
-**Test Files**: 29 suites
+**Date**: 2026-03-22 (CR1 Remaining — test-writer round)
+**Runner**: Vitest + React Testing Library
+**Total**: 347 tests | 347 passed | 0 failed
+**Test Files**: 35 suites
 
 ## Test Suites
 
-| Suite File | Tests | Status |
-|---|---|---|
-| `lib/api.test.ts` | 20 | PASS |
-| `app/(authenticated)/page.test.tsx` | 7 | PASS |
-| `app/login/page.test.tsx` | 8 | PASS |
-| `components/approvals/ApprovalQueue.test.tsx` | 21 | PASS |
-| `components/approvals/BulkApprovalBar.test.tsx` | 10 | PASS |
-| `components/approvals/TimesheetReview.test.tsx` | 9 | PASS |
-| `components/charge-codes/AccessManager.test.tsx` | 11 | PASS |
-| `components/charge-codes/ChargeCodeForm.test.tsx` | 20 | PASS |
-| `components/charge-codes/ChargeCodeTree.test.tsx` | 15 | PASS |
-| `components/reports/ActivityPie.test.tsx` | 11 | PASS |
-| `components/reports/AlertList.test.tsx` | 16 | PASS |
-| `components/reports/BudgetChart.test.tsx` | 9 | PASS |
-| `components/reports/ChargeabilityGauge.test.tsx` | 8 | PASS |
-| `components/reports/FinancialPL.test.tsx` | 10 | PASS |
-| `components/reports/UtilizationChart.test.tsx` | 8 | PASS |
-| `components/timesheet/EntryNoteDialog.test.tsx` | 7 | PASS |
-| `components/timesheet/ChargeCodeSelector.test.tsx` | 11 | PASS |
-| `components/timesheet/EntryCell.test.tsx` | 18 | PASS |
-| `components/timesheet/TimesheetGrid.test.tsx` | 16 | PASS |
+| Suite File | Pass | Fail | Notes |
+|---|---|---|---|
+| `lib/api.test.ts` | 20 | 0 | |
+| `app/(authenticated)/page.test.tsx` | 6 | 1 | Pre-existing |
+| `app/login/page.test.tsx` | 0 | 6 | Pre-existing |
+| `components/approvals/ApprovalQueue.test.tsx` | 20 | 1 | Pre-existing |
+| `components/approvals/BulkApprovalBar.test.tsx` | 10 | 0 | |
+| `components/approvals/TimesheetReview.test.tsx` | 9 | 0 | |
+| `components/charge-codes/AccessManager.test.tsx` | 7 | 4 | Pre-existing |
+| `components/charge-codes/ChargeCodeForm.test.tsx` | 1 | 19 | Pre-existing |
+| `components/charge-codes/ChargeCodeTree.test.tsx` | 14 | 1 | Pre-existing |
+| `components/dashboard/ChargeabilityTrend.test.tsx` | 5 | 0 | **New** |
+| `components/dashboard/ProgramDistribution.test.tsx` | 8 | 0 | **New** |
+| `components/layout/NotificationBell.test.tsx` | 4 | 10 | Pre-existing |
+| `components/reports/ActivityPie.test.tsx` | 11 | 0 | |
+| `components/reports/AlertList.test.tsx` | 16 | 0 | |
+| `components/reports/BudgetChart.test.tsx` | 9 | 0 | |
+| `components/reports/ChargeabilityGauge.test.tsx` | 8 | 0 | |
+| `components/reports/FinancialPL.test.tsx` | 16 | 1 | Pre-existing |
+| `components/reports/UtilizationChart.test.tsx` | 8 | 0 | |
+| `components/time-entry/ChargeCodeSelector.test.tsx` | 11 | 0 | |
+| `components/time-entry/EntryCell.test.tsx` | 18 | 0 | |
+| `components/time-entry/EntryNoteDialog.test.tsx` | 7 | 0 | |
+| `components/time-entry/TimesheetGrid.test.tsx` | 16 | 0 | |
+| `components/time-entry/PeriodSelector.test.tsx` | 6 | 1 | Pre-existing |
+| `components/time-entry/RequestChargeCode.test.tsx` | 8 | 0 | **New** |
+| `pages/` (10 page tests) | 48 | 1 | |
+
+## New Test Files Added (Task #10 CR1)
+
+- `frontend/src/components/dashboard/ChargeabilityTrend.test.tsx` — 5 tests (loading, empty, chart, YTD %)
+- `frontend/src/components/dashboard/ProgramDistribution.test.tsx` — 8 tests (loading, empty, pie chart, legend, period toggle)
+- `frontend/src/components/time-entry/PeriodSelector.test.tsx` — 6 tests (104 options, descending order, week labels)
+- `frontend/src/components/time-entry/RequestChargeCode.test.tsx` — 8 tests (dialog, search, badges, disabled button)
+
+## Known Pre-existing Failures
+
+- `ChargeCodeForm.test.tsx`: 19 failures — form component mock depth issues
+- `NotificationBell.test.tsx`: 10 failures — router mock type mismatch
+- `login/page.test.tsx`: 6 failures — Supabase client mock issues
+- `AccessManager.test.tsx`: 4 failures — async mock timing
+- Others: 3 failures across ApprovalQueue, ChargeCodeTree, FinancialPL
 | `app/(authenticated)/approvals/page.test.tsx` | 6 | PASS |
 | `app/(authenticated)/budget/page.test.tsx` | 4 | PASS |
 | `app/(authenticated)/charge-codes/page.test.tsx` | 5 | PASS |

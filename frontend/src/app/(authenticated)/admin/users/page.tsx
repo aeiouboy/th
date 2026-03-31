@@ -36,7 +36,6 @@ import {
   Loader2Icon,
   UsersIcon,
   ShieldIcon,
-  UserCheckIcon,
 } from 'lucide-react';
 import { formatRole } from '@/lib/utils';
 import { StatCard } from '@/components/shared/StatCard';
@@ -69,16 +68,10 @@ const ROLE_OPTIONS = [
   { value: 'employee', label: 'Employee' },
 ];
 
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'All Status' },
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
-];
 
 export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editRole, setEditRole] = useState('');
@@ -98,8 +91,7 @@ export default function AdminUsersPage() {
       user.email.toLowerCase().includes(search.toLowerCase()) ||
       (user.department || '').toLowerCase().includes(search.toLowerCase());
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    const matchesStatus = statusFilter === 'all'; // All users shown for now
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesRole;
   });
 
   const roleCounts = users.reduce<Record<string, number>>((acc, u) => {
@@ -136,7 +128,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       {/* Summary cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <StatCard
           label="Total users"
           value={users.length}
@@ -148,12 +140,6 @@ export default function AdminUsersPage() {
           value={roleCounts['admin'] || 0}
           icon={ShieldIcon}
           accent="var(--accent-purple)"
-        />
-        <StatCard
-          label="Active"
-          value={users.length}
-          icon={UserCheckIcon}
-          accent="var(--accent-green)"
         />
       </div>
 
@@ -182,18 +168,6 @@ export default function AdminUsersPage() {
                 {ROLE_OPTIONS.map((r) => (
                   <SelectItem key={r.value} value={r.value}>
                     {r.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={(v) => v && setStatusFilter(v)}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_OPTIONS.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>
-                    {s.label}
                   </SelectItem>
                 ))}
               </SelectContent>

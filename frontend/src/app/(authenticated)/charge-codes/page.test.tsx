@@ -13,7 +13,10 @@ vi.mock('next/navigation', () => ({
 // Mock API
 vi.mock('@/lib/api', () => ({
   api: {
-    get: vi.fn().mockRejectedValue(new Error('API not available')),
+    get: vi.fn().mockImplementation((path: string) => {
+      if (path === '/users/me') return Promise.resolve({ role: 'admin' });
+      return Promise.reject(new Error('API not available'));
+    }),
     post: vi.fn().mockRejectedValue(new Error('API not available')),
     put: vi.fn().mockRejectedValue(new Error('API not available')),
   },
@@ -129,12 +132,14 @@ describe('ChargeCodesPage', () => {
     expect(searchInput).toBeTruthy();
   });
 
-  it('should render Create New Code button', () => {
+  it('should render Create New Code button', async () => {
     render(<ChargeCodesPage />);
-    // Button text is "Create New" not "Create New Code"
-    const createButton = screen.queryAllByText(/create new/i);
-    const addButton = screen.queryAllByText(/add/i);
-    expect(createButton.length > 0 || addButton.length > 0).toBe(true);
+    // Button only visible for admin/pmo/finance roles — wait for role fetch to resolve
+    await waitFor(() => {
+      const createButton = screen.queryAllByText(/create new/i);
+      const addButton = screen.queryAllByText(/add/i);
+      expect(createButton.length > 0 || addButton.length > 0).toBe(true);
+    });
   });
 
   it('should render charge code tree panel', async () => {

@@ -29,7 +29,7 @@
         "testMatch": [
           "/auth\\.setup\\.ts/"
         ],
-        "timeout": 60000
+        "timeout": 360000
       },
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
@@ -45,7 +45,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 360000
       },
       {
         "outputDir": "/Users/tachongrak/Projects/ts/frontend/test-results",
@@ -61,7 +61,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 360000
       }
     ],
     "quiet": false,
@@ -89,8 +89,8 @@
     "version": "1.58.2",
     "workers": 1,
     "webServer": {
-      "command": "pnpm dev --port 3002",
-      "url": "http://localhost:3002",
+      "command": "pnpm dev --port 3000",
+      "url": "http://localhost:3000",
       "reuseExistingServer": true,
       "timeout": 120000
     }
@@ -108,7 +108,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 60000,
+              "timeout": 360000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "setup",
@@ -118,12 +118,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 19314,
+                  "duration": 40698,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-26T05:15:07.643Z",
+                  "startTime": "2026-03-31T08:23:15.673Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -133,487 +133,19 @@
           ],
           "id": "17e3fe6f4d9d8bd79c6b-3453aab771e18646c9cc",
           "file": "auth.setup.ts",
-          "line": 12,
+          "line": 5,
           "column": 6
-        }
-      ]
-    },
-    {
-      "title": "approvals-cr1-filter.spec.ts",
-      "file": "approvals-cr1-filter.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Approvals CR-1: Multi-Select Program Filter",
-          "file": "approvals-cr1-filter.spec.ts",
-          "line": 10,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-AP-FILTER-01: Admin views approvals page with program filter",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 2418,
-                      "error": {
-                        "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → GET http://127.0.0.1:3001/api/v1/approvals/pending\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n",
-                        "stack": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → GET http://127.0.0.1:3001/api/v1/approvals/pending\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/approvals-cr1-filter.spec.ts:31:22",
-                        "location": {
-                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                          "column": 23,
-                          "line": 95
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39mhelpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                            "column": 23,
-                            "line": 95
-                          },
-                          "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → GET http://127.0.0.1:3001/api/v1/approvals/pending\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\n\n   at helpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/approvals-cr1-filter.spec.ts:31:22"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-26T05:15:28.883Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/approvals-cr1-filter-Appro-b6fcc-ls-page-with-program-filter-desktop/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/approvals-cr1-filter-Appro-b6fcc-ls-page-with-program-filter-desktop/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                        "column": 23,
-                        "line": 95
-                      }
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 2226,
-                      "error": {
-                        "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → GET http://127.0.0.1:3001/api/v1/approvals/pending\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n",
-                        "stack": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → GET http://127.0.0.1:3001/api/v1/approvals/pending\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/approvals-cr1-filter.spec.ts:31:22",
-                        "location": {
-                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                          "column": 23,
-                          "line": 95
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39mhelpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                            "column": 23,
-                            "line": 95
-                          },
-                          "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → GET http://127.0.0.1:3001/api/v1/approvals/pending\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\n\n   at helpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/approvals-cr1-filter.spec.ts:31:22"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-03-26T05:15:32.454Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/approvals-cr1-filter-Appro-b6fcc-ls-page-with-program-filter-desktop-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/approvals-cr1-filter-Appro-b6fcc-ls-page-with-program-filter-desktop-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/approvals-cr1-filter-Appro-b6fcc-ls-page-with-program-filter-desktop-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                        "column": 23,
-                        "line": 95
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "229910623bb83e254288-fce0acd2ab6334718223",
-              "file": "approvals-cr1-filter.spec.ts",
-              "line": 11,
-              "column": 7
-            },
-            {
-              "title": "E2E-AP-FILTER-02: Search filter works on approvals page (NEGATIVE - no match)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3371,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-26T05:15:35.819Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "229910623bb83e254288-0b75a64bb58124963292",
-              "file": "approvals-cr1-filter.spec.ts",
-              "line": 111,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "profile-avatar.spec.ts",
-      "file": "profile-avatar.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Profile Avatar Upload",
-          "file": "profile-avatar.spec.ts",
-          "line": 10,
-          "column": 6,
-          "specs": [
-            {
-              "title": "E2E-AVATAR-01: Profile page shows avatar area with upload capability",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 3695,
-                      "error": {
-                        "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 25\u001b[22m\n",
-                        "stack": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 25\u001b[22m\n\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:38:22",
-                        "location": {
-                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                          "column": 23,
-                          "line": 95
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39mhelpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                            "column": 23,
-                            "line": 95
-                          },
-                          "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 25\u001b[22m\n\n\n   at helpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:38:22"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-26T05:15:39.734Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-55bbb-area-with-upload-capability-desktop/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-55bbb-area-with-upload-capability-desktop/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                        "column": 23,
-                        "line": 95
-                      }
-                    },
-                    {
-                      "workerIndex": 4,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 3617,
-                      "error": {
-                        "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 25\u001b[22m\n",
-                        "stack": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 25\u001b[22m\n\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:38:22",
-                        "location": {
-                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                          "column": 23,
-                          "line": 95
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39mhelpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                            "column": 23,
-                            "line": 95
-                          },
-                          "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 25\u001b[22m\n\n\n   at helpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:38:22"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-03-26T05:15:44.277Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-55bbb-area-with-upload-capability-desktop-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-55bbb-area-with-upload-capability-desktop-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-55bbb-area-with-upload-capability-desktop-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                        "column": 23,
-                        "line": 95
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "c419bd88c712331ff6e1-ef310a4579a316d9bd1c",
-              "file": "profile-avatar.spec.ts",
-              "line": 11,
-              "column": 7
-            },
-            {
-              "title": "E2E-AVATAR-02: Profile page edit form shows and cancel preserves original value",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 5,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5023,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-26T05:15:51.050Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "c419bd88c712331ff6e1-1e4033af828abcb714b4",
-              "file": "profile-avatar.spec.ts",
-              "line": 46,
-              "column": 7
-            },
-            {
-              "title": "E2E-AVATAR-03: PUT /users/me/avatar validates URL format (NEGATIVE)",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "desktop",
-                  "projectName": "desktop",
-                  "results": [
-                    {
-                      "workerIndex": 5,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1699,
-                      "error": {
-                        "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 31\u001b[22m\n",
-                        "stack": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 31\u001b[22m\n\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:98:29",
-                        "location": {
-                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                          "column": 23,
-                          "line": 95
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39mhelpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                            "column": 23,
-                            "line": 95
-                          },
-                          "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 31\u001b[22m\n\n\n   at helpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:98:29"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-26T05:15:57.174Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-403d2-idates-URL-format-NEGATIVE--desktop/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-403d2-idates-URL-format-NEGATIVE--desktop/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                        "column": 23,
-                        "line": 95
-                      }
-                    },
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1748,
-                      "error": {
-                        "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 31\u001b[22m\n",
-                        "stack": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 31\u001b[22m\n\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:98:29",
-                        "location": {
-                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                          "column": 23,
-                          "line": 95
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39mhelpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                            "column": 23,
-                            "line": 95
-                          },
-                          "message": "Error: apiRequestContext.fetch: connect ECONNREFUSED 127.0.0.1:3001\nCall log:\n\u001b[2m  - → PUT http://127.0.0.1:3001/api/v1/users/me/avatar\u001b[22m\n\u001b[2m    - user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.6 Safari/537.36\u001b[22m\n\u001b[2m    - accept: */*\u001b[22m\n\u001b[2m    - accept-encoding: gzip,deflate,br\u001b[22m\n\u001b[2m    - Content-Type: application/json\u001b[22m\n\u001b[2m    - Cache-Control: no-cache\u001b[22m\n\u001b[2m    - Authorization: Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjEzM2E5OGE1LTYyOWUtNDIwMC05ODVlLTc2NzE3MDZhODVlNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2xjaHh0a2ljZWV5cWprc2dhbndyLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMzA1NWU5MC00Mzk2LTRmYjYtOTVmYS0zNzY3ZWFmYjgzNDkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0NTA1NzEwLCJpYXQiOjE3NzQ1MDIxMTAsImVtYWlsIjoidGFjaG9uZ3Jha0BjZW50cmFsLmNvLnRoIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6InRhY2hvbmdyYWtAY2VudHJhbC5jby50aCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6ImQzMDU1ZTkwLTQzOTYtNGZiNi05NWZhLTM3NjdlYWZiODM0OSJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzc0NTAyMTEwfV0sInNlc3Npb25faWQiOiI3YTY2ODZiOC0xZTY0LTQ0ODQtYTU5My03MGMyYWI5MWNmNTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.vn2dJuQPHzYJdrX0uz3hH5SPC0OIpD3ZzZwdiBUH7SnAPdbZ2O1IbJsw9TLKz6Y4qqDVr6J_auVDi1rHKK3TdA\u001b[22m\n\u001b[2m    - content-length: 31\u001b[22m\n\n\n   at helpers.ts:95\n\n  93 |   }\n  94 |\n> 95 |   return page.request.fetch(url, options);\n     |                       ^\n  96 | }\n  97 |\n  98 | /**\n    at apiRequest (/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts:95:23)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/profile-avatar.spec.ts:98:29"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-03-26T05:15:59.728Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-403d2-idates-URL-format-NEGATIVE--desktop-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-403d2-idates-URL-format-NEGATIVE--desktop-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/profile-avatar-Profile-Ava-403d2-idates-URL-format-NEGATIVE--desktop-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/helpers.ts",
-                        "column": 23,
-                        "line": 95
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "c419bd88c712331ff6e1-0a443bd42c1c47614927",
-              "file": "profile-avatar.spec.ts",
-              "line": 90,
-              "column": 7
-            }
-          ]
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-26T05:15:05.692Z",
-    "duration": 56385.18,
-    "expected": 3,
+    "startTime": "2026-03-31T08:23:14.968Z",
+    "duration": 42461.640999999996,
+    "expected": 1,
     "skipped": 0,
-    "unexpected": 3,
+    "unexpected": 0,
     "flaky": 0
   }
 }

@@ -66,7 +66,10 @@ export function EntryCell({ value, onChange, disabled, isBillable, onNavigate, d
       type="text"
       inputMode="decimal"
       value={localValue}
-      onChange={(e) => setLocalValue(e.target.value)}
+      onChange={(e) => {
+        const v = e.target.value;
+        if (v === '' || /^\d*\.?\d{0,2}$/.test(v)) setLocalValue(v);
+      }}
       onBlur={commit}
       onKeyDown={handleKeyDown}
       autoFocus

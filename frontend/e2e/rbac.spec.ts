@@ -4,33 +4,32 @@ import { authFile, snap } from './helpers';
 /**
  * RBAC E2E Tests
  *
- * User roles (from helpers.ts):
- *   - nattaya: employee
- *   - somchai: employee
- *   - wichai: charge_manager
+ * User roles (actual DB roles per CLAUDE.md):
+ *   - wichai: employee
+ *   - somchai: pmo
+ *   - nattaya: charge_manager
  *   - ploy: pmo
  *   - tachongrak: admin
  *
  * Sidebar nav structure (from layout.tsx):
- *   Base (all roles): Dashboard, Time Entry, Charge Codes
- *   Approvals: visible to admin, charge_manager, pmo
- *   Insight (all roles): Reports, Budget
- *   Admin (admin only): Users, Calendar, Rates
+ *   Base (all roles): Dashboard, Time Entry, Calendar
+ *   Charge Codes: visible to admin, charge_manager, pmo, finance
+ *   Approvals: visible to admin, charge_manager
+ *   Insight (admin, pmo, finance): Reports, Budget
+ *   Admin (admin only): Users, Calendar (admin), Rates
  */
 
 test.describe('RBAC Tests', () => {
   /**
-   * On desktop (>=768px): sidebar <aside> is shown with full nav labels:
-   *   Dashboard, Time Entry, Charge Codes, Approvals, Reports, Budget, Users, Calendar, Rates
+   * On desktop (>=768px): sidebar <aside> is shown with nav labels.
+   *   Sidebar starts collapsed — must click "Expand sidebar" to see labels.
    * On mobile (<768px): sidebar is hidden; a bottom tab nav is shown instead.
-   *   Mobile labels: Home, Time, Codes, Approve (conditional), Reports
-   *   Admin-only items (Users, Calendar, Rates) are NOT in the mobile bottom nav.
    */
 
   test.describe('E2E-RBAC-01: Employee sidebar hides admin menu items', () => {
-    test.use({ storageState: authFile('nattaya') });
+    test.use({ storageState: authFile('wichai') });
 
-    test('nattaya (employee) sees limited sidebar', async ({ page }) => {
+    test('wichai (employee) sees limited sidebar', async ({ page }) => {
       await page.goto('/');
       await page.waitForLoadState('load');
       await page.waitForTimeout(5000); // Wait for role to load via /users/me
@@ -46,16 +45,15 @@ test.describe('RBAC Tests', () => {
       const hasSidebar = await sidebar.isVisible({ timeout: 3000 }).catch(() => false);
 
       if (hasSidebar) {
-        // Desktop: sidebar should NOT show Approvals or admin items for employee
+        // Desktop: employee should see Dashboard, Time Entry, Calendar but NOT Approvals or admin items
         await expect(sidebar.getByText('Dashboard')).toBeVisible();
         await expect(sidebar.getByText('Time Entry')).toBeVisible();
         await expect(sidebar.getByText('Approvals')).not.toBeVisible();
         await expect(sidebar.getByText('Users')).not.toBeVisible();
-        await expect(sidebar.getByText('Calendar')).not.toBeVisible();
         await expect(sidebar.getByText('Rates')).not.toBeVisible();
       } else {
         // Mobile: bottom nav uses short labels; employee has no 'Approve' tab
-        const bottomNav = page.locator('nav').last(); // bottom nav is the last nav element
+        const bottomNav = page.locator('nav').last();
         await expect(bottomNav).toBeVisible({ timeout: 10000 });
         await expect(bottomNav.getByText('Home')).toBeVisible();
         // 'Approve' tab should NOT be visible for employee
@@ -93,7 +91,8 @@ test.describe('RBAC Tests', () => {
         await expect(sidebar.getByText('Reports')).toBeVisible();
         await expect(sidebar.getByText('Budget')).toBeVisible();
         await expect(sidebar.getByText('Users')).toBeVisible();
-        await expect(sidebar.getByText('Calendar')).toBeVisible();
+        // "Calendar" appears twice (base nav + admin nav), just verify at least one is visible
+        await expect(sidebar.getByText('Calendar').first()).toBeVisible();
         await expect(sidebar.getByText('Rates')).toBeVisible();
       } else {
         // Mobile: bottom nav shows Home, Time, Codes, Approve (admin has approval access), Reports
@@ -109,9 +108,9 @@ test.describe('RBAC Tests', () => {
   });
 
   test.describe('E2E-RBAC-03: Charge manager sees Approvals and can create charge codes', () => {
-    test.use({ storageState: authFile('wichai') });
+    test.use({ storageState: authFile('nattaya') });
 
-    test('wichai (charge_manager) can access charge codes and create', async ({ page }) => {
+    test('nattaya (charge_manager) can access charge codes and create', async ({ page }) => {
       await page.goto('/');
       await page.waitForLoadState('load');
       await page.waitForTimeout(5000); // Wait for role to load via /users/me
@@ -199,9 +198,9 @@ test.describe('RBAC Tests', () => {
   });
 
   test.describe('E2E-RBAC-05: Employee cannot access admin pages', () => {
-    test.use({ storageState: authFile('nattaya') });
+    test.use({ storageState: authFile('wichai') });
 
-    test('nattaya (employee) navigating to /admin/users is blocked', async ({ page }) => {
+    test('wichai (employee) navigating to /admin/users is blocked', async ({ page }) => {
       // Attempt to navigate directly to admin page
       await page.goto('/admin/users');
       await page.waitForLoadState('load');

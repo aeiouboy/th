@@ -13,6 +13,8 @@ import { formatCurrencyStatic } from '@/lib/currency';
 import { StatCard } from '@/components/shared/StatCard';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { Clock, Percent, ClipboardCheck, Tag, CheckCircle, Users, Bell } from 'lucide-react';
+import { ChargeabilityTrend } from '@/components/dashboard/ChargeabilityTrend';
+import { ProgramDistribution } from '@/components/dashboard/ProgramDistribution';
 
 // --- Types ---
 
@@ -164,6 +166,11 @@ export default function DashboardPage() {
     queryKey: ['budget-alerts'],
     queryFn: () => api.get('/budgets/alerts'),
     enabled: hasBudgetAccess,
+  });
+
+  const { data: chargeabilityYtd } = useQuery<{ ytdChargeability: number }>({
+    queryKey: ['dashboard-chargeability-ytd'],
+    queryFn: () => api.get('/dashboard/chargeability-ytd'),
   });
 
   // Compute metrics
@@ -348,7 +355,7 @@ export default function DashboardPage() {
             <StatCard
               label="Chargeability"
               value={`${chargeability}%`}
-              subtext="Target 80%"
+              subtext={chargeabilityYtd ? `${chargeabilityYtd.ytdChargeability}% YTD` : 'Target 80%'}
               icon={Percent}
               accent={chargeability >= 80 ? 'var(--accent-green)' : chargeability > 0 ? 'var(--accent-amber)' : undefined}
               trend={chargeabilityDelta !== undefined ? { value: `${chargeabilityDelta >= 0 ? '+' : ''}${chargeabilityDelta}% vs prior`, direction: chargeabilityDelta >= 0 ? 'up' : 'down' } : undefined}
@@ -368,6 +375,12 @@ export default function DashboardPage() {
             />
           </>
         )}
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ChargeabilityTrend />
+        <ProgramDistribution />
       </div>
 
       {/* ROW 3: Employee -- Recent Entries + Alerts | Manager -- 3-column */}

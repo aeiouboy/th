@@ -11,10 +11,14 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BudgetChart } from '@/components/reports/BudgetChart';
 import { ChargeabilityGauge } from '@/components/reports/ChargeabilityGauge';
 import { ActivityPie } from '@/components/reports/ActivityPie';
 import { FinancialPL } from '@/components/reports/FinancialPL';
+import { ReportByProgram } from '@/components/reports/ReportByProgram';
+import { ReportByCostCenter } from '@/components/reports/ReportByCostCenter';
+import { ReportByPerson } from '@/components/reports/ReportByPerson';
 import { FileDown, FileText, DollarSign, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { StatCard } from '@/components/shared/StatCard';
@@ -236,70 +240,94 @@ export default function ReportsPage() {
         }
       />
 
-      {/* Filter bar */}
-      <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <Select value={selectedProgram} onValueChange={(v) => v && setSelectedProgram(v)}>
-          <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Program" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Programs</SelectItem>
-            {programs.map((p) => (
-              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <Tabs defaultValue="overview">
+        <TabsList variant="line" className="mb-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="by-program">By Program</TabsTrigger>
+          <TabsTrigger value="by-cost-center">By Cost Center</TabsTrigger>
+          <TabsTrigger value="by-person">By Person</TabsTrigger>
+        </TabsList>
 
-        <Select value={period} onValueChange={(v) => v && setPeriod(v)}>
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Period" />
-          </SelectTrigger>
-          <SelectContent>
-            {periodOptions.map((p) => (
-              <SelectItem key={p} value={p}>
-                {new Date(p + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <TabsContent value="overview">
+          <div className="space-y-6">
+            {/* Filter bar */}
+            <div className="flex flex-wrap items-center gap-3 p-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <Select value={selectedProgram} onValueChange={(v) => v && setSelectedProgram(v)}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Program" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Programs</SelectItem>
+                  {programs.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-      </div>
+              <Select value={period} onValueChange={(v) => v && setPeriod(v)}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Period" />
+                </SelectTrigger>
+                <SelectContent>
+                  {periodOptions.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {new Date(p + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-      {/* ROW 1: KPI Cards with colored top borders */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {loadingSummary ? (
-          <>{[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}</>
-        ) : (
-          <>
-            <StatCard label="Total budget" value={formatCurrency(budgetSummary.totalBudget)} subtext={`Across ${budgetSummary.totalChargeCodes} programs`} icon={DollarSign} accent="var(--accent-teal)" />
-            <StatCard label="Actual spent" value={formatCurrency(budgetSummary.totalActualSpent)} subtext={`${budgetSummary.overallPercentage}% consumed`} icon={TrendingUp} accent="var(--accent-amber)" />
-            <StatCard label="Utilization" value={`${utilization?.overallUtilization ?? 0}%`} subtext={loadingUtil ? 'Loading...' : `${utilization?.employees.length ?? 0} employees`} icon={Users} accent="var(--accent-green)" />
-            <StatCard label="Overrun count" value={String(budgetSummary.chargeCodesOverBudget)} subtext={`${budgetSummary.chargeCodesAtRisk} at risk`} icon={AlertTriangle} accent="var(--accent-red)" />
-          </>
-        )}
-      </div>
+            {/* ROW 1: KPI Cards with colored top borders */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {loadingSummary ? (
+                <>{[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}</>
+              ) : (
+                <>
+                  <StatCard label="Total budget" value={formatCurrency(budgetSummary.totalBudget)} subtext={`Across ${budgetSummary.totalChargeCodes} programs`} icon={DollarSign} accent="var(--accent-teal)" />
+                  <StatCard label="Actual spent" value={formatCurrency(budgetSummary.totalActualSpent)} subtext={`${budgetSummary.overallPercentage}% consumed`} icon={TrendingUp} accent="var(--accent-amber)" />
+                  <StatCard label="Utilization" value={`${utilization?.overallUtilization ?? 0}%`} subtext={loadingUtil ? 'Loading...' : `${utilization?.employees.length ?? 0} employees`} icon={Users} accent="var(--accent-green)" />
+                  <StatCard label="Overrun count" value={String(budgetSummary.chargeCodesOverBudget)} subtext={`${budgetSummary.chargeCodesAtRisk} at risk`} icon={AlertTriangle} accent="var(--accent-red)" />
+                </>
+              )}
+            </div>
 
-      {/* ROW 2: Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <ChartCard title="Budget vs Actual" loading={loadingAlerts}>
-          <div className="h-72"><BudgetChart data={budgetChartData} /></div>
-        </ChartCard>
-        <ChartCard title="Chargeability by Team" loading={loadingCharge}>
-          <div style={{ height: Math.max(150, Math.min(288, (chargeability.members?.length ?? 2) * 55 + 50)) }}><ChargeabilityGauge members={chargeability.members} target={chargeability.target} /></div>
-        </ChartCard>
-        <ChartCard title="Activity Distribution" loading={loadingActivity}>
-          <div className="h-72"><ActivityPie data={activityDist.distribution} /></div>
-        </ChartCard>
-      </div>
+            {/* ROW 2: Charts */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <ChartCard title="Budget vs Actual" loading={loadingAlerts}>
+                <div className="h-72"><BudgetChart data={budgetChartData} /></div>
+              </ChartCard>
+              <ChartCard title="Chargeability by Team" loading={loadingCharge}>
+                <div style={{ height: Math.max(150, Math.min(288, (chargeability.members?.length ?? 2) * 55 + 50)) }}><ChargeabilityGauge members={chargeability.members} target={chargeability.target} /></div>
+              </ChartCard>
+              <ChartCard title="Activity Distribution" loading={loadingActivity}>
+                <div className="h-72"><ActivityPie data={activityDist.distribution} /></div>
+              </ChartCard>
+            </div>
 
-      {/* ROW 3: Financial P/L with Team Breakdown + Alerts */}
-      <FinancialPL
-        period={period}
-        team={selectedProgram}
-        budgetAlerts={budgetAlerts}
-        chargeabilityAlerts={chargeabilityAlerts}
-        loadingAlerts={loadingAlerts}
-      />
+            {/* ROW 3: Financial P/L with Team Breakdown + Alerts */}
+            <FinancialPL
+              period={period}
+              team={selectedProgram}
+              budgetAlerts={budgetAlerts}
+              chargeabilityAlerts={chargeabilityAlerts}
+              loadingAlerts={loadingAlerts}
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="by-program">
+          <ReportByProgram />
+        </TabsContent>
+
+        <TabsContent value="by-cost-center">
+          <ReportByCostCenter />
+        </TabsContent>
+
+        <TabsContent value="by-person">
+          <ReportByPerson />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

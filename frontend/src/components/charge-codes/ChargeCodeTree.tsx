@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatCurrencyStatic } from '@/lib/currency';
+
+function formatCurrencyCompact(value: number): string {
+  if (value >= 1_000_000) return `฿${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `฿${(value / 1_000).toFixed(0)}K`;
+  return `฿${value.toFixed(0)}`;
+}
 
 export interface ChargeCodeNode {
   id: string;
@@ -47,14 +52,38 @@ function TreeNode({
   const isSelected = selectedId === node.id;
 
   return (
-    <div>
+    <div className="relative">
+      {/* Tree connector lines */}
+      {depth > 0 && (
+        <>
+          {/* Vertical connector line from parent */}
+          <div
+            className="absolute border-l-2 border-muted/40"
+            style={{
+              left: `${(depth - 1) * 24 + 20}px`,
+              top: 0,
+              height: expanded && hasChildren ? '100%' : '18px',
+            }}
+          />
+          {/* Horizontal branch connector */}
+          <div
+            className="absolute border-t-2 border-muted/40"
+            style={{
+              left: `${(depth - 1) * 24 + 20}px`,
+              top: '18px',
+              width: '12px',
+            }}
+          />
+        </>
+      )}
       <button
         onClick={() => onSelect(node.id)}
         className={cn(
-          'group/node flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-[var(--bg-card-hover)]',
+          'group/node relative flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-[var(--bg-card-hover)]',
           isSelected && 'bg-[var(--accent-teal-light)] ring-1 ring-[var(--accent-teal)]/20 font-medium',
+          depth % 2 === 1 && !isSelected && 'bg-stone-50/50 dark:bg-stone-900/20',
         )}
-        style={{ paddingLeft: `${depth * 20 + 8}px` }}
+        style={{ paddingLeft: `${depth * 24 + 8}px` }}
       >
         {hasChildren ? (
           <span
@@ -83,6 +112,9 @@ function TreeNode({
             {badge.label}
           </span>
         )}
+        <span className="font-mono text-xs text-[var(--text-muted)] shrink-0">
+          {node.id}
+        </span>
         <span className={cn(
           'truncate text-left',
           isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)]',
@@ -90,8 +122,8 @@ function TreeNode({
           {node.name}
         </span>
         {node.budgetAmount && (
-          <span className="ml-auto shrink-0 text-[11px] font-[family-name:var(--font-mono)] text-[var(--text-muted)]">
-            {formatCurrencyStatic(Number(node.budgetAmount))}
+          <span className="ml-auto shrink-0 text-[11px] font-mono text-[var(--text-muted)] tabular-nums text-right min-w-[60px]">
+            {formatCurrencyCompact(Number(node.budgetAmount))}
           </span>
         )}
         {onAddChild && node.level && CHILD_LEVEL[node.level] && (
@@ -100,7 +132,7 @@ function TreeNode({
               e.stopPropagation();
               onAddChild(node.id, node.level!);
             }}
-            className="ml-auto shrink-0 rounded p-0.5 opacity-0 group-hover/node:opacity-100 hover:bg-stone-200 transition-all"
+            className="shrink-0 rounded p-0.5 opacity-0 group-hover/node:opacity-100 hover:bg-stone-200 transition-all"
             title={`Add ${CHILD_LEVEL[node.level]}`}
           >
             <Plus className="h-3.5 w-3.5 text-[var(--text-secondary)]" />

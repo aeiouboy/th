@@ -225,14 +225,24 @@ export class CalendarService {
       .orderBy(vacationRequests.createdAt);
   }
 
-  async createVacation(userId: string, startDate: string, endDate: string) {
+  async createVacation(
+    userId: string,
+    startDate: string,
+    endDate: string,
+    leaveType: 'full_day' | 'half_am' | 'half_pm' = 'full_day',
+  ) {
     if (new Date(endDate) < new Date(startDate)) {
       throw new BadRequestException('End date must be after start date');
     }
 
+    // Half-day leave must be single day
+    if (leaveType !== 'full_day' && startDate !== endDate) {
+      throw new BadRequestException('Half-day leave must be for a single day');
+    }
+
     const [created] = await this.db
       .insert(vacationRequests)
-      .values({ userId, startDate, endDate })
+      .values({ userId, startDate, endDate, leaveType })
       .returning();
     return created;
   }

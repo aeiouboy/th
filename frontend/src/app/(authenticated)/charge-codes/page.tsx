@@ -21,6 +21,7 @@ import {
 } from '@/components/charge-codes/ChargeCodeTree';
 import { ChargeCodeForm } from '@/components/charge-codes/ChargeCodeForm';
 import { AccessManager } from '@/components/charge-codes/AccessManager';
+import { BudgetDetail } from '@/components/charge-codes/BudgetDetail';
 
 interface ChargeCodeDetail {
   id: string;
@@ -315,6 +316,7 @@ export default function ChargeCodesPage() {
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="access">Access</TabsTrigger>
                 <TabsTrigger value="budget">Budget</TabsTrigger>
+                <TabsTrigger value="budget-detail">Budget Detail</TabsTrigger>
               </TabsList>
 
               <TabsContent
@@ -428,6 +430,13 @@ export default function ChargeCodesPage() {
                     </div>
                   )}
                 </div>
+              </TabsContent>
+
+              <TabsContent
+                value="budget-detail"
+                className="overflow-y-auto p-4"
+              >
+                <BudgetDetail chargeCodeId={selected.id} />
               </TabsContent>
             </Tabs>
           </>

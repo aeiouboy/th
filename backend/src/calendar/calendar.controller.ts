@@ -86,6 +86,7 @@ export class CalendarController {
       user.id,
       dto.startDate,
       dto.endDate,
+      dto.leaveType,
     );
   }
 

@@ -308,7 +308,7 @@ test.describe.serial('Approval Workflow: Submit and Approve', () => {
       const statusOrGrid = page
         .getByText('Locked', { exact: true })
         .or(page.getByText('Submitted', { exact: true }))
-        .or(page.getByText('Manager Approved', { exact: true }))
+        .or(page.getByText('Approved', { exact: true }))
         .or(page.getByText('Draft', { exact: true }))
         .or(page.getByText('Rejected', { exact: true }))
         .or(page.locator('tbody tr').first());
@@ -316,7 +316,7 @@ test.describe.serial('Approval Workflow: Submit and Approve', () => {
       await page.waitForTimeout(300);
 
       const alreadySubmitted = await page.getByText('Submitted', { exact: true }).isVisible({ timeout: 2000 }).catch(() => false);
-      const alreadyApproved = await page.getByText('Manager Approved', { exact: true }).isVisible({ timeout: 2000 }).catch(() => false);
+      const alreadyApproved = await page.getByText('Approved', { exact: true }).isVisible({ timeout: 2000 }).catch(() => false);
       const alreadyLocked = await page.getByText('Locked', { exact: true }).isVisible({ timeout: 2000 }).catch(() => false);
       const alreadyDone = alreadySubmitted || alreadyApproved || alreadyLocked;
 
@@ -330,7 +330,7 @@ test.describe.serial('Approval Workflow: Submit and Approve', () => {
       // Verify timesheet is in submitted or later state
       await expect(
         page.getByText('Submitted', { exact: true })
-          .or(page.getByText('Manager Approved', { exact: true }))
+          .or(page.getByText('Approved', { exact: true }))
           .or(page.getByText('Locked', { exact: true }))
           .or(page.getByText(/submitted for approval/i))
           .first(),
@@ -359,9 +359,9 @@ test.describe.serial('Approval Workflow: Submit and Approve', () => {
       const pendingResponse = await apiRequest(page, 'GET', '/approvals/pending');
       const pending = await pendingResponse.json();
 
-      if (pending.asManager && pending.asManager.length > 0) {
+      if (pending.pending && pending.pending.length > 0) {
         // Approve all via API for reliability
-        const timesheetIds = pending.asManager.map((t: { id: string }) => t.id);
+        const timesheetIds = pending.pending.map((t: { id: string }) => t.id);
         const bulkResponse = await apiRequest(page, 'POST', '/approvals/bulk-approve', {
           timesheet_ids: timesheetIds,
         });
@@ -391,7 +391,7 @@ test.describe.serial('Approval Workflow: Submit and Approve', () => {
       // Verify status is Submitted, Manager Approved, CC Approved, or Locked
       // (depends on whether CC owner auto-approved or not)
       await expect(
-        page.getByText('Manager Approved', { exact: true })
+        page.getByText('Approved', { exact: true })
           .or(page.getByText('Submitted', { exact: true }))
           .or(page.getByText('Locked', { exact: true }))
           .or(page.getByText(/CC Approved|Approved/i))

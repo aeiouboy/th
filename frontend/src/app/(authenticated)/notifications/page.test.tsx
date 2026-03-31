@@ -43,6 +43,8 @@ vi.mock('lucide-react', () => ({
   TrendingUp: () => <span data-testid="trending-up-icon" />,
   CheckCheck: () => <span data-testid="check-check-icon" />,
   Inbox: () => <span data-testid="inbox-icon" />,
+  AlertTriangle: () => <span data-testid="alert-triangle-icon" />,
+  DollarSign: () => <span data-testid="dollar-sign-icon" />,
 }));
 
 // Mock shared components

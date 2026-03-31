@@ -19,6 +19,8 @@ vi.mock('lucide-react', () => ({
   X: () => <span data-testid="x-icon" />,
   Plus: () => <span data-testid="plus-icon" />,
   UserPlus: () => <span data-testid="user-plus-icon" />,
+  Search: () => <span data-testid="search-icon" />,
+  Check: () => <span data-testid="check-icon" />,
 }));
 
 // Mock Button
@@ -124,7 +126,8 @@ describe('AccessManager', () => {
       );
       fireEvent.click(screen.getByText('Add'));
       await waitFor(() => {
-        expect(screen.getByText('Select a user to add:')).toBeInTheDocument();
+        // New UI shows search input when panel opens
+        expect(screen.getByPlaceholderText('Search by name or email...')).toBeInTheDocument();
       });
     });
 
@@ -139,7 +142,7 @@ describe('AccessManager', () => {
       fireEvent.click(screen.getByText('Add'));
       // Wait for api.get to resolve
       await waitFor(() => {
-        // Alex Kim is not in assignedUsers (u1=alice, u2=bob), so should appear
+        // Alex Kim (u3) is not in assignedUsers (u1=alice, u2=bob), so should appear
         expect(screen.getByText('Alex Kim')).toBeInTheDocument();
       });
     });
@@ -153,11 +156,20 @@ describe('AccessManager', () => {
           onUpdate={vi.fn()}
         />
       );
+      // Open the add panel
       fireEvent.click(screen.getByText('Add'));
+      // Wait for user list to render
       await waitFor(() => {
         expect(screen.getByText('John Doe')).toBeInTheDocument();
       });
+      // Click John Doe to select (checkbox toggle)
       fireEvent.click(screen.getByText('John Doe'));
+      // Click the "Add (1)" button to confirm
+      await waitFor(() => {
+        const addBtn = screen.getAllByText(/^Add/).find((el) => el.textContent?.includes('('));
+        expect(addBtn).toBeTruthy();
+        if (addBtn) fireEvent.click(addBtn);
+      });
       await waitFor(() => {
         expect(api.put).toHaveBeenCalledWith('/charge-codes/CC-001/access', {
           addUserIds: ['u1'],
@@ -174,11 +186,18 @@ describe('AccessManager', () => {
           onUpdate={onUpdate}
         />
       );
+      // Open the add panel
       fireEvent.click(screen.getByText('Add'));
+      // Wait for user list
       await waitFor(() => {
         expect(screen.getByText('John Doe')).toBeInTheDocument();
       });
+      // Select user then confirm
       fireEvent.click(screen.getByText('John Doe'));
+      await waitFor(() => {
+        const addBtn = screen.getAllByText(/^Add/).find((el) => el.textContent?.includes('('));
+        if (addBtn) fireEvent.click(addBtn);
+      });
       await waitFor(() => {
         expect(onUpdate).toHaveBeenCalled();
       });

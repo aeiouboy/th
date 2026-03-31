@@ -63,15 +63,15 @@ test.describe('Time Entry Module', () => {
   });
 
   test('E2E-TS-03: Submit empty timesheet shows warning (NEGATIVE)', async ({ page }) => {
-    // Navigate to a future week where there are likely no entries
+    // Navigate to a past week where there are likely no entries
     await page.goto('/time-entry');
     await page.waitForLoadState('load');
     await expect(page.getByText(/Week of/i)).toBeVisible({ timeout: 30000 });
 
-    // Navigate to next week to get an empty timesheet
-    const nextBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m9 18"]') });
-    if (await nextBtn.count() > 0) {
-      await nextBtn.first().click();
+    // Navigate to previous week (next button is disabled on current/future weeks)
+    const prevBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m15 18"]') });
+    if (await prevBtn.count() > 0) {
+      await prevBtn.first().click();
       await page.waitForTimeout(1000);
     }
 
@@ -104,21 +104,21 @@ test.describe('Time Entry Module', () => {
     await expect(weekHeader).toBeVisible({ timeout: 30000 });
     const originalText = await weekHeader.textContent();
 
-    // Click next-week chevron button (right chevron)
-    const nextBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m9 18"]') });
-    if (await nextBtn.count() > 0) {
-      await nextBtn.first().click();
+    // Click previous-week chevron button (left chevron) — next button is disabled on current week
+    const prevBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m15 18"]') });
+    if (await prevBtn.count() > 0) {
+      await prevBtn.first().click();
       await page.waitForTimeout(1500);
 
       // The week text should change
       const newText = await weekHeader.textContent();
       expect(newText).not.toEqual(originalText);
-      await snap(page, 'e2e-ts-04', 'after-navigate-next');
+      await snap(page, 'e2e-ts-04', 'after-navigate-prev');
 
-      // Click previous-week chevron button (left chevron)
-      const prevBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m15 18"]') });
-      if (await prevBtn.count() > 0) {
-        await prevBtn.first().click();
+      // Click next-week chevron button (right chevron) to go back
+      const nextBtn = page.locator('button').filter({ has: page.locator('svg path[d*="m9 18"]') });
+      if (await nextBtn.count() > 0) {
+        await nextBtn.first().click();
         await page.waitForTimeout(1500);
 
         // The week text should return to original

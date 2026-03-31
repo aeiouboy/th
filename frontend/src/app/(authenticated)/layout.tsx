@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { api } from '@/lib/api';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { useQueryClient } from '@tanstack/react-query';
 import { CurrencyProvider } from '@/lib/currency';
 import {
   DropdownMenu,
@@ -14,10 +15,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { NotificationBell } from '@/components/layout/NotificationBell';
+import { ChatWidget } from '@/components/layout/ChatWidget';
 import {
   LayoutDashboard,
   Clock,
@@ -30,6 +32,7 @@ import {
   Settings,
   Menu,
   ChevronRight,
+  BookOpen,
 } from 'lucide-react';
 
 const baseNavItems = [
@@ -78,8 +81,10 @@ export default function AuthenticatedLayout({
   const [isTablet, setIsTablet] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const supabaseRef = useRef<SupabaseClient | null>(null);
   if (typeof window !== 'undefined' && !supabaseRef.current) {
     supabaseRef.current = createClient();
@@ -88,15 +93,28 @@ export default function AuthenticatedLayout({
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const profile = await api.get<{ role: string; fullName: string | null }>('/users/me');
+        const profile = await api.get<{ role: string; fullName: string | null; avatarUrl: string | null }>('/users/me');
         setUserRole(profile.role);
         setUserName(profile.fullName ?? null);
+        setAvatarUrl(profile.avatarUrl ?? null);
       } catch {
         // If fetch fails, role stays null — nav items hidden until loaded
       }
     };
     fetchUserProfile();
   }, []);
+
+  // Clear TanStack Query cache on auth state change (login/logout)
+  useEffect(() => {
+    const supabase = supabaseRef.current;
+    if (!supabase) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        queryClient.invalidateQueries();
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [queryClient]);
 
   const mainNavItems = [
     ...baseNavItems,
@@ -154,13 +172,13 @@ export default function AuthenticatedLayout({
 
   const getInitials = (name: string) => {
     const trimmed = name.trim();
-    if (!trimmed) return 'U';
+    if (!trimmed) return '?';
     const parts = trimmed.split(/\s+/);
     if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     return parts[0][0].toUpperCase();
   };
 
-  const avatarInitials = userName ? getInitials(userName) : 'U';
+  const avatarInitials = userName ? getInitials(userName) : '?';
 
   const collapsed = sidebarCollapsed || isTablet;
 
@@ -175,9 +193,7 @@ export default function AuthenticatedLayout({
         >
           {/* Logo */}
           <div className="h-14 flex items-center gap-3 px-4 border-b border-slate-700/50">
-            <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-              TS
-            </div>
+            <img src="/ris-logo.svg" alt="RIS" width={32} height={32} className="shrink-0" />
             {!collapsed && (
               <span className="font-semibold text-sm tracking-tight font-[family-name:var(--font-heading)]">
                 Timesheet
@@ -242,6 +258,17 @@ export default function AuthenticatedLayout({
             )}
           </nav>
 
+          {/* Help */}
+          <div className="mt-auto px-2 pb-2">
+            <NavItem
+              href="/user-manual"
+              label="Help"
+              icon={BookOpen}
+              active={isActive('/user-manual')}
+              collapsed={collapsed}
+            />
+          </div>
+
           {/* Footer */}
           <div className="p-4 border-t border-slate-700/50 space-y-2">
             {!collapsed ? (
@@ -294,6 +321,7 @@ export default function AuthenticatedLayout({
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer" suppressHydrationWarning>
                 <Avatar className="h-8 w-8">
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt={userName || 'User'} />}
                   <AvatarFallback className="bg-teal-600 text-white text-xs font-medium">
                     {avatarInitials}
                   </AvatarFallback>
@@ -320,6 +348,9 @@ export default function AuthenticatedLayout({
           <CurrencyProvider>{children}</CurrencyProvider>
         </main>
       </div>
+
+      {/* Chat Widget */}
+      <ChatWidget />
 
       {/* Mobile bottom tab navigation */}
       {isMobile && (

@@ -16,6 +16,8 @@ import { CostRatesModule } from './cost-rates/cost-rates.module';
 import { SettingsModule } from './settings/settings.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CompanySettingsModule } from './company-settings/company-settings.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { AiModule } from './ai/ai.module';
 import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -37,6 +39,8 @@ import { RolesGuard } from './common/guards/roles.guard';
     SettingsModule,
     NotificationsModule,
     CompanySettingsModule,
+    DashboardModule,
+    AiModule,
   ],
   providers: [
     {

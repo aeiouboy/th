@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timesheet System — User Manual</title>
+<style>
+  :root {
+    --teal: #0d9488;
+    --teal-light: #ccfbf1;
+    --dark: #1e293b;
+    --gray: #64748b;
+    --light: #f8fafc;
+    --border: #e2e8f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--dark); background: var(--light); line-height: 1.75;
+    font-size: 15px;
+  }
+  .cover {
+    background: linear-gradient(135deg, #0f172a 0%, #134e4a 50%, #0d9488 100%);
+    color: white; padding: 80px 40px; text-align: center;
+  }
+  .cover h1 { font-size: 3rem; margin-bottom: 8px; }
+  .cover .subtitle { font-size: 1.2rem; opacity: 0.85; margin-bottom: 40px; }
+  .cover .meta { font-size: 0.9rem; opacity: 0.7; }
+  .cover .logo {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 80px; height: 80px; background: var(--teal);
+    border-radius: 16px; font-size: 2rem; font-weight: bold; margin-bottom: 24px;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 40px 24px; }
+
+  .toc {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 32px; margin-bottom: 48px;
+  }
+  .toc h2 { font-size: 1.4rem; margin-bottom: 16px; color: var(--teal); }
+  .toc ol { padding-left: 24px; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { color: var(--dark); text-decoration: none; }
+  .toc a:hover { color: var(--teal); }
+
+  .section {
+    background: white; border: 1px solid var(--border);
+    border-radius: 12px; padding: 32px; margin-bottom: 28px;
+  }
+  .section h2 {
+    font-size: 1.5rem; color: var(--teal);
+    border-bottom: 2px solid var(--teal-light);
+    padding-bottom: 8px; margin-bottom: 16px;
+  }
+  .section h3 { font-size: 1.1rem; margin: 20px 0 8px; }
+  .section p { margin-bottom: 10px; }
+  .section ul, .section ol { margin: 8px 0 12px 20px; }
+  .section li { margin-bottom: 4px; }
+
+  .screenshot {
+    margin: 16px 0; text-align: center;
+  }
+  .screenshot img {
+    max-width: 100%; border: 1px solid var(--border);
+    border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .screenshot .cap {
+    font-size: 0.82rem; color: var(--gray); margin-top: 6px;
+  }
+
+  .step {
+    display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start;
+  }
+  .step-n {
+    flex-shrink: 0; width: 28px; height: 28px;
+    background: var(--teal); color: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 0.85rem;
+  }
+  .step-c { flex: 1; }
+
+  .badge {
+    display: inline-block; padding: 2px 10px;
+    border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+  }
+  .b-admin { background: #dbeafe; color: #1d4ed8; }
+  .b-mgr { background: #d1fae5; color: #059669; }
+  .b-emp { background: #fef3c7; color: #d97706; }
+
+  .tip {
+    background: #f0fdfa; border-left: 4px solid var(--teal);
+    padding: 10px 14px; border-radius: 0 8px 8px 0;
+    margin: 12px 0; font-size: 0.9rem;
+  }
+  .warn {
+    background: #fff7ed; border-left: 4px solid #f97316;
+    padding: 10px 14px; border-radius: 0 8px 8px 0;
+    margin: 12px 0; font-size: 0.9rem;
+  }
+
+  table.roles { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9rem; }
+  table.roles th, table.roles td { padding: 8px 12px; border: 1px solid var(--border); text-align: left; }
+  table.roles th { background: var(--teal-light); font-weight: 600; }
+
+  .flow {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    margin: 12px 0; font-size: 0.9rem;
+  }
+  .flow-box {
+    padding: 6px 14px; border-radius: 8px;
+    background: var(--teal-light); color: var(--teal); font-weight: 600;
+  }
+  .flow-arr { color: var(--gray); font-size: 1.2rem; }
+
+  @media print {
+    body { background: white; }
+    .section { box-shadow: none; break-inside: avoid; }
+  }
+  @media (max-width: 640px) {
+    .cover h1 { font-size: 2rem; }
+    .container { padding: 20px 12px; }
+    .section { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="logo">TS</div>
+  <h1>Timesheet System</h1>
+  <div class="subtitle">User Manual / คู่มือการใช้งาน</div>
+  <div class="meta">Version 1.0 &nbsp;|&nbsp; March 2026 &nbsp;|&nbsp; RIS Company Limited (Central Group)</div>
+</div>
+
+<div class="container">
+
+<!-- TOC -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#s1">Login — เข้าสู่ระบบ</a></li>
+    <li><a href="#s2">Dashboard — หน้าแรก</a></li>
+    <li><a href="#s3">Time Entry — บันทึกเวลา</a></li>
+    <li><a href="#s4">Calendar & Vacation — ปฏิทินและวันลา</a></li>
+    <li><a href="#s5">Charge Codes — รหัสค่าใช้จ่าย</a></li>
+    <li><a href="#s6">Approvals — การอนุมัติ</a></li>
+    <li><a href="#s7">Reports — รายงาน</a></li>
+    <li><a href="#s8">Budget — ติดตามงบประมาณ</a></li>
+    <li><a href="#s9">Notifications — การแจ้งเตือน</a></li>
+    <li><a href="#s10">Settings — ตั้งค่า</a></li>
+    <li><a href="#s11">Admin: Users — จัดการผู้ใช้</a></li>
+    <li><a href="#s12">Admin: Calendar — จัดการปฏิทิน</a></li>
+    <li><a href="#s13">Admin: Rates — อัตราค่าใช้จ่าย</a></li>
+    <li><a href="#s14">Roles & Permissions — บทบาทและสิทธิ์</a></li>
+  </ol>
+</div>
+
+<!-- 1. LOGIN -->
+<div class="section" id="s1">
+  <h2>1. Login — เข้าสู่ระบบ</h2>
+  <p>เปิด Browser แล้วไปที่ URL ของระบบ Timesheet จะพบหน้า Login สำหรับเข้าสู่ระบบ</p>
+
+  <div class="screenshot">
+    <img src="01-login-page.png" alt="Login Page">
+    <div class="cap">หน้า Login</div>
+  </div>
+
+  <h3>ขั้นตอนการ Login</h3>
+  <div class="step"><div class="step-n">1</div><div class="step-c">กรอก <strong>Email</strong> ของบริษัท เช่น yourname@central.co.th</div></div>
+  <div class="step"><div class="step-n">2</div><div class="step-c">กรอก <strong>Password</strong></div></div>
+  <div class="step"><div class="step-n">3</div><div class="step-c">กดปุ่ม <strong>Sign In</strong> หรือเลือก <strong>Sign in with Microsoft</strong> เพื่อใช้ SSO</div></div>
+
+  <div class="screenshot">
+    <img src="02-login-filled.png" alt="Login Filled">
+    <div class="cap">กรอก Email และ Password แล้วกด Sign In</div>
+  </div>
+
+  <div class="tip"><strong>Tip:</strong> หากลืม Password ให้กดปุ่ม "Forgot password?" ด้านล่างฟอร์ม</div>
+</div>
+
+<!-- 2. DASHBOARD -->
+<div class="section" id="s2">
+  <h2>2. Dashboard — หน้าแรก</h2>
+  <p>หลัง Login สำเร็จ จะเข้าสู่หน้า Dashboard แสดงภาพรวม Timesheet ประจำสัปดาห์และ KPI สำคัญ</p>
+
+  <div class="screenshot">
+    <img src="03-dashboard.png" alt="Dashboard">
+    <div class="cap">Dashboard แสดงภาพรวมทั้งหมด</div>
+  </div>
+
+  <h3>ส่วนประกอบหลัก</h3>
+  <ul>
+    <li><strong>Weekly Summary</strong> — แถบด้านบนแสดงสัปดาห์ปัจจุบัน, ชั่วโมงที่บันทึก, สถานะ (Draft/Submitted/Approved) และ Progress bar รายวัน</li>
+    <li><strong>Quick Actions</strong> — ปุ่มลัด: Open Timesheet, My Codes, Approvals</li>
+    <li><strong>KPI Cards</strong> — 4 การ์ด: Hours this period, Chargeability %, Pending Approvals, Active Charge Codes</li>
+    <li><strong>Chargeability Trend</strong> — กราฟเทรนด์ Chargeability รายเดือน เทียบกับเป้า 80%</li>
+    <li><strong>Program Distribution</strong> — Pie chart สัดส่วนชั่วโมงแยกตาม Program</li>
+    <li><strong>Bottom Cards</strong> — Pending Approvals (สำหรับ Manager), Team Status, Alerts</li>
+  </ul>
+</div>
+
+<!-- 3. TIME ENTRY -->
+<div class="section" id="s3">
+  <h2>3. Time Entry — บันทึกเวลา</h2>
+  <p>หน้าหลักสำหรับบันทึกชั่วโมงการทำงานรายวัน แต่ละแถวคือ Charge Code หนึ่งรายการ แสดงเป็นตาราง 7 วัน (จันทร์–อาทิตย์)</p>
+
+  <div class="screenshot">
+    <img src="04-time-entry.png" alt="Time Entry">
+    <div class="cap">ตารางบันทึกเวลารายสัปดาห์</div>
+  </div>
+
+  <h3>วิธีบันทึกชั่วโมง</h3>
+  <div class="step"><div class="step-n">1</div><div class="step-c"><strong>เลือกสัปดาห์</strong> — ใช้ลูกศร ◄ ► หรือ Date Picker ด้านบนตาราง</div></div>
+  <div class="step"><div class="step-n">2</div><div class="step-c"><strong>เพิ่ม Charge Code</strong> — คลิก "+ Add Charge Code" ด้านล่างตาราง แล้วเลือก Code จาก Dropdown</div></div>
+  <div class="step"><div class="step-n">3</div><div class="step-c"><strong>กรอกชั่วโมง</strong> — คลิกช่องของวันที่ต้องการ ใส่จำนวนชั่วโมง (เช่น 8.00) สามารถเพิ่ม Note ได้ผ่านปุ่ม "Edit note"</div></div>
+  <div class="step"><div class="step-n">4</div><div class="step-c"><strong>ตรวจสอบ</strong> — ดู Daily Total, Required (8 ชม./วัน) และ Variance ด้านล่าง ตัวเลขสีแดงคือชั่วโมงที่ยังขาด</div></div>
+  <div class="step"><div class="step-n">5</div><div class="step-c"><strong>บันทึก/ส่ง</strong> — กด <strong>Save Draft</strong> เพื่อบันทึกฉบับร่าง หรือกด <strong>Submit →</strong> เพื่อส่งให้ Manager อนุมัติ</div></div>
+
+  <div class="warn"><strong>สำคัญ:</strong> ระบบ Auto-save ทุก 30 วินาที แต่ควรกด Save Draft เพื่อความแน่ใจ สังเกต Submission Deadline (cutoff date) แถบสีส้มด้านบนตาราง</div>
+
+  <div class="tip"><strong>Tip:</strong> กด "+ Request New CC" หากต้องการขอ Charge Code ใหม่ที่ยังไม่มีสิทธิ์ใช้</div>
+</div>
+
+<!-- 4. CALENDAR -->
+<div class="section" id="s4">
+  <h2>4. Calendar & Vacation — ปฏิทินและวันลา</h2>
+  <p>แสดงปฏิทินทั้งปี พร้อมสีแยกประเภท: <strong>วันหยุด</strong> (ชมพู), <strong>วันเสาร์–อาทิตย์</strong> (เทา), <strong>วันลาของตัวเอง</strong> (ฟ้า), <strong>วันนี้</strong> (กรอบเขียว)</p>
+
+  <div class="screenshot">
+    <img src="05-calendar.png" alt="Calendar">
+    <div class="cap">ปฏิทินแสดงวันหยุดและวันลาทั้งปี</div>
+  </div>
+
+  <h3>วิธีขอลา (Request Vacation)</h3>
+  <div class="step"><div class="step-n">1</div><div class="step-c">คลิกปุ่ม <strong>"+ Request Vacation"</strong> มุมขวาบน</div></div>
+  <div class="step"><div class="step-n">2</div><div class="step-c">เลือก <strong>วันที่เริ่ม–สิ้นสุด</strong> และ <strong>ประเภท</strong> (Full Day / Half AM / Half PM)</div></div>
+  <div class="step"><div class="step-n">3</div><div class="step-c">กดส่งคำขอ — รอ Manager อนุมัติ</div></div>
+
+  <div class="tip"><strong>Tip:</strong> วันลาที่อนุมัติแล้วจะแสดงเป็น Read-only ใน Time Entry ไม่ต้องกรอกชั่วโมงซ้ำ</div>
+</div>
+
+<!-- 5. CHARGE CODES -->
+<div class="section" id="s5">
+  <h2>5. Charge Codes — รหัสค่าใช้จ่าย</h2>
+  <p>เรียกดู Charge Code ทั้งหมดในระบบ แบ่งเป็น 4 ระดับ: <strong>Program → Project → Activity → Task</strong> พร้อมงบประมาณของแต่ละ Code</p>
+
+  <div class="screenshot">
+    <img src="06-charge-codes.png" alt="Charge Codes">
+    <div class="cap">Charge Code Browser พร้อม Search และ Filter</div>
+  </div>
+
+  <h3>ฟีเจอร์หลัก</h3>
+  <ul>
+    <li><strong>Search</strong> — พิมพ์ชื่อหรือรหัสเพื่อค้นหา</li>
+    <li><strong>Filter</strong> — กรองตาม Level, Category, Status</li>
+    <li><strong>My Codes</strong> — ติ๊กเพื่อดูเฉพาะ Code ที่ตัวเองมีสิทธิ์</li>
+    <li><strong>+ Create New</strong> — สร้าง Charge Code ใหม่ (เฉพาะ Admin / Charge Manager)</li>
+    <li><strong>Detail Panel</strong> — คลิกที่ Code เพื่อดู Owner, Budget, Users ที่มีสิทธิ์ในแผงขวา</li>
+  </ul>
+</div>
+
+<!-- 6. APPROVALS -->
+<div class="section" id="s6">
+  <h2>6. Approvals — การอนุมัติ <span class="badge b-mgr">Manager / Admin</span></h2>
+  <p>สำหรับ Manager และ Admin ใช้ตรวจสอบ อนุมัติ หรือปฏิเสธ Timesheet ของทีม รวมถึงจัดการคำขอลา</p>
+
+  <div class="screenshot">
+    <img src="07-approvals.png" alt="Approvals">
+    <div class="cap">Approvals — Team Status แสดงสถานะชั่วโมงของทีม</div>
+  </div>
+
+  <h3>แท็บที่มี</h3>
+  <ul>
+    <li><strong>Team Status</strong> — ภาพรวมชั่วโมงของทุกคนในทีม: ใครกรอกครบ ใครยังขาด (Incomplete Days แสดงสีส้ม)</li>
+    <li><strong>Pending Approvals</strong> — Timesheet ที่รออนุมัติ คลิกเพื่อดูรายละเอียด แล้วกด Approve หรือ Reject</li>
+    <li><strong>Vacations</strong> — คำขอลาจากทีมที่รออนุมัติ</li>
+    <li><strong>History</strong> — ประวัติการอนุมัติทั้งหมด พร้อม Timestamp และ Comment</li>
+  </ul>
+
+  <h3>Approval Flow</h3>
+  <div class="flow">
+    <div class="flow-box">Draft</div><div class="flow-arr">→</div>
+    <div class="flow-box">Submitted</div><div class="flow-arr">→</div>
+    <div class="flow-box">Manager Approved</div><div class="flow-arr">→</div>
+    <div class="flow-box">CC Owner Approved</div><div class="flow-arr">→</div>
+    <div class="flow-box">Locked</div>
+  </div>
+</div>
+
+<!-- 7. REPORTS -->
+<div class="section" id="s7">
+  <h2>7. Reports — รายงาน <span class="badge b-admin">Admin / PMO / Finance</span></h2>
+  <p>รายงานภาพรวมค่าใช้จ่าย, Utilization, Chargeability ขององค์กร สามารถ Export เป็น CSV หรือ PDF</p>
+
+  <div class="screenshot">
+    <img src="08-reports.png" alt="Reports">
+    <div class="cap">Reports Overview — KPI, Charts, P/L Summary</div>
+  </div>
+
+  <h3>แท็บรายงาน</h3>
+  <ul>
+    <li><strong>Overview</strong> — KPI Cards (Total Budget, Actual Spent, Utilization, Overrun Count) + Chargeability by Team + Activity Distribution + P/L Summary</li>
+    <li><strong>By Program</strong> — รายงานแยกตาม Program</li>
+    <li><strong>By Cost Center</strong> — รายงานแยกตาม Cost Center</li>
+    <li><strong>By Person</strong> — รายงานแยกตามบุคคล</li>
+  </ul>
+</div>
+
+<!-- 8. BUDGET -->
+<div class="section" id="s8">
+  <h2>8. Budget — ติดตามงบประมาณ <span class="badge b-admin">Admin / PMO / Finance</span></h2>
+  <p>ติดตามงบประมาณแต่ละ Charge Code: Budget, Actual Spent, Usage %, Forecast, Variance และสถานะ</p>
+
+  <div class="screenshot">
+    <img src="09-budget.png" alt="Budget">
+    <div class="cap">Budget Tracking — ตารางงบประมาณแยกตาม Charge Code</div>
+  </div>
+
+  <h3>สถานะสี</h3>
+  <ul>
+    <li><span style="color:#22c55e">●</span> <strong>On Track</strong> — ใช้จ่ายไม่เกิน 60%</li>
+    <li><span style="color:#f97316">●</span> <strong>Warning</strong> — ใช้จ่าย 60–80% หรือ Forecast เกินงบ</li>
+    <li><span style="color:#ef4444">●</span> <strong>Over Budget</strong> — ใช้จ่ายเกิน 80% หรือ Actual เกิน Budget</li>
+  </ul>
+
+  <div class="tip"><strong>Tip:</strong> คลิกที่แถวเพื่อดู Child-level breakdown ของ Charge Code นั้นๆ</div>
+</div>
+
+<!-- 9. NOTIFICATIONS -->
+<div class="section" id="s9">
+  <h2>9. Notifications — การแจ้งเตือน</h2>
+  <p>ศูนย์รวมการแจ้งเตือนทุกประเภท สามารถกรองตามแท็บ และกด "Mark all as read" เพื่ออ่านทั้งหมด</p>
+
+  <div class="screenshot">
+    <img src="10-notifications.png" alt="Notifications">
+    <div class="cap">Notification Center — แจ้งเตือนทุกประเภท</div>
+  </div>
+
+  <h3>ประเภทแจ้งเตือน</h3>
+  <ul>
+    <li><strong>Alerts</strong> — แจ้งเตือน Budget เกิน / Chargeability ต่ำ</li>
+    <li><strong>Reminders</strong> — เตือนให้ Submit Timesheet ก่อน Cutoff</li>
+    <li><strong>Approvals</strong> — แจ้งเมื่อ Timesheet ถูก Approve/Reject</li>
+    <li><strong>Summaries</strong> — สรุปสถานะทีมประจำสัปดาห์</li>
+    <li><strong>Insights</strong> — วิเคราะห์ข้อมูลรายสัปดาห์ (ชั่วโมง, Cost, Chargeability)</li>
+  </ul>
+</div>
+
+<!-- 10. SETTINGS -->
+<div class="section" id="s10">
+  <h2>10. Settings — ตั้งค่า</h2>
+  <p>ตั้งค่าส่วนตัว: ธีม, สกุลเงิน, การแจ้งเตือน, Timezone</p>
+
+  <div class="screenshot">
+    <img src="11-settings.png" alt="Settings">
+    <div class="cap">หน้าตั้งค่า — Appearance, Currency, Notifications, Timezone</div>
+  </div>
+
+  <ul>
+    <li><strong>Appearance</strong> — สลับ Light/Dark Mode</li>
+    <li><strong>Currency</strong> — เลือกสกุลเงิน (THB, USD, EUR, JPY) — Admin เปลี่ยนได้ มีผลทั้งระบบ</li>
+    <li><strong>Notifications</strong> — เปิด/ปิดแจ้งเตือนแต่ละประเภท ผ่าน 3 ช่องทาง: Email, In-App, Teams</li>
+    <li><strong>Timezone</strong> — เลือก Timezone เช่น Asia/Bangkok</li>
+  </ul>
+</div>
+
+<!-- 11. ADMIN: USERS -->
+<div class="section" id="s11">
+  <h2>11. Admin: Users — จัดการผู้ใช้ <span class="badge b-admin">Admin Only</span></h2>
+  <p>จัดการผู้ใช้ในระบบ: ดูรายชื่อ, กำหนด Role, เปลี่ยน Job Grade, ค้นหาและกรองตาม Department</p>
+
+  <div class="screenshot">
+    <img src="12-admin-users.png" alt="Admin Users">
+    <div class="cap">User Management — รายชื่อผู้ใช้ทั้งหมดพร้อม Role และ Department</div>
+  </div>
+
+  <ul>
+    <li>คลิกไอคอน ✏️ ที่คอลัมน์ Actions เพื่อแก้ไข Role หรือ Job Grade</li>
+    <li>ค้นหาจากชื่อ, Email, หรือ Department</li>
+    <li>กรองตาม Role ผ่าน Dropdown</li>
+  </ul>
+</div>
+
+<!-- 12. ADMIN: CALENDAR -->
+<div class="section" id="s12">
+  <h2>12. Admin: Calendar — จัดการปฏิทิน <span class="badge b-admin">Admin Only</span></h2>
+  <p>จัดการวันหยุดนักขัตฤกษ์และวันหยุดสุดสัปดาห์ เลือก Country Code และปี</p>
+
+  <div class="screenshot">
+    <img src="13-admin-calendar.png" alt="Admin Calendar">
+    <div class="cap">Admin Calendar — จัดการวันหยุดประจำปี</div>
+  </div>
+
+  <ul>
+    <li><strong>Add Holiday</strong> — เพิ่มวันหยุดนักขัตฤกษ์ทีละวัน</li>
+    <li><strong>Populate Weekends</strong> — สร้างวันเสาร์–อาทิตย์อัตโนมัติทั้งปี (คลิกครั้งเดียว)</li>
+    <li><strong>Country Code</strong> — เลือกประเทศ (TH = ไทย) เพื่อใช้ปฏิทินที่ถูกต้อง</li>
+  </ul>
+</div>
+
+<!-- 13. ADMIN: RATES -->
+<div class="section" id="s13">
+  <h2>13. Admin: Rates — อัตราค่าใช้จ่าย <span class="badge b-admin">Admin Only</span></h2>
+  <p>กำหนดอัตราค่าใช้จ่ายต่อชั่วโมงตาม Job Grade ใช้สำหรับคำนวณ Budget และ Cost ในรายงาน</p>
+
+  <div class="screenshot">
+    <img src="14-admin-rates.png" alt="Admin Rates">
+    <div class="cap">Cost Rates — อัตราค่าใช้จ่ายแยกตาม Job Grade</div>
+  </div>
+
+  <ul>
+    <li><strong>Company Billing Rate</strong> — อัตราเรียกเก็บของบริษัท (ต่อวัน / ต่อชั่วโมง)</li>
+    <li><strong>Cost Rates</strong> — อัตราตาม Job Grade (L1–L5) พร้อมวันที่มีผล (Effective From/To)</li>
+    <li><strong>+ Add Rate</strong> — เพิ่มอัตราใหม่</li>
+    <li>แก้ไข/ลบ ผ่านไอคอน ✏️ / 🗑️ ที่คอลัมน์ Actions</li>
+  </ul>
+</div>
+
+<!-- 14. ROLES -->
+<div class="section" id="s14">
+  <h2>14. Roles & Permissions — บทบาทและสิทธิ์</h2>
+
+  <table class="roles">
+    <tr><th>Role</th><th>สิทธิ์การเข้าถึง</th></tr>
+    <tr>
+      <td><span class="badge b-emp">Employee</span></td>
+      <td>บันทึกเวลา, ขอลา, ดู Notification, ดู Charge Code ของตัวเอง</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-mgr">Charge Manager</span></td>
+      <td>ทุกอย่างของ Employee + อนุมัติ Timesheet, อนุมัติวันลา, จัดการ Charge Code, ดูสถานะทีม</td>
+    </tr>
+    <tr>
+      <td><span class="badge" style="background:#ede9fe;color:#7c3aed">PMO</span></td>
+      <td>ดู Reports, ดู Budget, จัดการ Charge Code</td>
+    </tr>
+    <tr>
+      <td><span class="badge" style="background:#fce7f3;color:#db2777">Finance</span></td>
+      <td>ดู Reports, ดู Budget</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-admin">Admin</span></td>
+      <td>เข้าถึงทุกฟีเจอร์ + จัดการ Users, Calendar, Rates, Currency</td>
+    </tr>
+  </table>
+
+  <h3>Timesheet Workflow</h3>
+  <div class="flow">
+    <div class="flow-box">บันทึกชั่วโมง</div><div class="flow-arr">→</div>
+    <div class="flow-box">Save Draft</div><div class="flow-arr">→</div>
+    <div class="flow-box">Submit</div><div class="flow-arr">→</div>
+    <div class="flow-box">Manager Review</div><div class="flow-arr">→</div>
+    <div class="flow-box">Approved / Rejected</div>
+  </div>
+
+  <h3>Vacation Workflow</h3>
+  <div class="flow">
+    <div class="flow-box">ส่งคำขอลา</div><div class="flow-arr">→</div>
+    <div class="flow-box">Manager Review</div><div class="flow-arr">→</div>
+    <div class="flow-box">อนุมัติ</div><div class="flow-arr">→</div>
+    <div class="flow-box">แสดงใน Timesheet อัตโนมัติ</div>
+  </div>
+
+  <h3>กำหนดเวลาสำคัญ</h3>
+  <ul>
+    <li><strong>Submission Cutoff</strong> — ส่ง Timesheet ภายใน 3 วันหลังสิ้นงวด</li>
+    <li><strong>Working Hours</strong> — เป้าหมาย 8 ชม./วัน, 40 ชม./สัปดาห์</li>
+    <li><strong>Chargeability Target</strong> — เป้าหมาย 80% ของชั่วโมงทำงานเป็น Billable</li>
+  </ul>
+</div>
+
+<!-- FOOTER -->
+<div style="text-align:center; padding: 40px 0; color: var(--gray); font-size: 0.82rem;">
+  <p>Timesheet System User Manual v1.0 — March 2026</p>
+  <p>RIS Company Limited (Central Group)</p>
+</div>
+
+</div>
+</body>
+</html>

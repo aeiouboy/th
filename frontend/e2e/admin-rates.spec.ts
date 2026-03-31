@@ -3,6 +3,42 @@ import { apiRequest, uniqueName, takeScreenshots, snap } from './helpers';
 
 test.describe.serial('Admin Rates Module', () => {
   let testJobGrade: string;
+  const createdRateIds: number[] = [];
+
+  test.afterAll(async ({ browser }) => {
+    // Cleanup: delete any cost rates created during tests
+    const context = await browser.newContext({ storageState: 'frontend/e2e/.auth/tachongrak.json' });
+    const page = await context.newPage();
+    await page.goto('/');
+
+    // Delete tracked rate IDs
+    for (const id of createdRateIds) {
+      try {
+        const res = await apiRequest(page, 'DELETE', `/cost-rates/${id}`);
+        console.log(`Cleanup: deleted cost rate ${id}, status=${res.status()}`);
+      } catch (e) {
+        console.warn(`Cleanup: failed to delete cost rate ${id}:`, e);
+      }
+    }
+
+    // Also cleanup any remaining L-TEST-* rates
+    try {
+      const ratesRes = await apiRequest(page, 'GET', '/cost-rates');
+      if (ratesRes.ok()) {
+        const rates = await ratesRes.json();
+        const testRates = (Array.isArray(rates) ? rates : rates.data || [])
+          .filter((r: any) => r.jobGrade?.startsWith('L-TEST'));
+        for (const rate of testRates) {
+          await apiRequest(page, 'DELETE', `/cost-rates/${rate.id}`).catch(() => {});
+          console.log(`Cleanup: deleted leftover test rate ${rate.id} (${rate.jobGrade})`);
+        }
+      }
+    } catch (e) {
+      console.warn('Cleanup: failed to search/delete remaining test rates:', e);
+    }
+
+    await context.close();
+  });
 
   test('E2E-RATE-01: Rates table loads with real data', async ({ page }) => {
     await page.goto('/admin/rates');
@@ -60,6 +96,18 @@ test.describe.serial('Admin Rates Module', () => {
 
     // New rate should appear in the rates table
     await expect(page.getByText(testJobGrade)).toBeVisible({ timeout: 10000 });
+
+    // Track created rate ID for cleanup
+    try {
+      const ratesRes = await apiRequest(page, 'GET', '/cost-rates');
+      if (ratesRes.ok()) {
+        const rates = await ratesRes.json();
+        const found = (Array.isArray(rates) ? rates : rates.data || [])
+          .find((r: any) => r.jobGrade === testJobGrade);
+        if (found) createdRateIds.push(found.id);
+      }
+    } catch { /* best effort */ }
+
     await snap(page, 'e2e-rate-02', 'after-add-rate');
   });
 });

@@ -1,5 +1,5 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { eq, sql, and, lte, or, isNull, sum } from 'drizzle-orm';
+import { eq, sql, and, lte, or, isNull, sum, inArray } from 'drizzle-orm';
 import { DRIZZLE, DrizzleDB } from '../database/drizzle.provider';
 import {
   budgets,
@@ -121,8 +121,8 @@ export class BudgetsService {
     };
   }
 
-  async findAll() {
-    const rows = await this.db
+  async findAll(chargeCodeIds?: string[], page = 1, limit = 20) {
+    let query = this.db
       .select({
         chargeCodeId: budgets.chargeCodeId,
         name: chargeCodes.name,
@@ -133,7 +133,13 @@ export class BudgetsService {
       .from(budgets)
       .innerJoin(chargeCodes, eq(budgets.chargeCodeId, chargeCodes.id));
 
-    return rows
+    if (chargeCodeIds && chargeCodeIds.length > 0) {
+      query = query.where(inArray(budgets.chargeCodeId, chargeCodeIds)) as typeof query;
+    }
+
+    const rows = await query;
+
+    const sorted = rows
       .filter((row) => Number(row.budgetAmount ?? 0) > 0)
       .map((row) => {
         const budget = Number(row.budgetAmount ?? 0);
@@ -160,6 +166,12 @@ export class BudgetsService {
         const order = { red: 0, orange: 1, yellow: 2, green: 3 };
         return order[a.severity] - order[b.severity];
       });
+
+    const total = sorted.length;
+    const offset = (page - 1) * limit;
+    const data = sorted.slice(offset, offset + limit);
+
+    return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   async getAlerts(): Promise<BudgetAlertDto[]> {
@@ -267,7 +279,7 @@ export class BudgetsService {
 
   async recalculate(): Promise<{ recalculated: number }> {
     // Step 1: Recalculate calculated_cost for each timesheet entry
-    // For each entry, look up the user's job_grade and the matching cost rate
+    // Pre-load all profiles and cost rates to avoid N+1 queries
     const entries = await this.db
       .select({
         entryId: timesheetEntries.id,
@@ -279,30 +291,32 @@ export class BudgetsService {
       .from(timesheetEntries)
       .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id));
 
-    for (const entry of entries) {
-      const [profile] = await this.db
-        .select({ jobGrade: profiles.jobGrade })
-        .from(profiles)
-        .where(eq(profiles.id, entry.userId))
-        .limit(1);
+    const allProfiles = await this.db.select().from(profiles);
+    const profileMap = new Map(allProfiles.map((p) => [p.id, p]));
 
+    const allRates = await this.db.select().from(costRates);
+
+    // Build a lookup: jobGrade -> sorted rate periods
+    const ratesByGrade = new Map<string, typeof allRates>();
+    for (const rate of allRates) {
+      const existing = ratesByGrade.get(rate.jobGrade) ?? [];
+      existing.push(rate);
+      ratesByGrade.set(rate.jobGrade, existing);
+    }
+
+    const findRate = (jobGrade: string, date: string) => {
+      const rates = ratesByGrade.get(jobGrade);
+      if (!rates) return null;
+      return rates.find(
+        (r) => r.effectiveFrom <= date && (!r.effectiveTo || r.effectiveTo >= date),
+      ) ?? null;
+    };
+
+    for (const entry of entries) {
+      const profile = profileMap.get(entry.userId);
       if (!profile?.jobGrade) continue;
 
-      const [rate] = await this.db
-        .select({ hourlyRate: costRates.hourlyRate })
-        .from(costRates)
-        .where(
-          and(
-            eq(costRates.jobGrade, profile.jobGrade),
-            lte(costRates.effectiveFrom, entry.date),
-            or(
-              isNull(costRates.effectiveTo),
-              sql`${costRates.effectiveTo} >= ${entry.date}`,
-            ),
-          ),
-        )
-        .limit(1);
-
+      const rate = findRate(profile.jobGrade, entry.date);
       if (!rate) continue;
 
       const calculatedCost = (
@@ -513,6 +527,62 @@ export class BudgetsService {
     alerts.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
 
     return alerts;
+  }
+
+  async getTeamBreakdown(chargeCodeId: string) {
+    // Find all descendant charge codes (children, grandchildren, etc.)
+    const allChargeCodes = await this.db
+      .select({ id: chargeCodes.id, parentId: chargeCodes.parentId })
+      .from(chargeCodes);
+
+    const childrenMap = new Map<string, string[]>();
+    for (const cc of allChargeCodes) {
+      if (cc.parentId) {
+        const children = childrenMap.get(cc.parentId) ?? [];
+        children.push(cc.id);
+        childrenMap.set(cc.parentId, children);
+      }
+    }
+
+    // Collect all descendant IDs (including self)
+    const descendantIds: string[] = [chargeCodeId];
+    const collectDescendants = (id: string) => {
+      const children = childrenMap.get(id) ?? [];
+      for (const childId of children) {
+        descendantIds.push(childId);
+        collectDescendants(childId);
+      }
+    };
+    collectDescendants(chargeCodeId);
+
+    // Query hours and cost grouped by department
+    const rows = await this.db
+      .select({
+        department: profiles.department,
+        totalHours: sum(timesheetEntries.hours).as('total_hours'),
+        totalCost: sum(timesheetEntries.calculatedCost).as('total_cost'),
+      })
+      .from(timesheetEntries)
+      .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
+      .innerJoin(profiles, eq(timesheets.userId, profiles.id))
+      .where(inArray(timesheetEntries.chargeCodeId, descendantIds))
+      .groupBy(profiles.department);
+
+    const totalCost = rows.reduce((s, r) => s + Number(r.totalCost ?? 0), 0);
+
+    const teams = rows
+      .map((row) => ({
+        team: row.department || 'Unassigned',
+        hours: Math.round(Number(row.totalHours ?? 0) * 100) / 100,
+        cost: Math.round(Number(row.totalCost ?? 0) * 100) / 100,
+        percentage: totalCost > 0
+          ? Math.round((Number(row.totalCost ?? 0) / totalCost) * 10000) / 100
+          : 0,
+      }))
+      .sort((a, b) => b.cost - a.cost)
+      .slice(0, 5);
+
+    return { chargeCodeId, topTeams: teams };
   }
 
   private getStatus(

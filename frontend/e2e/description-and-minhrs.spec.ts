@@ -17,10 +17,11 @@ import { snap, authFile } from './helpers';
  * Returns true if an editable week was found, false otherwise.
  */
 async function navigateToEditableWeek(page: Page, maxWeeks = 15): Promise<boolean> {
-  const nextBtn = page.locator('button.h-8.w-8').last();
+  // Navigate backward (next button is disabled on current/future weeks)
+  const prevBtn = page.locator('button.h-8.w-8').first();
 
   for (let i = 0; i < maxWeeks; i++) {
-    await nextBtn.click();
+    await prevBtn.click();
     // Wait for spinner to disappear (timesheet loading)
     await page.locator('.animate-spin').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
     await page.waitForTimeout(1000);
@@ -267,7 +268,7 @@ test.describe('E2E-MIN: Minimum Hours Validation', () => {
   test.setTimeout(180000);
 
   test('E2E-MIN-01: Submit with <8h shows Incomplete Hours dialog; status remains Draft', async ({ page }) => {
-    // GIVEN: Navigate to time-entry
+    // GIVEN: Navigate to time-entry (current week)
     await page.goto('/time-entry');
     await expect(page.getByText(/Week of/i)).toBeVisible({ timeout: 25000 });
 
@@ -279,6 +280,14 @@ test.describe('E2E-MIN: Minimum Hours Validation', () => {
     }
     if (!isEditable) {
       test.skip(true, 'No editable week found');
+      return;
+    }
+
+    // Check Submit button is available (not disabled by cutoff)
+    const submitCheck = page.getByRole('button', { name: /Submit/i }).last();
+    const submitEnabled = await submitCheck.isEnabled({ timeout: 3000 }).catch(() => false);
+    if (!submitEnabled) {
+      test.skip(true, 'Submit button disabled (cutoff closed) — cannot test min hours validation');
       return;
     }
 
@@ -337,11 +346,11 @@ test.describe('E2E-MIN: Minimum Hours Validation', () => {
   });
 
   test('E2E-MIN-02 (NEGATIVE): Submit with 0 hours lists all 5 weekdays as incomplete', async ({ page }) => {
-    // GIVEN: Navigate 3+ weeks ahead — need a completely empty week
+    // GIVEN: Navigate to current week
     await page.goto('/time-entry');
     await expect(page.getByText(/Week of/i)).toBeVisible({ timeout: 25000 });
 
-    // Navigate forward to find an editable week (may be many weeks ahead due to prior test runs)
+    // Find an editable week
     const saveDraftBtn = page.getByRole('button', { name: /Save Draft/i });
     let isEditable = await saveDraftBtn.isVisible({ timeout: 5000 }).catch(() => false) &&
                      await saveDraftBtn.isEnabled({ timeout: 5000 }).catch(() => false);
@@ -349,7 +358,15 @@ test.describe('E2E-MIN: Minimum Hours Validation', () => {
       isEditable = await navigateToEditableWeek(page);
     }
     if (!isEditable) {
-      test.skip(true, 'No editable week found within 15 forward navigations');
+      test.skip(true, 'No editable week found');
+      return;
+    }
+
+    // Check Submit button is available (not disabled by cutoff)
+    const submitCheck = page.getByRole('button', { name: /Submit/i }).last();
+    const submitEnabled = await submitCheck.isEnabled({ timeout: 3000 }).catch(() => false);
+    if (!submitEnabled) {
+      test.skip(true, 'Submit button disabled (cutoff closed) — cannot test min hours validation');
       return;
     }
 

@@ -18,6 +18,8 @@ import { formatCurrency } from '@/lib/utils';
 import { StatCard } from '@/components/shared/StatCard';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageHeader } from '@/components/shared/PageHeader';
+import { MultiSelectFilter } from '@/components/budget/MultiSelectFilter';
+import { TeamBreakdown } from '@/components/budget/TeamBreakdown';
 
 interface BudgetSummaryResponse {
   totalBudget: number;
@@ -94,20 +96,66 @@ function getSeverityConfig(severity: string) {
   return SEVERITY_CONFIG[severity as keyof typeof SEVERITY_CONFIG] ?? SEVERITY_CONFIG.green;
 }
 
+interface PaginatedBudgetResponse {
+  data: BudgetItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export default function BudgetPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
+  const [initialized, setInitialized] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20;
 
   const { data: summary = emptySummary, isLoading: loadingSummary } = useQuery<BudgetSummaryResponse>({
     queryKey: ['budget-summary'],
     queryFn: () => api.get('/budgets/summary'),
   });
 
-  const { data: budgetItems = [], isLoading: loadingItems } = useQuery<BudgetItem[]>({
-    queryKey: ['budgets'],
-    queryFn: () => api.get('/budgets'),
+  // Fetch all items (unfiltered, large limit) to build filter options
+  const { data: allBudgetResponse, isLoading: loadingAll } = useQuery<PaginatedBudgetResponse>({
+    queryKey: ['budgets-all'],
+    queryFn: () => api.get('/budgets?limit=100'),
   });
+  const allBudgetItems = allBudgetResponse?.data ?? [];
 
-  const isLoading = loadingSummary || loadingItems;
+  // Initialize selected programs once data loads
+  useEffect(() => {
+    if (!initialized && allBudgetItems.length > 0) {
+      setSelectedPrograms(allBudgetItems.map((item) => item.chargeCodeId));
+      setInitialized(true);
+    }
+  }, [allBudgetItems, initialized]);
+
+  // Filter options from all items
+  const filterOptions = useMemo(
+    () => allBudgetItems.map((item) => ({ id: item.chargeCodeId, label: item.name })),
+    [allBudgetItems],
+  );
+
+  // Filtered budget items based on selection with pagination
+  const { data: budgetResponse, isLoading: loadingItems } = useQuery<PaginatedBudgetResponse>({
+    queryKey: ['budgets', selectedPrograms, currentPage, pageSize],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      p.set('page', String(currentPage));
+      p.set('limit', String(pageSize));
+      if (selectedPrograms.length > 0 && selectedPrograms.length < allBudgetItems.length) {
+        p.set('chargeCodeIds', selectedPrograms.join(','));
+      }
+      return api.get(`/budgets?${p.toString()}`);
+    },
+    enabled: initialized,
+  });
+  const budgetItems = budgetResponse?.data ?? [];
+  const totalPages = budgetResponse?.totalPages ?? 1;
+  const totalItems = budgetResponse?.total ?? 0;
+
+  const isLoading = loadingSummary || loadingAll || loadingItems;
 
   // Derive KPI from budget items (what's shown in the table)
   const stats = useMemo(() => {
@@ -126,6 +174,16 @@ export default function BudgetPage() {
         title="Budget Tracking"
         description="Monitor charge code budgets, spending, and forecasts"
       />
+
+      {/* Multi-select filter */}
+      {filterOptions.length > 0 && (
+        <MultiSelectFilter
+          options={filterOptions}
+          selected={selectedPrograms}
+          onChange={(v) => { setSelectedPrograms(v); setCurrentPage(1); }}
+          label="Programs"
+        />
+      )}
 
       {/* Overview cards */}
       {isLoading ? (
@@ -243,6 +301,55 @@ export default function BudgetPage() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-5 py-3 border-t border-[var(--border-default)] flex items-center justify-between text-sm">
+            <span className="text-[var(--text-muted)] text-xs">
+              Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalItems)} of {totalItems}
+            </span>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+              >
+                Previous
+              </Button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
+                  if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push('ellipsis');
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p, i) =>
+                  p === 'ellipsis' ? (
+                    <span key={`e${i}`} className="px-1 text-[var(--text-muted)]">...</span>
+                  ) : (
+                    <Button
+                      key={p}
+                      variant={p === currentPage ? 'default' : 'outline'}
+                      size="sm"
+                      className="min-w-[32px]"
+                      onClick={() => setCurrentPage(p)}
+                    >
+                      {p}
+                    </Button>
+                  ),
+                )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -389,7 +496,12 @@ function BudgetRow({
             </>
           )}
 
-          {/* Root cause callout */}
+          {/* Team breakdown */}
+          <tr className="border-b border-[var(--border-default)] bg-stone-50/70 dark:bg-stone-900/30">
+            <td colSpan={8} className="pl-10">
+              <TeamBreakdown chargeCodeId={item.chargeCodeId} />
+            </td>
+          </tr>
         </>
       )}
     </>

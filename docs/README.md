@@ -48,15 +48,20 @@ ts/
 ├── backend/             # NestJS REST API
 │   └── src/
 │       ├── approvals/       # Approval workflow module
-│       ├── budgets/         # Budget tracking module
+│       ├── budgets/         # Budget tracking module (multi-select, team breakdown)
 │       ├── calendar/        # Calendar & holiday management
-│       ├── charge-codes/    # Charge code hierarchy
+│       ├── charge-codes/    # Charge code hierarchy (access requests, cascade)
 │       ├── common/          # Guards, decorators, filters
+│       ├── company-settings/# Company billing rate settings
+│       ├── cost-rates/      # Job grade hourly rates
+│       ├── dashboard/       # Dashboard KPIs (chargeability-ytd, program-distribution)
 │       ├── database/        # Drizzle ORM schema & provider
-│       ├── integrations/    # Teams bot, notifications, CSV upload
-│       ├── reports/         # Reporting & analytics
+│       ├── integrations/    # Teams bot, notifications, CSV upload, chat widget backend
+│       ├── notifications/   # Per-user notification inbox
+│       ├── reports/         # Reporting & analytics (by-program, by-cost-center, by-person)
 │       ├── schedulers/      # Cron jobs (cutoff, notifications, budgets)
-│       ├── timesheets/      # Timesheet & entry management
+│       ├── settings/        # Application settings
+│       ├── timesheets/      # Timesheet & entry management (copy-from-previous)
 │       └── users/           # User profile management
 ├── frontend/            # Next.js 16 web application
 │   └── src/
@@ -77,6 +82,8 @@ ts/
 - [Database Schema](database-schema.md) -- Full ERD and table definitions
 - [Deployment Guide](deployment.md) -- Step-by-step deployment instructions
 - [Troubleshooting](troubleshooting.md) -- Common issues and fixes
+- [Chatbot Roadmap](chatbot-roadmap.md) -- In-app chat widget and future Teams bot integration
+- [PRD Runbook](prd-runbook.md) -- Feature reference by acceptance criteria (Thai)
 - [Test Results](test-results/summary.md) -- Test execution summary
 
 ## User Roles & Test Accounts

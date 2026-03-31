@@ -93,7 +93,7 @@ describe('FinancialPL', () => {
 
   it('should render team P/L table headers', async () => {
     render(<FinancialPL />, { wrapper: createWrapper() });
-    expect(await screen.findByText('Team')).toBeInTheDocument();
+    expect(await screen.findByText('Program')).toBeInTheDocument();
     expect(screen.getByText('Cost')).toBeInTheDocument();
     expect(screen.getByText('Billable Rev.')).toBeInTheDocument();
     expect(screen.getByText('Margin')).toBeInTheDocument();

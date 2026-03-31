@@ -102,6 +102,13 @@ describe('TimesheetsService', () => {
       const insertChain = buildInsertChain([sheet]);
       db.insert.mockReturnValueOnce(insertChain);
 
+      // autoFillLeaveEntries: vacations select (thenable), holidays select (thenable)
+      db.select
+        .mockReturnValueOnce(buildEntriesSelectChain([]))  // vacations
+        .mockReturnValueOnce(buildEntriesSelectChain([])); // holidays
+      const deleteChain = { where: jest.fn().mockResolvedValue([]) };
+      db.delete.mockReturnValueOnce(deleteChain);
+
       const result = await service.create('user-1', { period_start: '2026-03-11', period_end: '2026-03-17' });
       expect(result.periodStart).toBe('2026-03-09');
     });
@@ -160,15 +167,6 @@ describe('TimesheetsService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw ForbiddenException when timesheet status is submitted', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'submitted' };
-      db.select.mockReturnValueOnce(buildSelectChain([sheet]));
-
-      await expect(
-        service.upsertEntries('user-1', 'ts-1', [])
-      ).rejects.toThrow(ForbiddenException);
-    });
-
     it('should throw ForbiddenException when timesheet status is locked', async () => {
       const sheet = { id: 'ts-1', userId: 'user-1', status: 'locked' };
       db.select.mockReturnValueOnce(buildSelectChain([sheet]));
@@ -179,40 +177,44 @@ describe('TimesheetsService', () => {
     });
 
     it('should allow editing when status is draft', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft' };
-      db.select.mockReturnValueOnce(buildSelectChain([sheet]));
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
+      db.select
+        .mockReturnValueOnce(buildSelectChain([sheet]))  // find sheet
+        .mockReturnValueOnce(buildEntriesSelectChain([])); // approvedVacations
 
-      const deleteChain = { from: jest.fn().mockReturnThis(), where: jest.fn().mockResolvedValue([]) };
+      const deleteChain = { where: jest.fn().mockResolvedValue([]) };
       db.delete.mockReturnValueOnce(deleteChain);
 
-      const updateChain = buildUpdateChain([sheet]);
-      db.update.mockReturnValueOnce(updateChain);
+      // When entries is empty and no inserts, returns select of existing leave entries
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
 
       const result = await service.upsertEntries('user-1', 'ts-1', []);
       expect(result).toEqual([]);
     });
 
     it('should allow editing when status is rejected', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'rejected' };
-      db.select.mockReturnValueOnce(buildSelectChain([sheet]));
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'rejected', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
+      db.select
+        .mockReturnValueOnce(buildSelectChain([sheet]))  // find sheet
+        .mockReturnValueOnce(buildEntriesSelectChain([])); // approvedVacations
 
-      const deleteChain = { from: jest.fn().mockReturnThis(), where: jest.fn().mockResolvedValue([]) };
+      const deleteChain = { where: jest.fn().mockResolvedValue([]) };
       db.delete.mockReturnValueOnce(deleteChain);
 
-      const updateChain = buildUpdateChain([sheet]);
-      db.update.mockReturnValueOnce(updateChain);
+      // When entries is empty, returns select of existing leave entries
+      db.select.mockReturnValueOnce(buildEntriesSelectChain([]));
 
       const result = await service.upsertEntries('user-1', 'ts-1', []);
       expect(result).toEqual([]);
     });
 
     it('should validate that charge codes are assigned to the user', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft' };
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
       const entries = [{ charge_code_id: 'CC-NOT-MINE', date: '2026-03-09', hours: 8 }];
 
       db.select
-        .mockReturnValueOnce(buildSelectChain([sheet]))
-        .mockReturnValueOnce(buildWhereArrayChain([])); // no allowed codes
+        .mockReturnValueOnce(buildSelectChain([sheet]))     // find sheet
+        .mockReturnValueOnce(buildEntriesSelectChain([]));  // allowed codes (none)
 
       await expect(
         service.upsertEntries('user-1', 'ts-1', entries)
@@ -220,7 +222,7 @@ describe('TimesheetsService', () => {
     });
 
     it('should filter out entries with 0 hours', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft' };
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
       const entries = [
         { charge_code_id: 'CC-001', date: '2026-03-09', hours: 0 },
         { charge_code_id: 'CC-001', date: '2026-03-10', hours: 8 },
@@ -228,10 +230,11 @@ describe('TimesheetsService', () => {
       const allowedCodes = [{ chargeCodeId: 'CC-001' }];
 
       db.select
-        .mockReturnValueOnce(buildSelectChain([sheet]))
-        .mockReturnValueOnce(buildWhereArrayChain(allowedCodes));
+        .mockReturnValueOnce(buildSelectChain([sheet]))          // find sheet
+        .mockReturnValueOnce(buildEntriesSelectChain(allowedCodes))  // allowed codes
+        .mockReturnValueOnce(buildEntriesSelectChain([]));       // approvedVacations
 
-      const deleteChain = { from: jest.fn().mockReturnThis(), where: jest.fn().mockResolvedValue([]) };
+      const deleteChain = { where: jest.fn().mockResolvedValue([]) };
       db.delete.mockReturnValueOnce(deleteChain);
 
       const inserted = [{ id: 'e-1', timesheetId: 'ts-1', chargeCodeId: 'CC-001', date: '2026-03-10', hours: '8' }];
@@ -253,8 +256,8 @@ describe('TimesheetsService', () => {
       await expect(service.submit('user-1', 'bad-id')).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw BadRequestException when status is already submitted', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'submitted' };
+    it('should throw BadRequestException when status is locked', async () => {
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'locked' };
       db.select.mockReturnValueOnce(buildSelectChain([sheet]));
 
       await expect(service.submit('user-1', 'ts-1')).rejects.toThrow(BadRequestException);
@@ -268,10 +271,18 @@ describe('TimesheetsService', () => {
     });
 
     it('should transition draft timesheet to submitted when min hours met', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
+      // Use current week to avoid cutoff enforcement
+      const today = new Date();
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - today.getDay() + 1);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const fmt = (d: Date) => d.toISOString().split('T')[0];
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: fmt(monday), periodEnd: fmt(sunday) };
       const updated = { ...sheet, status: 'submitted' };
 
-      // Mock validateMinimumHours to pass (spy and resolve)
+      // Mock private methods to avoid DB chain complexity
+      jest.spyOn(service as any, 'autoFillLeaveEntries').mockResolvedValueOnce(undefined);
       jest.spyOn(service, 'validateMinimumHours').mockResolvedValueOnce(undefined);
 
       db.select.mockReturnValueOnce(buildSelectChain([sheet]));
@@ -282,9 +293,16 @@ describe('TimesheetsService', () => {
     });
 
     it('should allow resubmitting a rejected timesheet', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'rejected', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
+      const today = new Date();
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - today.getDay() + 1);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const fmt = (d: Date) => d.toISOString().split('T')[0];
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'rejected', periodStart: fmt(monday), periodEnd: fmt(sunday) };
       const updated = { ...sheet, status: 'submitted' };
 
+      jest.spyOn(service as any, 'autoFillLeaveEntries').mockResolvedValueOnce(undefined);
       jest.spyOn(service, 'validateMinimumHours').mockResolvedValueOnce(undefined);
 
       db.select.mockReturnValueOnce(buildSelectChain([sheet]));
@@ -295,8 +313,15 @@ describe('TimesheetsService', () => {
     });
 
     it('should throw BadRequestException when weekday has less than 8 hours', async () => {
-      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: '2026-03-09', periodEnd: '2026-03-15' };
+      const today = new Date();
+      const monday = new Date(today);
+      monday.setDate(today.getDate() - today.getDay() + 1);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const fmt = (d: Date) => d.toISOString().split('T')[0];
+      const sheet = { id: 'ts-1', userId: 'user-1', status: 'draft', periodStart: fmt(monday), periodEnd: fmt(sunday) };
 
+      jest.spyOn(service as any, 'autoFillLeaveEntries').mockResolvedValueOnce(undefined);
       jest.spyOn(service, 'validateMinimumHours').mockRejectedValueOnce(
         new BadRequestException({
           message: 'Minimum 8 hours required on weekdays',

@@ -192,6 +192,45 @@ export class TimesheetsService {
       }
     }
 
+    // Validate: reject entries with hours > 0 on full-day vacation days
+    const approvedVacations = await this.db
+      .select({
+        startDate: vacationRequests.startDate,
+        endDate: vacationRequests.endDate,
+        leaveType: vacationRequests.leaveType,
+      })
+      .from(vacationRequests)
+      .where(
+        and(
+          eq(vacationRequests.userId, userId),
+          eq(vacationRequests.status, 'approved'),
+          lte(vacationRequests.startDate, sheet.periodEnd),
+          gte(vacationRequests.endDate, sheet.periodStart),
+        ),
+      );
+
+    const fullDayVacationDates = new Set<string>();
+    const halfDayVacationDates = new Map<string, number>();
+    for (const v of approvedVacations) {
+      const leaveType = v.leaveType || 'full_day';
+      const vStart = new Date(Math.max(new Date(v.startDate).getTime(), new Date(sheet.periodStart).getTime()));
+      const vEnd = new Date(Math.min(new Date(v.endDate).getTime(), new Date(sheet.periodEnd).getTime()));
+      for (let d = new Date(vStart); d <= vEnd; d.setDate(d.getDate() + 1)) {
+        const dateStr = d.toISOString().split('T')[0];
+        if (leaveType === 'full_day') {
+          fullDayVacationDates.add(dateStr);
+        } else {
+          halfDayVacationDates.set(dateStr, 4); // max 4h allowed on half-day
+        }
+      }
+    }
+
+    // Filter out entries on full-day vacation days silently
+    const validatedEntries = userEntries.filter((e) => {
+      if (fullDayVacationDates.has(e.date) && e.hours > 0) return false;
+      return true;
+    });
+
     // Delete existing non-leave entries for this timesheet, then insert fresh
     // Preserve system leave entries (LEAVE-001)
     await this.db
@@ -203,7 +242,7 @@ export class TimesheetsService {
         ),
       );
 
-    if (userEntries.length === 0) {
+    if (validatedEntries.length === 0) {
       // Still return existing leave entries
       return this.db
         .select()
@@ -211,7 +250,7 @@ export class TimesheetsService {
         .where(eq(timesheetEntries.timesheetId, timesheetId));
     }
 
-    const toInsert = userEntries
+    const toInsert = validatedEntries
       .filter((e) => e.hours > 0)
       .map((e) => ({
         timesheetId,
@@ -345,6 +384,7 @@ export class TimesheetsService {
       .select({
         startDate: vacationRequests.startDate,
         endDate: vacationRequests.endDate,
+        leaveType: vacationRequests.leaveType,
       })
       .from(vacationRequests)
       .where(
@@ -356,8 +396,11 @@ export class TimesheetsService {
         ),
       );
 
-    const vacationDays = new Set<string>();
+    // Map date -> leave hours (full_day=8, half=4)
+    const vacationHoursMap = new Map<string, number>();
     for (const v of approvedVacations) {
+      const leaveType = v.leaveType || 'full_day';
+      const leaveHours = leaveType === 'full_day' ? 8 : 4;
       const vStart = new Date(
         Math.max(new Date(v.startDate).getTime(), new Date(periodStart).getTime()),
       );
@@ -365,24 +408,32 @@ export class TimesheetsService {
         Math.min(new Date(v.endDate).getTime(), new Date(periodEnd).getTime()),
       );
       for (let d = new Date(vStart); d <= vEnd; d.setDate(d.getDate() + 1)) {
-        vacationDays.add(d.toISOString().split('T')[0]);
+        const dateStr = d.toISOString().split('T')[0];
+        // Take the max leave hours if multiple vacations overlap the same day
+        vacationHoursMap.set(dateStr, Math.max(vacationHoursMap.get(dateStr) || 0, leaveHours));
       }
     }
 
-    // Check each day that has entries — must have at least 8 hours
+    // Check each day that has entries — must have at least required hours
     // Days without any entries are allowed (employee can submit daily)
     const shortDays: { date: string; logged: number; required: number }[] = [];
 
     for (const [dateStr, logged] of hoursByDate) {
-      // Skip weekends, holidays, and approved vacation days
+      // Skip weekends and holidays
       const d = new Date(dateStr + 'T00:00:00Z');
       const dayOfWeek = d.getUTCDay();
-      if (dayOfWeek === 0 || dayOfWeek === 6 || nonWorkingSet.has(dateStr) || vacationDays.has(dateStr)) {
+      if (dayOfWeek === 0 || dayOfWeek === 6 || nonWorkingSet.has(dateStr)) {
         continue;
       }
 
-      if (logged < 8) {
-        shortDays.push({ date: dateStr, logged, required: 8 });
+      // Full-day vacation: skip entirely
+      const leaveHours = vacationHoursMap.get(dateStr) || 0;
+      if (leaveHours >= 8) continue;
+
+      // Half-day vacation: require 8 - leaveHours
+      const required = 8 - leaveHours;
+      if (logged < required) {
+        shortDays.push({ date: dateStr, logged, required });
       }
     }
 
@@ -409,6 +460,7 @@ export class TimesheetsService {
       .select({
         startDate: vacationRequests.startDate,
         endDate: vacationRequests.endDate,
+        leaveType: vacationRequests.leaveType,
       })
       .from(vacationRequests)
       .where(
@@ -421,10 +473,14 @@ export class TimesheetsService {
       );
 
     // Collect all vacation weekdays within the period
-    const leaveEntriesToInsert: { date: string; description: string }[] = [];
+    const leaveEntriesToInsert: { date: string; hours: string; description: string }[] = [];
     const coveredDates = new Set<string>();
 
     for (const v of approvedVacations) {
+      const leaveType = v.leaveType || 'full_day';
+      const hours = leaveType === 'full_day' ? '8' : '4';
+      const descSuffix = leaveType === 'half_am' ? ' (AM)' : leaveType === 'half_pm' ? ' (PM)' : '';
+
       const vStart = new Date(
         Math.max(new Date(v.startDate).getTime(), new Date(periodStart).getTime()),
       );
@@ -438,7 +494,11 @@ export class TimesheetsService {
           const dateStr = d.toISOString().split('T')[0];
           if (!coveredDates.has(dateStr)) {
             coveredDates.add(dateStr);
-            leaveEntriesToInsert.push({ date: dateStr, description: 'Annual Leave' });
+            leaveEntriesToInsert.push({
+              date: dateStr,
+              hours,
+              description: `Annual Leave${descSuffix}`,
+            });
           }
         }
       }
@@ -468,6 +528,7 @@ export class TimesheetsService {
         coveredDates.add(h.date);
         leaveEntriesToInsert.push({
           date: h.date,
+          hours: '8',
           description: h.holidayName || 'Public Holiday',
         });
       }
@@ -489,11 +550,124 @@ export class TimesheetsService {
       timesheetId,
       chargeCodeId: 'LEAVE-001',
       date: entry.date,
-      hours: '8',
+      hours: entry.hours,
       description: entry.description,
     }));
 
     await this.db.insert(timesheetEntries).values(values);
+  }
+
+  async copyFromPrevious(userId: string, timesheetId: string) {
+    const [sheet] = await this.db
+      .select()
+      .from(timesheets)
+      .where(and(eq(timesheets.id, timesheetId), eq(timesheets.userId, userId)))
+      .limit(1);
+
+    if (!sheet) throw new NotFoundException('Timesheet not found');
+    if (sheet.status !== 'draft') {
+      throw new BadRequestException('Can only copy to draft timesheets');
+    }
+
+    // Check if current timesheet already has non-leave entries
+    const existingEntries = await this.db
+      .select({ id: timesheetEntries.id })
+      .from(timesheetEntries)
+      .where(
+        and(
+          eq(timesheetEntries.timesheetId, timesheetId),
+          sql`${timesheetEntries.chargeCodeId} != 'LEAVE-001'`,
+        ),
+      )
+      .limit(1);
+
+    if (existingEntries.length > 0) {
+      throw new BadRequestException('Timesheet already has entries');
+    }
+
+    // Find previous week's timesheet
+    const prevWeekStart = new Date(sheet.periodStart);
+    prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+    const prevPeriodStart = prevWeekStart.toISOString().split('T')[0];
+
+    const [prevSheet] = await this.db
+      .select()
+      .from(timesheets)
+      .where(
+        and(
+          eq(timesheets.userId, userId),
+          eq(timesheets.periodStart, prevPeriodStart),
+        ),
+      )
+      .limit(1);
+
+    if (!prevSheet) {
+      throw new NotFoundException('No previous timesheet found');
+    }
+
+    // Get distinct charge codes from previous period (excluding LEAVE-001)
+    const prevEntries = await this.db
+      .select({
+        chargeCodeId: timesheetEntries.chargeCodeId,
+        chargeCodeName: chargeCodes.name,
+        isBillable: chargeCodes.isBillable,
+      })
+      .from(timesheetEntries)
+      .leftJoin(chargeCodes, eq(timesheetEntries.chargeCodeId, chargeCodes.id))
+      .where(
+        and(
+          eq(timesheetEntries.timesheetId, prevSheet.id),
+          sql`${timesheetEntries.chargeCodeId} != 'LEAVE-001'`,
+        ),
+      )
+      .groupBy(
+        timesheetEntries.chargeCodeId,
+        chargeCodes.name,
+        chargeCodes.isBillable,
+      );
+
+    if (prevEntries.length === 0) {
+      return { message: 'No entries to copy', entries: [] };
+    }
+
+    // Create empty entries (0 hours) for each weekday of the current period
+    const toInsert: {
+      timesheetId: string;
+      chargeCodeId: string;
+      date: string;
+      hours: string;
+    }[] = [];
+
+    const periodStart = new Date(sheet.periodStart);
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(periodStart);
+      d.setDate(periodStart.getDate() + i);
+      const dayOfWeek = d.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+      const dateStr = d.toISOString().split('T')[0];
+
+      for (const prev of prevEntries) {
+        toInsert.push({
+          timesheetId,
+          chargeCodeId: prev.chargeCodeId,
+          date: dateStr,
+          hours: '0',
+        });
+      }
+    }
+
+    if (toInsert.length > 0) {
+      await this.db.insert(timesheetEntries).values(toInsert);
+    }
+
+    return {
+      message: `Copied ${prevEntries.length} charge code(s) from previous period`,
+      entries: prevEntries.map((e) => ({
+        chargeCodeId: e.chargeCodeId,
+        chargeCodeName: e.chargeCodeName,
+        isBillable: e.isBillable,
+      })),
+    };
   }
 
   async getUserChargeCodes(userId: string) {
@@ -513,21 +687,45 @@ export class TimesheetsService {
       )
       .where(eq(chargeCodeUsers.userId, userId));
 
-    // Always include the system LEAVE-001 charge code
-    const [leaveCode] = await this.db
-      .select({
-        chargeCodeId: chargeCodes.id,
+    // Also include charge codes from user's current timesheet entries
+    const existingIds = new Set(userCodes.map((c) => c.chargeCodeId));
+    const timesheetCodes = await this.db
+      .selectDistinct({
+        chargeCodeId: timesheetEntries.chargeCodeId,
         name: chargeCodes.name,
         isBillable: chargeCodes.isBillable,
         programName: chargeCodes.programName,
         activityCategory: chargeCodes.activityCategory,
       })
-      .from(chargeCodes)
-      .where(eq(chargeCodes.id, 'LEAVE-001'))
-      .limit(1);
+      .from(timesheetEntries)
+      .innerJoin(timesheets, eq(timesheetEntries.timesheetId, timesheets.id))
+      .innerJoin(chargeCodes, eq(timesheetEntries.chargeCodeId, chargeCodes.id))
+      .where(eq(timesheets.userId, userId));
 
-    if (leaveCode && !userCodes.find((c) => c.chargeCodeId === 'LEAVE-001')) {
-      userCodes.push(leaveCode);
+    for (const tc of timesheetCodes) {
+      if (!existingIds.has(tc.chargeCodeId)) {
+        userCodes.push(tc);
+        existingIds.add(tc.chargeCodeId);
+      }
+    }
+
+    // Always include the system LEAVE-001 charge code
+    if (!existingIds.has('LEAVE-001')) {
+      const [leaveCode] = await this.db
+        .select({
+          chargeCodeId: chargeCodes.id,
+          name: chargeCodes.name,
+          isBillable: chargeCodes.isBillable,
+          programName: chargeCodes.programName,
+          activityCategory: chargeCodes.activityCategory,
+        })
+        .from(chargeCodes)
+        .where(eq(chargeCodes.id, 'LEAVE-001'))
+        .limit(1);
+
+      if (leaveCode) {
+        userCodes.push(leaveCode);
+      }
     }
 
     return userCodes;

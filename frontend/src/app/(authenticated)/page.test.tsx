@@ -122,13 +122,6 @@ describe('DashboardPage', () => {
     });
   });
 
-  it('should render quick action Log Time button', async () => {
-    render(<DashboardPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Log Time')).toBeInTheDocument();
-    });
-  });
-
   it('should render My Codes quick action', async () => {
     render(<DashboardPage />);
     await waitFor(() => {

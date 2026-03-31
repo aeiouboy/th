@@ -1,10 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReportsService } from './reports.service';
 import { BudgetsService } from '../budgets/budgets.service';
+import { CompanySettingsService } from '../company-settings/company-settings.service';
 import { DRIZZLE } from '../database/drizzle.provider';
 
 const mockBudgetsService = {
   getAlerts: jest.fn(),
+};
+
+const mockCompanySettingsService = {
+  getSettings: jest.fn().mockResolvedValue({ billingRatePerDay: 0 }),
 };
 
 describe('ReportsService', () => {
@@ -23,6 +28,7 @@ describe('ReportsService', () => {
         ReportsService,
         { provide: DRIZZLE, useValue: db },
         { provide: BudgetsService, useValue: mockBudgetsService },
+        { provide: CompanySettingsService, useValue: mockCompanySettingsService },
       ],
     }).compile();
 
@@ -78,8 +84,9 @@ describe('ReportsService', () => {
   describe('getChargeabilityReport', () => {
     it('should return zero chargeability when no hours logged', async () => {
       db.select
-        .mockReturnValueOnce(buildGroupByChain([])) // hours query
-        .mockReturnValueOnce(buildAllChain([]));     // profiles
+        .mockReturnValueOnce(buildGroupByChain([]))   // hours query (grouped)
+        .mockReturnValueOnce(buildAllChain([]))        // allChargeCodes
+        .mockReturnValueOnce(buildAllChain([]));       // allProfiles
 
       const result = await service.getChargeabilityReport();
       expect(result.overallBillableHours).toBe(0);
@@ -89,13 +96,18 @@ describe('ReportsService', () => {
 
     it('should calculate chargeability correctly (billable/total)', async () => {
       const hoursRows = [
-        { userId: 'u1', isBillable: true, totalHours: '80' },
-        { userId: 'u1', isBillable: false, totalHours: '20' },
+        { userId: 'u1', chargeCodeId: 'PRJ-001', isBillable: true, totalHours: '80' },
+        { userId: 'u1', chargeCodeId: 'ACT-001', isBillable: false, totalHours: '20' },
+      ];
+      const allCcs = [
+        { id: 'PRJ-001', path: 'PRG-001/PRJ-001' },
+        { id: 'ACT-001', path: 'PRG-001/PRJ-001/ACT-001' },
       ];
       const profiles = [{ id: 'u1', fullName: 'Alice', email: 'alice@test.com', department: 'Eng' }];
 
       db.select
         .mockReturnValueOnce(buildGroupByChain(hoursRows))
+        .mockReturnValueOnce(buildAllChain(allCcs))
         .mockReturnValueOnce(buildAllChain(profiles));
 
       const result = await service.getChargeabilityReport();
@@ -107,6 +119,7 @@ describe('ReportsService', () => {
     it('should have 80% target chargeability', async () => {
       db.select
         .mockReturnValueOnce(buildGroupByChain([]))
+        .mockReturnValueOnce(buildAllChain([]))
         .mockReturnValueOnce(buildAllChain([]));
 
       const result = await service.getChargeabilityReport();

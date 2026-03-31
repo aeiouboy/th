@@ -125,7 +125,7 @@ describe('ApprovalQueue', () => {
 
     it('should render manager_approved status badge', () => {
       render(<ApprovalQueue items={[makePendingTimesheet({ status: 'manager_approved' })]} onRefresh={onRefresh} />);
-      expect(screen.getByText('Manager Approved')).toBeInTheDocument();
+      expect(screen.getByText('Approved')).toBeInTheDocument();
     });
 
     it('should render multiple rows for multiple items', () => {

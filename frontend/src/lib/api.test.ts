@@ -230,10 +230,12 @@ describe('api.ts — session without token', () => {
 
   it('should not include Authorization header when session is null', async () => {
     // Override the createClient mock to return null session for this test
+    // Must handle the retry path: getSession() → null → getUser() → getSession() → null
     const { createClient } = await import('@/lib/supabase/client');
     (createClient as ReturnType<typeof vi.fn>).mockReturnValueOnce({
       auth: {
         getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+        getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
       },
     });
 

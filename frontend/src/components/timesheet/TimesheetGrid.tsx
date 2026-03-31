@@ -36,6 +36,7 @@ interface TimesheetGridProps {
   disabled?: boolean;
   onRemoveRow?: (chargeCodeId: string) => void;
   vacationDates?: Set<string>;
+  halfDayDates?: Set<string>;
   holidayDates?: Set<string>;
 }
 
@@ -52,6 +53,7 @@ export function TimesheetGrid({
   disabled,
   onRemoveRow,
   vacationDates,
+  halfDayDates,
   holidayDates,
 }: TimesheetGridProps) {
   const [activeNote, setActiveNote] = useState<{ chargeCodeId: string; date: string } | null>(null);
@@ -73,6 +75,11 @@ export function TimesheetGrid({
   const isHoliday = useCallback(
     (dateStr: string) => holidayDates?.has(dateStr) ?? false,
     [holidayDates],
+  );
+
+  const isHalfDayVacation = useCallback(
+    (dateStr: string) => halfDayDates?.has(dateStr) ?? false,
+    [halfDayDates],
   );
 
   const isNonWorking = useCallback(
@@ -145,8 +152,11 @@ export function TimesheetGrid({
                 <div className="font-[family-name:var(--font-mono)] font-normal text-[var(--text-muted)] mt-0.5 text-[11px]">
                   {format(parseISO(date), 'd')}
                 </div>
-                {isVacation(date) && (
+                {isVacation(date) && !isHalfDayVacation(date) && (
                   <div className="text-[10px] text-purple-500 font-medium mt-0.5">Vacation</div>
+                )}
+                {isHalfDayVacation(date) && (
+                  <div className="text-[10px] text-purple-500 font-medium mt-0.5">Half-day</div>
                 )}
                 {isHoliday(date) && !isVacation(date) && (
                   <div className="text-[10px] text-orange-500 font-medium mt-0.5">Holiday</div>
@@ -162,7 +172,11 @@ export function TimesheetGrid({
           {rows.map((row, rowIdx) => (
             <tr
               key={row.chargeCodeId}
-              className="border-b border-stone-100 hover:bg-stone-50/30 transition-colors"
+              className={`border-b border-stone-100 transition-colors ${
+                SYSTEM_CHARGE_CODES.has(row.chargeCodeId)
+                  ? 'bg-purple-50/50 dark:bg-purple-950/20'
+                  : 'hover:bg-stone-50/30'
+              }`}
             >
               <td className="px-3 py-2 sticky left-0 bg-[var(--bg-card)] z-10">
                 <div className="flex items-center gap-2">
@@ -183,7 +197,7 @@ export function TimesheetGrid({
                           : 'bg-[var(--accent-amber-light)] text-[var(--accent-amber)] border-amber-200'
                     }`}
                   >
-                    {SYSTEM_CHARGE_CODES.has(row.chargeCodeId) ? 'leave' : row.isBillable ? 'billable' : 'non-billable'}
+                    {SYSTEM_CHARGE_CODES.has(row.chargeCodeId) ? 'System - Leave' : row.isBillable ? 'billable' : 'non-billable'}
                   </Badge>
                   {onRemoveRow && !disabled && !SYSTEM_CHARGE_CODES.has(row.chargeCodeId) && (
                     <button
@@ -205,7 +219,13 @@ export function TimesheetGrid({
                   <EntryCell
                     value={data[row.chargeCodeId]?.[date] || 0}
                     onChange={(v) => onCellChange(row.chargeCodeId, date, v)}
-                    disabled={disabled || isNonWorking(colIdx) || SYSTEM_CHARGE_CODES.has(row.chargeCodeId)}
+                    disabled={
+                      disabled ||
+                      SYSTEM_CHARGE_CODES.has(row.chargeCodeId) ||
+                      isWeekend(colIdx) ||
+                      isHoliday(date) ||
+                      (isVacation(date) && !isHalfDayVacation(date))
+                    }
                     isBillable={row.isBillable ?? false}
                     description={descriptions?.[row.chargeCodeId]?.[date]}
                     onNoteClick={() => setActiveNote({ chargeCodeId: row.chargeCodeId, date })}

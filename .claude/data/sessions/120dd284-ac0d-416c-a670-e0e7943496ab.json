@@ -1,0 +1,7 @@
+{
+  "session_id": "120dd284-ac0d-416c-a670-e0e7943496ab",
+  "prompts": [
+    "[AUTO-TEST] ## Auto-triggered: Write tests for new commits in Timesheet\n\n### Recent Commits\n- f8b35c5d: fix(e2e): rewrite BF tests \u2014 real screenshots, proper test isolation\n\n### Changed Source Files (2)\n- frontend/e2e/helpers.ts\n- frontend/pnpm-lock.yaml\n\n\n### Instructions\n1. Read the changed files to understand what was modified\n2. Write/update tests to cover the new/changed functionality\n3. Focus on the most critical paths \u2014 don't test every line\n4. Tests should pass with: `cd frontend && npx playwright test`\n5. Report: files created/modified, test count, coverage summary"
+  ],
+  "agent_name": "Zenith"
+}

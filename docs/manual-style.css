@@ -1,0 +1,89 @@
+body {
+  font-family: -apple-system, 'Noto Sans Thai', 'Sarabun', sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #1a1a2e;
+}
+
+img {
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin: 12px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+th {
+  background: #f0f4f8;
+  font-weight: 600;
+}
+
+h1 {
+  color: #1a1a2e;
+  border-bottom: 2px solid #00a5e0;
+  padding-bottom: 8px;
+}
+
+h2 {
+  color: #16213e;
+  margin-top: 32px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 4px;
+}
+
+h3 {
+  color: #0f3460;
+}
+
+code {
+  background: #f0f0f0;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+blockquote {
+  border-left: 3px solid #00a5e0;
+  padding: 8px 14px;
+  margin: 10px 0;
+  background: #f8f9fa;
+  border-radius: 0 4px 4px 0;
+}
+
+/* PDF page-break rules */
+@media print {
+  h1, h2 {
+    page-break-after: avoid;
+  }
+  h2, h3 {
+    page-break-after: avoid;
+  }
+  h1 + *, h2 + *, h3 + * {
+    page-break-before: avoid;
+  }
+  blockquote {
+    page-break-before: avoid;
+    page-break-inside: avoid;
+  }
+  table {
+    page-break-inside: avoid;
+  }
+  /* ห้ามตัด heading ไว้ท้ายหน้า */
+  h1, h2, h3 {
+    break-after: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+}

@@ -178,8 +178,8 @@ describe('ChargeCodeTree', () => {
       fireEvent.click(chevronRight);
 
       const projectButton = screen.getByText('Project One').closest('button');
-      // Depth 1 -> paddingLeft = 20+8 = 28px
-      expect(projectButton).toHaveStyle({ paddingLeft: '28px' });
+      // Depth 1 -> paddingLeft = 24+8 = 32px
+      expect(projectButton).toHaveStyle({ paddingLeft: '32px' });
     });
   });
 });

@@ -64,4 +64,9 @@ export class TimesheetsController {
   submit(@CurrentUser() user: any, @Param('id') id: string) {
     return this.timesheetsService.submit(user.id, id);
   }
+
+  @Post(':id/copy-from-previous')
+  copyFromPrevious(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.timesheetsService.copyFromPrevious(user.id, id);
+  }
 }

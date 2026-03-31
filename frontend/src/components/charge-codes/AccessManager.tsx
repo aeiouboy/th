@@ -37,6 +37,7 @@ export function AccessManager({
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [cascadeToChildren, setCascadeToChildren] = useState(false);
 
   useEffect(() => {
     if (!readOnly) {
@@ -72,13 +73,21 @@ export function AccessManager({
     if (selected.size === 0) return;
     setLoading(true);
     try {
-      await api.put(`/charge-codes/${chargeCodeId}/access`, {
-        addUserIds: Array.from(selected),
-      });
-      toast.success(`Added ${selected.size} user${selected.size > 1 ? 's' : ''}`);
+      if (cascadeToChildren) {
+        await api.post(`/charge-codes/${chargeCodeId}/cascade-access`, {
+          userIds: Array.from(selected),
+        });
+        toast.success(`Added ${selected.size} user${selected.size > 1 ? 's' : ''} to this and all child charge codes`);
+      } else {
+        await api.put(`/charge-codes/${chargeCodeId}/access`, {
+          addUserIds: Array.from(selected),
+        });
+        toast.success(`Added ${selected.size} user${selected.size > 1 ? 's' : ''}`);
+      }
       setSelected(new Set());
       setSearch('');
       setShowAdd(false);
+      setCascadeToChildren(false);
       onUpdate();
     } catch {
       toast.error('Failed to add users');
@@ -182,6 +191,17 @@ export function AccessManager({
               })
             )}
           </div>
+
+          {/* Cascade checkbox */}
+          <label className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+            <input
+              type="checkbox"
+              checked={cascadeToChildren}
+              onChange={(e) => setCascadeToChildren(e.target.checked)}
+              className="h-3.5 w-3.5 rounded border-stone-300 text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]"
+            />
+            Also add to all child charge codes
+          </label>
 
           {/* Action bar */}
           <div className="flex items-center justify-between pt-1 border-t border-[var(--border-default)]">

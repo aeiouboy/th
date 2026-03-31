@@ -102,6 +102,7 @@ export default function CalendarPage() {
   const [vacationDialogOpen, setVacationDialogOpen] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [leaveType, setLeaveType] = useState<'full_day' | 'half_am' | 'half_pm'>('full_day');
   const [submitting, setSubmitting] = useState(false);
 
   const fetchCalendar = useCallback(async () => {
@@ -145,11 +146,12 @@ export default function CalendarPage() {
     if (!startDate || !endDate) return;
     setSubmitting(true);
     try {
-      await api.post('/vacations', { startDate, endDate });
+      await api.post('/vacations', { startDate, endDate, leaveType });
       toast.success('Vacation request submitted');
       setVacationDialogOpen(false);
       setStartDate('');
       setEndDate('');
+      setLeaveType('full_day');
       await fetchVacations();
     } catch {
       // handled by api wrapper
@@ -297,6 +299,35 @@ export default function CalendarPage() {
                 min={startDate}
                 className="font-[family-name:var(--font-mono)]"
               />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">
+                Leave Type
+              </label>
+              <div className="flex flex-col gap-2">
+                {([
+                  { value: 'full_day', label: 'Full Day' },
+                  { value: 'half_am', label: 'Half Day (AM)' },
+                  { value: 'half_pm', label: 'Half Day (PM)' },
+                ] as const).map((opt) => (
+                  <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="leaveType"
+                      value={opt.value}
+                      checked={leaveType === opt.value}
+                      onChange={() => setLeaveType(opt.value)}
+                      className="text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]"
+                    />
+                    <span className="text-sm text-[var(--text-primary)]">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+              {leaveType !== 'full_day' && startDate !== endDate && startDate && endDate && (
+                <p className="text-xs text-[var(--accent-amber)] mt-1">
+                  Half-day leave can only be for a single day
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter>

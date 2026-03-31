@@ -13,7 +13,7 @@ test.describe('Dashboard Module', () => {
     await expect(page.getByText('Hours this period')).toBeVisible({ timeout: 30000 });
 
     // "Chargeability" card should show a percentage
-    await expect(page.getByText('Chargeability')).toBeVisible({ timeout: 30000 });
+    await expect(page.getByText('Chargeability', { exact: true })).toBeVisible({ timeout: 30000 });
 
     // "Active Charge Codes" card should show a number
     await expect(page.getByText('Active charge codes')).toBeVisible({ timeout: 30000 });
