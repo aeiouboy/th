@@ -54,6 +54,17 @@ export class ChargeCodesController {
     return this.chargeCodesService.getTree();
   }
 
+  @Get('my-requests')
+  getMyRequests(@CurrentUser() user: any) {
+    return this.chargeCodesService.getMyRequests(user.id);
+  }
+
+  @Get('access-requests/list')
+  @Roles('admin', 'charge_manager')
+  getAccessRequests(@CurrentUser() user: any) {
+    return this.chargeCodesService.getAccessRequests(user.id, user.role);
+  }
+
   @Post()
   @Roles('admin', 'charge_manager')
   create(@Body() dto: CreateChargeCodeDto) {
@@ -106,17 +117,6 @@ export class ChargeCodesController {
     @CurrentUser() user: any,
   ) {
     return this.chargeCodesService.requestAccess(id, user.id, reason);
-  }
-
-  @Get('my-requests')
-  getMyRequests(@CurrentUser() user: any) {
-    return this.chargeCodesService.getMyRequests(user.id);
-  }
-
-  @Get('access-requests/list')
-  @Roles('admin', 'charge_manager')
-  getAccessRequests(@CurrentUser() user: any) {
-    return this.chargeCodesService.getAccessRequests(user.id, user.role);
   }
 
   @Patch('access-requests/:requestId')
