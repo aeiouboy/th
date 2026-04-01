@@ -273,12 +273,22 @@ export default function ApprovalsPage() {
         <TabsList className="bg-stone-100 dark:bg-stone-800">
           <TabsTrigger value="manager">
             Pending Approvals
-            {(pending.pending.length + ccRequests.length) > 0 && (
+            {pending.pending.length > 0 && (
               <Badge variant="amber" className="ml-1.5 text-[10px]">
-                {pending.pending.length}{ccRequests.length > 0 ? ` + ${ccRequests.length} CC` : ''}
+                {pending.pending.length}
               </Badge>
             )}
           </TabsTrigger>
+          {showTeamStatus && (
+            <TabsTrigger value="cc_requests">
+              CC Requests
+              {ccRequests.length > 0 && (
+                <Badge variant="amber" className="ml-1.5 text-[10px]">
+                  {ccRequests.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          )}
           <TabsTrigger value="vacations">
             Vacations
             {pendingVacations.length > 0 && (
@@ -290,8 +300,7 @@ export default function ApprovalsPage() {
           <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="manager" className="mt-4 space-y-6">
-          {/* Timesheet Approvals */}
+        <TabsContent value="manager" className="mt-4">
           {loading ? (
             <ApprovalSkeleton />
           ) : (
@@ -300,17 +309,13 @@ export default function ApprovalsPage() {
               onRefresh={fetchData}
             />
           )}
-
-          {/* CC Access Requests */}
-          {showTeamStatus && ccRequests.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">
-                Charge Code Access Requests
-              </h3>
-              <CCRequestList requests={ccRequests} onRefresh={fetchCcRequests} />
-            </div>
-          )}
         </TabsContent>
+
+        {showTeamStatus && (
+          <TabsContent value="cc_requests" className="mt-4">
+            <CCRequestList requests={ccRequests} onRefresh={fetchCcRequests} />
+          </TabsContent>
+        )}
 
         <TabsContent value="vacations" className="mt-4">
           <VacationApprovalList
