@@ -590,8 +590,8 @@ function TeamLoggingStatus({ data, search }: { data: TeamStatusResponse | null; 
     ? data.members.filter((m) => {
         const q = search.toLowerCase();
         return (
-          m.fullName.toLowerCase().includes(q) ||
-          m.email.toLowerCase().includes(q) ||
+          (m.fullName || '').toLowerCase().includes(q) ||
+          (m.email || '').toLowerCase().includes(q) ||
           (m.department || '').toLowerCase().includes(q)
         );
       })
