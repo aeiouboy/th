@@ -516,57 +516,63 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Alerts & Notifications */}
+          {/* My Pending Requests */}
           <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <CardHeader>
               <CardTitle className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
-                Alerts &amp; Notifications
+                My Requests
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <EmployeeAlerts
-                chargeability={chargeability}
-                missingHours={missingHours}
-                timesheetStatus={timesheet?.status}
-                periodEnd={timesheet?.periodEnd}
-              />
+              <div className="space-y-2">
+                {/* Timesheet status */}
+                {timesheet && ['submitted', 'manager_approved', 'cc_approved'].includes(timesheet.status) && (
+                  <div className="flex items-center justify-between py-1.5 px-2 rounded bg-stone-50 dark:bg-stone-800">
+                    <div className="min-w-0">
+                      <p className="text-sm text-[var(--text-primary)]">Timesheet</p>
+                      <p className="text-[11px] text-[var(--text-muted)]">
+                        {format(new Date(timesheet.periodStart + 'T00:00:00'), 'MMM d')} – {format(new Date(timesheet.periodEnd + 'T00:00:00'), 'MMM d')}
+                      </p>
+                    </div>
+                    <Badge className={`text-[10px] shrink-0 ${
+                      timesheet.status === 'submitted' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                    }`}>
+                      {timesheet.status === 'submitted' ? 'Awaiting Approval' :
+                       timesheet.status === 'manager_approved' ? 'Manager Approved' :
+                       'CC Approved'}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* CC Requests */}
+                {myCcRequests.map((req) => (
+                  <div key={req.id} className="flex items-center justify-between py-1.5 px-2 rounded bg-stone-50 dark:bg-stone-800">
+                    <div className="min-w-0">
+                      <p className="text-sm text-[var(--text-primary)] truncate">{req.chargeCodeName || req.chargeCodeId}</p>
+                      <p className="text-[11px] text-[var(--text-muted)]">CC Access Request</p>
+                    </div>
+                    <Badge className={`text-[10px] shrink-0 ${
+                      req.status === 'pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
+                      req.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                      'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                    }`}>
+                      {req.status === 'approved' ? 'Approved' : req.status === 'rejected' ? 'Rejected' : 'Pending'}
+                    </Badge>
+                  </div>
+                ))}
+
+                {/* Empty state */}
+                {(!timesheet || !['submitted', 'manager_approved', 'cc_approved'].includes(timesheet.status)) && myCcRequests.length === 0 && (
+                  <EmptyState
+                    icon={CheckCircle}
+                    title="No pending requests"
+                    description="Your submitted items will appear here"
+                  />
+                )}
+              </div>
             </CardContent>
           </Card>
-
-          {/* My CC Requests */}
-          {myCcRequests.length > 0 && (
-            <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
-                  My CC Requests
-                </CardTitle>
-                {myPendingCcCount > 0 && (
-                  <Badge className="bg-[var(--accent-amber-light)] text-[var(--accent-amber)]">
-                    {myPendingCcCount} pending
-                  </Badge>
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-1.5">
-                  {myCcRequests.slice(0, 5).map((req) => (
-                    <div key={req.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-[var(--bg-card-hover)] transition-colors">
-                      <div className="min-w-0">
-                        <p className="text-sm text-[var(--text-primary)] truncate">{req.chargeCodeName || req.chargeCodeId}</p>
-                        <p className="text-[11px] text-[var(--text-muted)]">{req.chargeCodeId}</p>
-                      </div>
-                      <Badge className={`text-[10px] shrink-0 ${
-                        req.status === 'pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
-                        req.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
-                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                      }`}>
-                        {req.status === 'approved' ? 'Approved' : req.status === 'rejected' ? 'Rejected' : 'Pending'}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
       )}
 
