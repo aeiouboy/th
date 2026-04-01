@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ApprovalQueue } from '@/components/approvals/ApprovalQueue';
 import { MultiSelectFilter } from '@/components/budget/MultiSelectFilter';
-import { Search, CheckCircle, History, Palmtree, CheckIcon, XIcon, Users, AlertTriangle, Tag } from 'lucide-react';
+import { Search, CheckCircle, History, Palmtree, CheckIcon, XIcon, Tag } from 'lucide-react';
 import { formatShortDate } from '@/lib/utils';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageHeader } from '@/components/shared/PageHeader';
@@ -71,26 +71,6 @@ interface PendingVacation {
   };
 }
 
-interface TeamStatusMember {
-  id: string;
-  fullName: string | null;
-  email: string;
-  department: string | null;
-  status: string;
-  totalHours: number;
-  targetHours: number;
-  incompleteDays: number;
-  workingDayCount: number;
-}
-
-interface TeamStatusResponse {
-  periodStart: string;
-  periodEnd: string;
-  workingDayCount: number;
-  targetHours: number;
-  members: TeamStatusMember[];
-}
-
 interface ApprovalHistoryItem {
   id: number | string;
   timesheetId: string | null;
@@ -119,7 +99,6 @@ export default function ApprovalsPage() {
   const [history, setHistory] = useState<ApprovalHistoryItem[]>([]);
   const [pendingVacations, setPendingVacations] = useState<PendingVacation[]>([]);
   const [ccRequests, setCcRequests] = useState<CCAccessRequest[]>([]);
-  const [teamStatus, setTeamStatus] = useState<TeamStatusResponse | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [period, setPeriod] = useState(() => format(new Date(), 'yyyy-MM'));
@@ -164,22 +143,10 @@ export default function ApprovalsPage() {
     }
   }, []);
 
-  const fetchTeamStatus = useCallback(async () => {
-    try {
-      const data = await api.get<TeamStatusResponse>('/approvals/team-status');
-      setTeamStatus(data);
-    } catch {
-      // User may not have permission — ignore
-    }
-  }, []);
-
   const fetchUserRole = useCallback(async () => {
     try {
       const profile = await api.get<{ role: string }>('/users/me');
       setUserRole(profile.role);
-      if (['admin', 'charge_manager'].includes(profile.role)) {
-        setActiveTab('team_status');
-      }
     } catch {
       // ignore
     }
@@ -193,10 +160,9 @@ export default function ApprovalsPage() {
 
   useEffect(() => {
     if (showTeamStatus) {
-      fetchTeamStatus();
       fetchCcRequests();
     }
-  }, [showTeamStatus, fetchTeamStatus]);
+  }, [showTeamStatus, fetchCcRequests]);
 
   const periodOptions = useMemo(() => {
     const now = new Date();
@@ -305,16 +271,6 @@ export default function ApprovalsPage() {
       {/* Tabs with approval queues */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="bg-stone-100 dark:bg-stone-800">
-          {showTeamStatus && (
-            <TabsTrigger value="team_status">
-              Team Status
-              {teamStatus && teamStatus.members.filter((m) => m.incompleteDays > 0).length > 0 && (
-                <Badge variant="amber" className="ml-1.5 text-[10px]">
-                  {teamStatus.members.filter((m) => m.incompleteDays > 0).length}
-                </Badge>
-              )}
-            </TabsTrigger>
-          )}
           <TabsTrigger value="manager">
             Pending Approvals
             {pending.pending.length > 0 && (
@@ -365,12 +321,6 @@ export default function ApprovalsPage() {
         <TabsContent value="history" className="mt-4">
           <HistoryTable items={history} />
         </TabsContent>
-
-        {showTeamStatus && (
-          <TabsContent value="team_status" className="mt-4">
-            <TeamLoggingStatus data={teamStatus} search={search} />
-          </TabsContent>
-        )}
 
         {showTeamStatus && (
           <TabsContent value="cc_requests" className="mt-4">
@@ -618,166 +568,6 @@ const STATUS_BADGE_MAP: Record<string, { label: string; variant: 'default' | 'am
   locked: { label: 'Locked', variant: 'green' },
   rejected: { label: 'Rejected', variant: 'destructive' },
 };
-
-function TeamLoggingStatus({ data, search }: { data: TeamStatusResponse | null; search?: string }) {
-  if (!data) {
-    return <ApprovalSkeleton />;
-  }
-
-  // Filter members by search term
-  const members = search?.trim()
-    ? data.members.filter((m) => {
-        const q = search.toLowerCase();
-        return (
-          (m.fullName || '').toLowerCase().includes(q) ||
-          (m.email || '').toLowerCase().includes(q) ||
-          (m.department || '').toLowerCase().includes(q)
-        );
-      })
-    : data.members;
-
-  if (members.length === 0 && data.members.length === 0) {
-    return (
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <EmptyState
-          icon={Users}
-          title="No team members"
-          description="You have no direct reports to display"
-        />
-      </div>
-    );
-  }
-
-  if (members.length === 0) {
-    return (
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <EmptyState
-          icon={Search}
-          title="No results"
-          description={`No team members match "${search}"`}
-        />
-      </div>
-    );
-  }
-
-  const incompleteCount = members.filter((m) => m.incompleteDays > 0).length;
-
-  return (
-    <div className="space-y-4">
-      {/* Summary bar */}
-      <div className="flex flex-wrap items-center gap-4 p-4 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <div className="text-sm text-[var(--text-secondary)]">
-          <span className="font-medium text-[var(--text-primary)]">
-            {formatShortDate(data.periodStart)}
-          </span>
-          {' '}&mdash;{' '}
-          <span className="font-medium text-[var(--text-primary)]">
-            {formatShortDate(data.periodEnd)}
-          </span>
-        </div>
-        <div className="text-sm text-[var(--text-secondary)]">
-          {data.workingDayCount} working days &middot; {data.targetHours}h target
-        </div>
-        {incompleteCount > 0 && (
-          <div className="flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
-            <AlertTriangle className="w-4 h-4" />
-            {incompleteCount} member{incompleteCount !== 1 ? 's' : ''} with incomplete logging
-          </div>
-        )}
-      </div>
-
-      {/* Table */}
-      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-[var(--border-default)] bg-stone-50 dark:bg-stone-900 sticky top-0">
-              <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
-                Employee
-              </th>
-              <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
-                Status
-              </th>
-              <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
-                Hours Logged
-              </th>
-              <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
-                Progress
-              </th>
-              <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">
-                Incomplete Days
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((member, idx) => {
-              const pct = member.targetHours > 0
-                ? Math.min(100, Math.round((member.totalHours / member.targetHours) * 100))
-                : 0;
-              const statusInfo = STATUS_BADGE_MAP[member.status] || { label: member.status, variant: 'outline' as const };
-              const isIncomplete = member.incompleteDays > 0;
-
-              return (
-                <tr
-                  key={member.id}
-                  className={`border-b border-[var(--border-default)] transition-colors hover:bg-[var(--bg-card-hover)] ${
-                    idx % 2 === 0 ? 'bg-[var(--bg-card)]' : 'bg-stone-50 dark:bg-stone-900/50'
-                  }`}
-                >
-                  <td className="px-4 py-2.5">
-                    <div className="font-medium text-[var(--text-primary)]">
-                      {member.fullName || member.email}
-                    </div>
-                    <div className="text-xs text-[var(--text-muted)]">
-                      {member.email}
-                    </div>
-                  </td>
-                  <td className="px-4 py-2.5">
-                    <Badge variant={statusInfo.variant}>
-                      {statusInfo.label}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-2.5 text-[var(--text-secondary)]">
-                    <span className="font-medium">{member.totalHours}</span>
-                    <span className="text-[var(--text-muted)]"> / {member.targetHours}h</span>
-                  </td>
-                  <td className="px-4 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-stone-200 dark:bg-stone-700 rounded-full overflow-hidden min-w-[80px]">
-                        <div
-                          className={`h-full rounded-full transition-all ${
-                            pct >= 100
-                              ? 'bg-emerald-500'
-                              : pct >= 50
-                                ? 'bg-amber-500'
-                                : 'bg-red-500'
-                          }`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-[var(--text-muted)] w-8 text-right">{pct}%</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2.5">
-                    {isIncomplete ? (
-                      <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 text-xs font-medium">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        {member.incompleteDays} / {member.workingDayCount} days
-                      </span>
-                    ) : (
-                      <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium">
-                        All complete
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
 
 /* ── CC Access Request List ─────────────────────── */
 

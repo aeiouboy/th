@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { formatCurrencyStatic } from '@/lib/currency';
 import { StatCard } from '@/components/shared/StatCard';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Clock, Percent, ClipboardCheck, Tag, CheckCircle, Users, Bell } from 'lucide-react';
+import { Clock, Percent, ClipboardCheck, Tag, CheckCircle, Users, Bell, AlertTriangle } from 'lucide-react';
 import { ChargeabilityTrend } from '@/components/dashboard/ChargeabilityTrend';
 import { ProgramDistribution } from '@/components/dashboard/ProgramDistribution';
 
@@ -79,6 +79,24 @@ interface BudgetAlert {
   forecast: number | null;
   severity: string;
   rootCauseActivity: string | null;
+}
+
+interface TeamStatusResponse {
+  periodStart: string;
+  periodEnd: string;
+  workingDayCount: number;
+  targetHours: number;
+  members: {
+    id: string;
+    fullName: string;
+    email: string;
+    department: string | null;
+    status: string;
+    totalHours: number;
+    targetHours: number;
+    incompleteDays: number;
+    workingDayCount: number;
+  }[];
 }
 
 // --- Constants ---
@@ -168,9 +186,22 @@ export default function DashboardPage() {
     enabled: hasBudgetAccess,
   });
 
+  const showTeamStatus = user?.role === 'admin' || user?.role === 'charge_manager';
+
+  const { data: teamStatus, isLoading: teamStatusLoading } = useQuery<TeamStatusResponse>({
+    queryKey: ['team-status'],
+    queryFn: () => api.get('/approvals/team-status'),
+    enabled: showTeamStatus,
+  });
+
   const { data: chargeabilityYtd } = useQuery<{ ytdChargeability: number }>({
     queryKey: ['dashboard-chargeability-ytd'],
     queryFn: () => api.get('/dashboard/chargeability-ytd'),
+  });
+
+  const { data: myCcRequests = [] } = useQuery<{ id: string; chargeCodeId: string; chargeCodeName: string; status: string; createdAt: string }[]>({
+    queryKey: ['my-cc-requests'],
+    queryFn: () => api.get('/charge-codes/my-requests'),
   });
 
   // Compute metrics
@@ -390,6 +421,8 @@ export default function DashboardPage() {
           pendingCount={pendingCount}
           budgetAlerts={budgetAlerts}
           chargeability={chargeability}
+          teamStatus={teamStatus}
+          teamStatusLoading={teamStatusLoading}
         />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -479,6 +512,41 @@ export default function DashboardPage() {
               />
             </CardContent>
           </Card>
+
+          {/* My CC Requests */}
+          {myCcRequests.length > 0 && (
+            <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
+                  My CC Requests
+                </CardTitle>
+                {myCcRequests.filter((r) => r.status === 'pending').length > 0 && (
+                  <Badge className="bg-[var(--accent-amber-light)] text-[var(--accent-amber)]">
+                    {myCcRequests.filter((r) => r.status === 'pending').length} pending
+                  </Badge>
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1.5">
+                  {myCcRequests.slice(0, 5).map((req) => (
+                    <div key={req.id} className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-[var(--bg-card-hover)] transition-colors">
+                      <div className="min-w-0">
+                        <p className="text-sm text-[var(--text-primary)] truncate">{req.chargeCodeName || req.chargeCodeId}</p>
+                        <p className="text-[11px] text-[var(--text-muted)]">{req.chargeCodeId}</p>
+                      </div>
+                      <Badge className={`text-[10px] shrink-0 ${
+                        req.status === 'pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
+                        req.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                      }`}>
+                        {req.status === 'approved' ? 'Approved' : req.status === 'rejected' ? 'Rejected' : 'Pending'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
@@ -493,11 +561,15 @@ function ManagerRow3({
   pendingCount,
   budgetAlerts,
   chargeability,
+  teamStatus,
+  teamStatusLoading,
 }: {
   pending?: PendingResponse;
   pendingCount: number;
   budgetAlerts: BudgetAlert[];
   chargeability: number;
+  teamStatus?: TeamStatusResponse;
+  teamStatusLoading: boolean;
 }) {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -531,9 +603,9 @@ function ManagerRow3({
     }
   };
 
-  const teamMembers = getUniqueTeamMembers(allPending);
-
-  const completedCount = teamMembers.filter(m => m.totalHours >= TARGET_WEEKLY).length;
+  const incompleteCount = teamStatus
+    ? teamStatus.members.filter((m) => m.incompleteDays > 0).length
+    : 0;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -615,60 +687,78 @@ function ManagerRow3({
 
       {/* Team Status */}
       <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
             Team Status
           </CardTitle>
+          {incompleteCount > 0 && (
+            <Badge className="bg-[var(--accent-amber-light)] text-[var(--accent-amber)]">
+              {incompleteCount} incomplete
+            </Badge>
+          )}
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {teamMembers.slice(0, 8).map((member) => {
-              const hours = member.totalHours;
-              const pct = Math.min((hours / TARGET_WEEKLY) * 100, 100);
-              const status =
-                hours >= TARGET_WEEKLY
-                  ? 'complete'
-                  : hours > 0
-                    ? 'partial'
-                    : 'empty';
-              return (
-                <div key={member.id} className="flex items-center gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[var(--text-primary)] truncate">
-                      {member.fullName || member.email}
-                    </p>
+          {teamStatusLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-8 rounded" />
+              ))}
+            </div>
+          ) : !teamStatus || teamStatus.members.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title="No team members"
+              description="Direct reports will appear here"
+            />
+          ) : (
+            <div className="space-y-2">
+              {teamStatus.members.slice(0, 8).map((member) => {
+                const pct = member.targetHours > 0
+                  ? Math.min(100, Math.round((member.totalHours / member.targetHours) * 100))
+                  : 0;
+                const isComplete = member.incompleteDays === 0;
+                return (
+                  <div key={member.id} className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[var(--text-primary)] truncate">
+                        {member.fullName || member.email}
+                      </p>
+                    </div>
+                    <div className="w-20 h-2 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          pct >= 100
+                            ? 'bg-[var(--accent-green)]'
+                            : pct >= 50
+                              ? 'bg-[var(--accent-amber)]'
+                              : 'bg-[var(--accent-red)]'
+                        }`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <span className="text-xs w-16 text-right shrink-0 text-[var(--text-secondary)]">
+                      {member.totalHours}/{member.targetHours}h
+                    </span>
+                    <span className="text-sm shrink-0">
+                      {isComplete ? (
+                        <span className="text-[var(--accent-green)]">&#10003;</span>
+                      ) : (
+                        <span className="text-[var(--accent-amber)]">
+                          <AlertTriangle className="w-3.5 h-3.5 inline" />
+                        </span>
+                      )}
+                    </span>
                   </div>
-                  <div className="w-20 h-2 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-600 ${
-                        status === 'complete'
-                          ? 'bg-[var(--accent-green)]'
-                          : status === 'partial'
-                            ? 'bg-[var(--accent-amber)]'
-                            : 'bg-stone-200'
-                      }`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                  <span className="text-xs w-12 text-right shrink-0 text-[var(--text-secondary)]">
-                    {hours}/{TARGET_WEEKLY}
-                  </span>
-                  <span className="text-sm shrink-0">
-                    {status === 'complete' ? (
-                      <span className="text-[var(--accent-green)]">&#10003;</span>
-                    ) : status === 'partial' ? (
-                      <span className="text-[var(--accent-amber)]">&#9888;</span>
-                    ) : (
-                      <span className="text-[var(--accent-red)]">&#10007;</span>
-                    )}
-                  </span>
-                </div>
-              );
-            })}
-            <p className="text-xs text-[var(--text-muted)] mt-2 pt-2 border-t border-[var(--border-default)]">
-              {completedCount}/{teamMembers.length} complete
-            </p>
-          </div>
+                );
+              })}
+              <p className="text-xs text-[var(--text-muted)] mt-2 pt-2 border-t border-[var(--border-default)]">
+                {teamStatus.members.filter((m) => m.incompleteDays === 0).length}/{teamStatus.members.length} complete
+                {teamStatus.members.length > 8 && (
+                  <> &middot; showing 8 of {teamStatus.members.length}</>
+                )}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -906,27 +996,6 @@ function formatPeriod(start: string, end: string) {
   const s = new Date(start + 'T00:00:00');
   const e = new Date(end + 'T00:00:00');
   return `${format(s, 'MMM d')} - ${format(e, 'MMM d')}`;
-}
-
-function getUniqueTeamMembers(items: PendingTimesheet[]) {
-  const map = new Map<
-    string,
-    { id: string; fullName: string | null; email: string; totalHours: number }
-  >();
-  for (const item of items) {
-    const existing = map.get(item.employee.id);
-    if (existing) {
-      existing.totalHours += item.totalHours;
-    } else {
-      map.set(item.employee.id, {
-        id: item.employee.id,
-        fullName: item.employee.fullName,
-        email: item.employee.email,
-        totalHours: item.totalHours,
-      });
-    }
-  }
-  return Array.from(map.values());
 }
 
 // --- Icons ---
