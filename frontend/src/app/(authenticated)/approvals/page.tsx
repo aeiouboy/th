@@ -275,7 +275,7 @@ export default function ApprovalsPage() {
             Pending Approvals
             {(pending.pending.length + ccRequests.length) > 0 && (
               <Badge variant="amber" className="ml-1.5 text-[10px]">
-                {pending.pending.length + ccRequests.length}
+                {pending.pending.length}{ccRequests.length > 0 ? ` + ${ccRequests.length} CC` : ''}
               </Badge>
             )}
           </TabsTrigger>

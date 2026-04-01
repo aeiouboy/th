@@ -230,7 +230,7 @@ export default function DashboardPage() {
     .reduce((s, e) => s + parseFloat(e.hours), 0);
   const chargeability =
     weeklyHours > 0 ? Math.round((billableHours / weeklyHours) * 100) : 0;
-  const pendingCount = (pending ? pending.pending.length : 0) + pendingCcRequests.length;
+  const pendingCount = pending ? pending.pending.length : 0;
   const prevWeeklyHours = prevEntries.reduce((s, e) => s + parseFloat(e.hours), 0);
   const prevBillableHours = prevEntries
     .filter((e) => e.isBillable)
@@ -615,7 +615,7 @@ function ManagerRow3({
     : 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Pending Approvals with bulk */}
       <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <CardHeader className="flex flex-row items-center justify-between">
@@ -687,6 +687,50 @@ function ManagerRow3({
                   View all {allPending.length} &rarr;
                 </Link>
               )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* CC Requests */}
+      <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
+            CC Requests
+          </CardTitle>
+          {pendingCcRequests.length > 0 && (
+            <Badge className="bg-[var(--accent-amber-light)] text-[var(--accent-amber)]">
+              {pendingCcRequests.length}
+            </Badge>
+          )}
+        </CardHeader>
+        <CardContent>
+          {pendingCcRequests.length === 0 ? (
+            <EmptyState
+              icon={CheckCircle}
+              title="No pending requests"
+              description="Charge code access requests will appear here"
+            />
+          ) : (
+            <div className="space-y-2">
+              {pendingCcRequests.slice(0, 5).map((req) => (
+                <div key={req.id} className="flex items-center gap-2 py-1.5 px-1 rounded hover:bg-[var(--bg-card-hover)] transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                      {req.requesterName || req.requesterEmail}
+                    </p>
+                    <p className="text-[11px] text-[var(--text-secondary)]">
+                      {req.chargeCodeName} &middot; {req.chargeCodeId}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <Link
+                href="/approvals"
+                className="text-xs text-[var(--accent-teal)] hover:underline block text-center pt-1"
+              >
+                Review in Approvals &rarr;
+              </Link>
             </div>
           )}
         </CardContent>
@@ -768,42 +812,6 @@ function ManagerRow3({
           )}
         </CardContent>
       </Card>
-
-      {/* CC Requests */}
-      {pendingCcRequests.length > 0 && (
-        <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
-              CC Requests
-            </CardTitle>
-            <Badge className="bg-[var(--accent-amber-light)] text-[var(--accent-amber)]">
-              {pendingCcRequests.length}
-            </Badge>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {pendingCcRequests.slice(0, 5).map((req) => (
-                <div key={req.id} className="flex items-center gap-2 py-1.5 px-1 rounded hover:bg-[var(--bg-card-hover)] transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">
-                      {req.requesterName || req.requesterEmail}
-                    </p>
-                    <p className="text-[11px] text-[var(--text-secondary)]">
-                      {req.chargeCodeName} &middot; {req.chargeCodeId}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              <Link
-                href="/approvals"
-                className="text-xs text-[var(--accent-teal)] hover:underline block text-center pt-1"
-              >
-                Review in Approvals &rarr;
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Alerts */}
       <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
