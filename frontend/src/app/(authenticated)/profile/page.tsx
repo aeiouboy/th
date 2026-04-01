@@ -23,6 +23,7 @@ import {
   EyeOffIcon,
   CameraIcon,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { formatRole } from '@/lib/utils';
 
 interface UserProfile {
@@ -64,6 +65,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -92,15 +94,19 @@ export default function ProfilePage() {
     setAvatarError(null);
 
     if (!file.type.startsWith('image/')) {
-      setAvatarError('Please select an image file.');
+      toast.error('Please select an image file.');
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      setAvatarError('Image must be under 2MB.');
+      toast.error('Image must be under 2MB.');
       return;
     }
 
+    // Show instant preview while uploading
+    const localPreview = URL.createObjectURL(file);
+    setPreviewUrl(localPreview);
     setUploadingAvatar(true);
+
     try {
       const supabase = createClient();
       const path = `${user.id}/${Date.now()}-${file.name}`;
@@ -112,11 +118,15 @@ export default function ProfilePage() {
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(data.path);
       await api.put('/users/me/avatar', { avatarUrl: urlData.publicUrl });
       await queryClient.invalidateQueries({ queryKey: ['me'] });
+      setPreviewUrl(null);
+      toast.success('Photo updated');
     } catch (err) {
       console.error('Avatar upload failed:', err);
-      setAvatarError('Upload failed. Please try again.');
+      setPreviewUrl(null);
+      toast.error('Upload failed. Please try again.');
     } finally {
       setUploadingAvatar(false);
+      URL.revokeObjectURL(localPreview);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }
@@ -128,25 +138,30 @@ export default function ProfilePage() {
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             {/* Avatar */}
-            <div className="relative shrink-0 group">
-              <Avatar className="h-20 w-20">
-                {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.fullName || 'Avatar'} />}
-                <AvatarFallback className="bg-[var(--accent-teal)] text-white text-2xl font-semibold font-[family-name:var(--font-heading)]">
-                  {getInitials(user?.fullName || null, user?.email || '')}
-                </AvatarFallback>
-              </Avatar>
+            <div className="shrink-0 flex flex-col items-center gap-2">
+              <div className="relative group">
+                <Avatar className="h-20 w-20">
+                  {(previewUrl || user?.avatarUrl) && (
+                    <AvatarImage src={previewUrl || user?.avatarUrl || ''} alt={user?.fullName || 'Avatar'} />
+                  )}
+                  <AvatarFallback className="bg-[var(--accent-teal)] text-white text-2xl font-semibold font-[family-name:var(--font-heading)]">
+                    {getInitials(user?.fullName || null, user?.email || '')}
+                  </AvatarFallback>
+                </Avatar>
+                {uploadingAvatar && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
+                    <Loader2Icon className="w-5 h-5 text-white animate-spin" />
+                  </div>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingAvatar}
-                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                aria-label="Change photo"
+                className="flex items-center gap-1.5 text-xs text-[var(--accent-teal)] hover:text-teal-700 dark:hover:text-teal-300 transition-colors cursor-pointer disabled:opacity-50"
               >
-                {uploadingAvatar ? (
-                  <Loader2Icon className="w-5 h-5 text-white animate-spin" />
-                ) : (
-                  <CameraIcon className="w-5 h-5 text-white" />
-                )}
+                <CameraIcon className="w-3.5 h-3.5" />
+                {uploadingAvatar ? 'Uploading...' : 'Change Photo'}
               </button>
               <input
                 ref={fileInputRef}
@@ -155,11 +170,6 @@ export default function ProfilePage() {
                 className="hidden"
                 onChange={handleAvatarUpload}
               />
-              {avatarError && (
-                <p className="absolute -bottom-6 left-0 right-0 text-xs text-red-500 text-center whitespace-nowrap">
-                  {avatarError}
-                </p>
-              )}
             </div>
 
             {/* User info */}
