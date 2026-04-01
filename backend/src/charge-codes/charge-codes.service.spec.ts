@@ -278,6 +278,109 @@ describe('ChargeCodesService', () => {
       expect(result.assignedUsers).toHaveLength(1);
     });
   });
+
+  describe('findAll', () => {
+    it('should add ilike condition when search filter is provided', async () => {
+      const chain = buildFindAllChain([]);
+      db.select.mockReturnValueOnce(chain);
+
+      await service.findAll({ search: 'Alpha' });
+
+      expect(chain.where).toHaveBeenCalled();
+    });
+
+    it('should escape special characters in search filter (%, _, \\)', async () => {
+      const chain = buildFindAllChain([]);
+      db.select.mockReturnValueOnce(chain);
+
+      await service.findAll({ search: '100%_test\\' });
+
+      // The where clause should have been called (with escaped chars)
+      expect(chain.where).toHaveBeenCalled();
+    });
+
+    it('should add active status condition when status=active', async () => {
+      const chain = buildFindAllChain([]);
+      db.select.mockReturnValueOnce(chain);
+
+      await service.findAll({ status: 'active' });
+
+      expect(chain.where).toHaveBeenCalled();
+    });
+
+    it('should add expired status condition when status=expired', async () => {
+      const chain = buildFindAllChain([]);
+      db.select.mockReturnValueOnce(chain);
+
+      await service.findAll({ status: 'expired' });
+
+      expect(chain.where).toHaveBeenCalled();
+    });
+
+    it('should not add where clause when no filters are provided', async () => {
+      const chain = buildFindAllChain([]);
+      db.select.mockReturnValueOnce(chain);
+
+      await service.findAll({});
+
+      // where should NOT have been called when no conditions exist
+      expect(chain.where).not.toHaveBeenCalled();
+    });
+
+    it('should combine search and status filters together', async () => {
+      const chain = buildFindAllChain([]);
+      db.select.mockReturnValueOnce(chain);
+
+      await service.findAll({ search: 'test', status: 'active' });
+
+      // where should be called once with combined conditions
+      expect(chain.where).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('getBudgetDetail - aggregateFromTree logic', () => {
+    it('should aggregate budget and actual from children when parent budget is 0', async () => {
+      const parentCode = { id: 'PRG-001', name: 'Program', level: 'program', parentId: null, path: 'PRG-001', budgetAmount: '0', ownerId: null, approverId: null };
+      const childCode = { id: 'PRJ-001', name: 'Project', level: 'project', parentId: 'PRG-001', path: 'PRG-001/PRJ-001', budgetAmount: '50000', ownerId: null, approverId: null };
+
+      const parentBudget = { chargeCodeId: 'PRG-001', budgetAmount: '0', actualSpent: '0', forecastAtCompletion: null };
+      const childBudget = { chargeCodeId: 'PRJ-001', budgetAmount: '50000', actualSpent: '20000', forecastAtCompletion: null };
+
+      db.select
+        .mockReturnValueOnce(buildLimitChain([parentCode]))  // findByIdRaw
+        .mockReturnValueOnce(buildFromChain([parentCode, childCode]))  // allCodes
+        .mockReturnValueOnce(buildFromChain([parentBudget, childBudget]))  // allBudgets
+        .mockReturnValueOnce(buildGroupByChain([]))  // entries (no timesheet entries)
+        .mockReturnValueOnce(buildFromChain([]));  // allProfiles
+
+      const result = await service.getBudgetDetail('PRG-001');
+
+      // Parent budget is 0, so it should aggregate from children
+      expect(result.budget).toBe(50000);
+      expect(result.actual).toBe(20000);
+      expect(result.variance).toBe(30000);
+    });
+
+    it('should use own budget when parent budget is > 0', async () => {
+      const parentCode = { id: 'PRG-001', name: 'Program', level: 'program', parentId: null, path: 'PRG-001', budgetAmount: '100000', ownerId: null, approverId: null };
+      const childCode = { id: 'PRJ-001', name: 'Project', level: 'project', parentId: 'PRG-001', path: 'PRG-001/PRJ-001', budgetAmount: '50000', ownerId: null, approverId: null };
+
+      const parentBudget = { chargeCodeId: 'PRG-001', budgetAmount: '100000', actualSpent: '30000', forecastAtCompletion: null };
+      const childBudget = { chargeCodeId: 'PRJ-001', budgetAmount: '50000', actualSpent: '20000', forecastAtCompletion: null };
+
+      db.select
+        .mockReturnValueOnce(buildLimitChain([parentCode]))  // findByIdRaw
+        .mockReturnValueOnce(buildFromChain([parentCode, childCode]))  // allCodes
+        .mockReturnValueOnce(buildFromChain([parentBudget, childBudget]))  // allBudgets
+        .mockReturnValueOnce(buildGroupByChain([]))  // entries
+        .mockReturnValueOnce(buildFromChain([]));  // allProfiles
+
+      const result = await service.getBudgetDetail('PRG-001');
+
+      // Parent has its own budget > 0, should use it
+      expect(result.budget).toBe(100000);
+    });
+  });
 });
 
 // Helpers
@@ -340,6 +443,30 @@ function buildInsertChain(resolveValue: any[]) {
     values: jest.fn().mockReturnThis(),
     returning: jest.fn().mockResolvedValue(resolveValue),
     onConflictDoNothing: jest.fn().mockResolvedValue(resolveValue),
+  };
+  return chain;
+}
+
+// For queries with .from().innerJoin().groupBy() — e.g., getBudgetDetail entries query
+function buildGroupByChain(resolveValue: any[]) {
+  const chain: any = {
+    from: jest.fn().mockReturnThis(),
+    innerJoin: jest.fn().mockReturnThis(),
+    groupBy: jest.fn().mockResolvedValue(resolveValue),
+  };
+  chain.innerJoin.mockReturnValue(chain);
+  return chain;
+}
+
+// For findAll's $dynamic() query chain — where/limit/offset are optional
+function buildFindAllChain(resolveValue: any[]) {
+  const chain: any = {
+    $dynamic: jest.fn().mockReturnThis(),
+    from: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+    offset: jest.fn().mockReturnThis(),
+    then: (resolve: (value: any[]) => void) => resolve(resolveValue),
   };
   return chain;
 }

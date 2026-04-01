@@ -124,6 +124,15 @@ export class ChargeCodesController {
     return this.chargeCodesService.reviewAccessRequest(requestId, status, user.id);
   }
 
+  @Patch(':id/archive')
+  @Roles('admin', 'charge_manager')
+  archive(@Param('id') id: string, @Body('archived') archived: boolean) {
+    if (archived === false) {
+      return this.chargeCodesService.unarchive(id);
+    }
+    return this.chargeCodesService.archive(id);
+  }
+
   @Delete(':id')
   @Roles('admin')
   remove(@Param('id') id: string) {

@@ -35,6 +35,7 @@ export const chargeCodes = pgTable('charge_codes', {
   validFrom: date('valid_from'),
   validTo: date('valid_to'),
   isBillable: boolean('is_billable').default(true),
+  isArchived: boolean('is_archived').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [

@@ -12,9 +12,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Plus, Search, Archive } from 'lucide-react';
+import { Plus, Search, Archive, ArchiveRestore } from 'lucide-react';
 import { api } from '@/lib/api';
+import { toast } from 'sonner';
 import { useCurrency } from '@/lib/currency';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import {
   ChargeCodeTree,
   type ChargeCodeNode,
@@ -40,6 +49,7 @@ interface ChargeCodeDetail {
   approverId?: string | null;
   ownerName?: string | null;
   approverName?: string | null;
+  isArchived?: boolean;
   actualSpent?: number;
   forecastAtCompletion?: number | null;
   assignedUsers: { userId: string; email: string; fullName: string | null }[];
@@ -70,6 +80,9 @@ export default function ChargeCodesPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [billableFilter, setBillableFilter] = useState('all');
   const [myCodesOnly, setMyCodesOnly] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [archiving, setArchiving] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
 
   const canManage = userRole != null && CAN_MANAGE_ROLES.includes(userRole);
@@ -125,6 +138,23 @@ export default function ChargeCodesPage() {
     if (selectedId) loadSelected(selectedId);
   };
 
+  const handleArchiveToggle = async () => {
+    if (!selected) return;
+    const isCurrentlyArchived = !!selected.isArchived;
+    const newArchived = !isCurrentlyArchived;
+    setArchiving(true);
+    try {
+      await api.patch(`/charge-codes/${selected.id}/archive`, { archived: newArchived });
+      toast.success(newArchived ? 'Charge code archived' : 'Charge code restored');
+      setShowArchiveConfirm(false);
+      handleRefresh();
+    } catch {
+      toast.error(newArchived ? 'Failed to archive charge code' : 'Failed to restore charge code');
+    } finally {
+      setArchiving(false);
+    }
+  };
+
   const getNodeStatus = (node: ChargeCodeNode): 'active' | 'expired' => {
     if (!node.validTo) return 'active';
     return new Date(node.validTo + 'T23:59:59') >= new Date() ? 'active' : 'expired';
@@ -149,7 +179,8 @@ export default function ChargeCodesPage() {
         // When user is actively searching, skip myCodesOnly filter so
         // parent nodes (e.g. program-level codes) are not excluded
         const matchesMyCodes = !myCodesOnly || !!search || myCodeIds.has(node.id);
-        const selfMatch = matchesSearch && matchesLevel && matchesStatus && matchesBillable && matchesMyCodes;
+        const matchesArchived = showArchived || !node.isArchived;
+        const selfMatch = matchesSearch && matchesLevel && matchesStatus && matchesBillable && matchesMyCodes && matchesArchived;
 
         if (selfMatch || children.length > 0) {
           return { ...node, children };
@@ -239,6 +270,15 @@ export default function ChargeCodesPage() {
             ) : (
               <span className="text-xs text-[var(--text-muted)]">My Codes</span>
             )}
+            <label className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+              <input
+                type="checkbox"
+                checked={showArchived}
+                onChange={(e) => setShowArchived(e.target.checked)}
+                className="h-3.5 w-3.5 rounded border-stone-300 text-[var(--accent-teal)] focus:ring-[var(--accent-teal)]"
+              />
+              Show Archived
+            </label>
           </div>
         </div>
 
@@ -310,9 +350,17 @@ export default function ChargeCodesPage() {
                     >
                       Edit
                     </Button>
-                    <Button size="sm" variant="ghost" className="text-[var(--text-secondary)]">
-                      <Archive className="h-3.5 w-3.5 mr-1" />
-                      Archive
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-[var(--text-secondary)]"
+                      onClick={() => setShowArchiveConfirm(true)}
+                    >
+                      {selected.isArchived ? (
+                        <><ArchiveRestore className="h-3.5 w-3.5 mr-1" />Restore</>
+                      ) : (
+                        <><Archive className="h-3.5 w-3.5 mr-1" />Archive</>
+                      )}
                     </Button>
                   </>
                 )}
@@ -478,6 +526,34 @@ export default function ChargeCodesPage() {
           editData={selected}
         />
       )}
+
+      {/* Archive Confirmation Dialog */}
+      <Dialog open={showArchiveConfirm} onOpenChange={setShowArchiveConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selected?.isArchived ? 'Restore' : 'Archive'} {selected?.name}?
+            </DialogTitle>
+            <DialogDescription>
+              {selected?.isArchived
+                ? 'This will make it visible in the charge code list again.'
+                : 'This will hide it from the charge code list.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowArchiveConfirm(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant={selected?.isArchived ? 'default' : 'destructive'}
+              onClick={handleArchiveToggle}
+              disabled={archiving}
+            >
+              {archiving ? 'Processing...' : selected?.isArchived ? 'Restore' : 'Archive'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

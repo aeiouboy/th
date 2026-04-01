@@ -624,6 +624,30 @@ export class ChargeCodesService {
     return updated;
   }
 
+  async archive(id: string) {
+    await this.findByIdRaw(id);
+
+    const [updated] = await this.db
+      .update(chargeCodes)
+      .set({ isArchived: true, updatedAt: new Date() })
+      .where(eq(chargeCodes.id, id))
+      .returning();
+
+    return updated;
+  }
+
+  async unarchive(id: string) {
+    await this.findByIdRaw(id);
+
+    const [updated] = await this.db
+      .update(chargeCodes)
+      .set({ isArchived: false, updatedAt: new Date() })
+      .where(eq(chargeCodes.id, id))
+      .returning();
+
+    return updated;
+  }
+
   async remove(id: string) {
     const code = await this.findByIdRaw(id);
 

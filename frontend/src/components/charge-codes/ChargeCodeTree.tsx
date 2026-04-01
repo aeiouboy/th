@@ -17,6 +17,7 @@ export interface ChargeCodeNode {
   parentId: string | null;
   budgetAmount: string | null;
   isBillable: boolean | null;
+  isArchived?: boolean;
   validFrom: string | null;
   validTo: string | null;
   children: ChargeCodeNode[];
@@ -120,6 +121,7 @@ function TreeNode({
         <span className={cn(
           'truncate text-left',
           isSelected ? 'text-[var(--text-primary)]' : 'text-[var(--text-primary)]',
+          node.isArchived && 'line-through opacity-50',
         )}>
           {node.name}
         </span>
