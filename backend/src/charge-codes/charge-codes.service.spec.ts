@@ -338,6 +338,56 @@ describe('ChargeCodesService', () => {
     });
   });
 
+  describe('setArchived', () => {
+    it('should set isArchived to true', async () => {
+      const code = { id: 'PRG-001', name: 'Program', level: 'program', isArchived: false };
+      db.select.mockReturnValueOnce(buildLimitChain([code])); // findByIdRaw
+
+      const updated = { ...code, isArchived: true };
+      const updateChain = {
+        set: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockResolvedValue([updated]),
+      };
+      db.update.mockReturnValueOnce(updateChain);
+
+      const result = await service.setArchived('PRG-001', true);
+      expect(result.isArchived).toBe(true);
+      expect(updateChain.set).toHaveBeenCalledWith(
+        expect.objectContaining({ isArchived: true }),
+      );
+    });
+
+    it('should set isArchived to false', async () => {
+      const code = { id: 'PRG-001', name: 'Program', level: 'program', isArchived: true };
+      db.select.mockReturnValueOnce(buildLimitChain([code])); // findByIdRaw
+
+      const updated = { ...code, isArchived: false };
+      const updateChain = {
+        set: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockResolvedValue([updated]),
+      };
+      db.update.mockReturnValueOnce(updateChain);
+
+      const result = await service.setArchived('PRG-001', false);
+      expect(result.isArchived).toBe(false);
+      expect(updateChain.set).toHaveBeenCalledWith(
+        expect.objectContaining({ isArchived: false }),
+      );
+    });
+
+    it('should throw NotFoundException when charge code does not exist', async () => {
+      const updateChain = {
+        set: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockResolvedValue([]),
+      };
+      db.update.mockReturnValueOnce(updateChain);
+      await expect(service.setArchived('nonexistent', true)).rejects.toThrow(NotFoundException);
+    });
+  });
+
   describe('getBudgetDetail - aggregateFromTree logic', () => {
     it('should aggregate budget and actual from children when parent budget is 0', async () => {
       const parentCode = { id: 'PRG-001', name: 'Program', level: 'program', parentId: null, path: 'PRG-001', budgetAmount: '0', ownerId: null, approverId: null };

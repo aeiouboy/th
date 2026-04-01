@@ -273,8 +273,10 @@ function TimeEntryContent() {
     setDescriptions(newDescriptions);
     setActiveRows(Array.from(rowMap.values()));
     setIsDirty(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- vacationDates/halfDayDates are derived from vacations+weekStart (already deps via weekStart)
-  }, [entriesData, weekStart, vacationDates.size, halfDayDates.size]);
+  // Serialize vacation date sets for stable dependency comparison —
+  // the Set objects get new references on each render even when contents are identical
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entriesData, weekStart, JSON.stringify([...vacationDates].sort()), JSON.stringify([...halfDayDates].sort())]);
 
   // Save mutation
   const saveMutation = useMutation({

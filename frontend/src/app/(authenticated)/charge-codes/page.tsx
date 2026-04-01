@@ -390,7 +390,7 @@ export default function ChargeCodesPage() {
                     <InfoItem label="Cost center" value={selected.costCenter || '-'} />
                     <InfoItem label="Valid" value={
                       selected.validFrom && selected.validTo
-                        ? `${formatShortDate(selected.validFrom)} - ${formatShortDate(selected.validTo)}`
+                        ? `${formatMonthYear(selected.validFrom)} - ${formatMonthYear(selected.validTo)}`
                         : '-'
                     } />
                     <InfoItem
@@ -579,7 +579,7 @@ function InfoItem({
   );
 }
 
-function formatShortDate(dateStr: string): string {
+function formatMonthYear(dateStr: string): string {
   try {
     const d = new Date(dateStr + 'T00:00:00');
     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });

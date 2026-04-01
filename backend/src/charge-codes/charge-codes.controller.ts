@@ -127,10 +127,7 @@ export class ChargeCodesController {
   @Patch(':id/archive')
   @Roles('admin', 'charge_manager')
   archive(@Param('id') id: string, @Body('archived') archived: boolean) {
-    if (archived === false) {
-      return this.chargeCodesService.unarchive(id);
-    }
-    return this.chargeCodesService.archive(id);
+    return this.chargeCodesService.setArchived(id, archived !== false);
   }
 
   @Delete(':id')

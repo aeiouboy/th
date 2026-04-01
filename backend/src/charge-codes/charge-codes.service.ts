@@ -624,26 +624,16 @@ export class ChargeCodesService {
     return updated;
   }
 
-  async archive(id: string) {
-    await this.findByIdRaw(id);
-
+  async setArchived(id: string, archived: boolean) {
     const [updated] = await this.db
       .update(chargeCodes)
-      .set({ isArchived: true, updatedAt: new Date() })
+      .set({ isArchived: archived, updatedAt: new Date() })
       .where(eq(chargeCodes.id, id))
       .returning();
 
-    return updated;
-  }
-
-  async unarchive(id: string) {
-    await this.findByIdRaw(id);
-
-    const [updated] = await this.db
-      .update(chargeCodes)
-      .set({ isArchived: false, updatedAt: new Date() })
-      .where(eq(chargeCodes.id, id))
-      .returning();
+    if (!updated) {
+      throw new NotFoundException(`Charge code ${id} not found`);
+    }
 
     return updated;
   }
