@@ -71,6 +71,26 @@ interface PendingResponse {
   pending: PendingTimesheet[];
 }
 
+interface MyCcRequest {
+  id: string;
+  chargeCodeId: string;
+  chargeCodeName: string;
+  status: string;
+  createdAt: string;
+}
+
+interface PendingCcRequest {
+  id: string;
+  requesterId: string;
+  chargeCodeId: string;
+  chargeCodeName: string;
+  requesterName: string | null;
+  requesterEmail: string;
+  reason: string | null;
+  status: string;
+  createdAt: string;
+}
+
 interface BudgetAlert {
   chargeCodeId: string;
   name: string;
@@ -199,12 +219,12 @@ export default function DashboardPage() {
     queryFn: () => api.get('/dashboard/chargeability-ytd'),
   });
 
-  const { data: myCcRequests = [] } = useQuery<{ id: string; chargeCodeId: string; chargeCodeName: string; status: string; createdAt: string }[]>({
+  const { data: myCcRequests = [] } = useQuery<MyCcRequest[]>({
     queryKey: ['my-cc-requests'],
     queryFn: () => api.get('/charge-codes/my-requests'),
   });
 
-  const { data: pendingCcRequests = [] } = useQuery<{ id: string; requesterId: string; chargeCodeId: string; chargeCodeName: string; requesterName: string | null; requesterEmail: string; reason: string | null; status: string; createdAt: string }[]>({
+  const { data: pendingCcRequests = [] } = useQuery<PendingCcRequest[]>({
     queryKey: ['pending-cc-requests'],
     queryFn: () => api.get('/charge-codes/access-requests/list'),
     enabled: isManager,
@@ -231,6 +251,8 @@ export default function DashboardPage() {
   const chargeability =
     weeklyHours > 0 ? Math.round((billableHours / weeklyHours) * 100) : 0;
   const pendingCount = pending ? pending.pending.length : 0;
+  const totalPendingActions = pendingCount + pendingCcRequests.length;
+  const myPendingCcCount = myCcRequests.filter((r) => r.status === 'pending').length;
   const prevWeeklyHours = prevEntries.reduce((s, e) => s + parseFloat(e.hours), 0);
   const prevBillableHours = prevEntries
     .filter((e) => e.isBillable)
@@ -361,9 +383,9 @@ export default function DashboardPage() {
           <Link href="/approvals">
             <Button variant="outline" className="gap-1.5">
               <CheckIcon /> Approvals
-              {(pendingCount + pendingCcRequests.length) > 0 && (
+              {totalPendingActions > 0 && (
                 <Badge className="ml-1 bg-[var(--accent-amber-light)] text-[var(--accent-amber)] text-[10px]">
-                  {pendingCount + pendingCcRequests.length}
+                  {totalPendingActions}
                 </Badge>
               )}
             </Button>
@@ -518,9 +540,9 @@ export default function DashboardPage() {
                 <CardTitle className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
                   My CC Requests
                 </CardTitle>
-                {myCcRequests.filter((r) => r.status === 'pending').length > 0 && (
+                {myPendingCcCount > 0 && (
                   <Badge className="bg-[var(--accent-amber-light)] text-[var(--accent-amber)]">
-                    {myCcRequests.filter((r) => r.status === 'pending').length} pending
+                    {myPendingCcCount} pending
                   </Badge>
                 )}
               </CardHeader>
@@ -569,7 +591,7 @@ function ManagerRow3({
   chargeability: number;
   teamStatus?: TeamStatusResponse;
   teamStatusLoading: boolean;
-  pendingCcRequests?: { id: string; requesterName: string | null; requesterEmail: string; chargeCodeName: string; chargeCodeId: string; reason: string | null }[];
+  pendingCcRequests?: PendingCcRequest[];
 }) {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -1043,22 +1065,6 @@ function formatPeriod(start: string, end: string) {
 }
 
 // --- Icons ---
-
-function PlusIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" x2="12" y1="5" y2="19" /><line x1="5" x2="19" y1="12" y2="12" />
-    </svg>
-  );
-}
-
-function SendIcon() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m22 2-7 20-4-9-9-4z" /><path d="M22 2 11 13" />
-    </svg>
-  );
-}
 
 function TagIcon() {
   return (

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { format, subMonths } from 'date-fns';
@@ -17,8 +18,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ApprovalQueue } from '@/components/approvals/ApprovalQueue';
 import { MultiSelectFilter } from '@/components/budget/MultiSelectFilter';
-import { Search, CheckCircle, History, Palmtree, CheckIcon, XIcon, Tag } from 'lucide-react';
-import { formatShortDate } from '@/lib/utils';
+import { Search, History, Palmtree, CheckIcon, XIcon, Tag } from 'lucide-react';
+import { formatShortDate, formatDateMedium, formatDateTimeMedium } from '@/lib/utils';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageHeader } from '@/components/shared/PageHeader';
 
@@ -93,76 +94,55 @@ interface ApprovalHistoryItem {
 }
 
 export default function ApprovalsPage() {
-  const [pending, setPending] = useState<PendingResponse>({
-    pending: [],
-  });
-  const [history, setHistory] = useState<ApprovalHistoryItem[]>([]);
-  const [pendingVacations, setPendingVacations] = useState<PendingVacation[]>([]);
-  const [ccRequests, setCcRequests] = useState<CCAccessRequest[]>([]);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [period, setPeriod] = useState(() => format(new Date(), 'yyyy-MM'));
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('manager');
 
-  const showTeamStatus = userRole && ['admin', 'charge_manager'].includes(userRole);
+  const { data: user } = useQuery<{ role: string }>({
+    queryKey: ['me'],
+    queryFn: () => api.get('/users/me'),
+  });
+  const userRole = user?.role ?? null;
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [pendingData, historyData] = await Promise.all([
-        api.get<PendingResponse>('/approvals/pending'),
-        api.get<ApprovalHistoryItem[]>('/approvals/history'),
-      ]);
-      setPending(pendingData);
-      setHistory(historyData);
-    } catch {
-      toast.error('Failed to load approvals data');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const isManagerOrAdmin = userRole && ['admin', 'charge_manager'].includes(userRole);
 
-  const fetchVacations = useCallback(async () => {
-    try {
-      const data = await api.get<PendingVacation[]>('/vacations/pending');
-      setPendingVacations(data);
-    } catch {
-      // User may not be a manager — ignore
-    }
-  }, []);
+  const { data: pendingData, isLoading: loading } = useQuery<PendingResponse>({
+    queryKey: ['pending-approvals'],
+    queryFn: () => api.get('/approvals/pending'),
+  });
+  const pending = pendingData ?? { pending: [] };
 
-  const fetchCcRequests = useCallback(async () => {
-    try {
-      const data = await api.get<CCAccessRequest[]>('/charge-codes/access-requests/list');
-      setCcRequests(data);
-    } catch {
-      // User may not have permission — ignore
-    }
-  }, []);
+  const { data: history = [] } = useQuery<ApprovalHistoryItem[]>({
+    queryKey: ['approval-history'],
+    queryFn: () => api.get('/approvals/history'),
+  });
 
-  const fetchUserRole = useCallback(async () => {
-    try {
-      const profile = await api.get<{ role: string }>('/users/me');
-      setUserRole(profile.role);
-    } catch {
-      // ignore
-    }
-  }, []);
+  const { data: pendingVacations = [] } = useQuery<PendingVacation[]>({
+    queryKey: ['pending-vacations'],
+    queryFn: () => api.get('/vacations/pending'),
+  });
 
-  useEffect(() => {
-    fetchData();
-    fetchVacations();
-    fetchUserRole();
-  }, [fetchData, fetchVacations, fetchUserRole]);
+  const { data: ccRequests = [] } = useQuery<CCAccessRequest[]>({
+    queryKey: ['pending-cc-requests'],
+    queryFn: () => api.get('/charge-codes/access-requests/list'),
+    enabled: !!isManagerOrAdmin,
+  });
 
-  useEffect(() => {
-    if (showTeamStatus) {
-      fetchCcRequests();
-    }
-  }, [showTeamStatus, fetchCcRequests]);
+  const refetchApprovals = () => {
+    queryClient.invalidateQueries({ queryKey: ['pending-approvals'] });
+    queryClient.invalidateQueries({ queryKey: ['approval-history'] });
+  };
+
+  const refetchVacations = () => {
+    queryClient.invalidateQueries({ queryKey: ['pending-vacations'] });
+  };
+
+  const refetchCcRequests = () => {
+    queryClient.invalidateQueries({ queryKey: ['pending-cc-requests'] });
+  };
 
   const periodOptions = useMemo(() => {
     const now = new Date();
@@ -279,7 +259,7 @@ export default function ApprovalsPage() {
               </Badge>
             )}
           </TabsTrigger>
-          {showTeamStatus && (
+          {isManagerOrAdmin && (
             <TabsTrigger value="cc_requests">
               CC Requests
               {ccRequests.length > 0 && (
@@ -306,21 +286,21 @@ export default function ApprovalsPage() {
           ) : (
             <ApprovalQueue
               items={filterItems(pending.pending)}
-              onRefresh={fetchData}
+              onRefresh={refetchApprovals}
             />
           )}
         </TabsContent>
 
-        {showTeamStatus && (
+        {isManagerOrAdmin && (
           <TabsContent value="cc_requests" className="mt-4">
-            <CCRequestList requests={ccRequests} onRefresh={fetchCcRequests} />
+            <CCRequestList requests={ccRequests} onRefresh={refetchCcRequests} />
           </TabsContent>
         )}
 
         <TabsContent value="vacations" className="mt-4">
           <VacationApprovalList
             items={pendingVacations}
-            onRefresh={fetchVacations}
+            onRefresh={refetchVacations}
           />
         </TabsContent>
 
@@ -431,11 +411,7 @@ function HistoryTable({ items }: { items: ApprovalHistoryItem[] }) {
                 {item.comment || '-'}
               </td>
               <td className="px-4 py-2.5 text-[var(--text-muted)] text-xs">
-                {new Date(item.approvedAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
+                {formatDateMedium(item.approvedAt)}
               </td>
             </tr>
           ))}
@@ -524,11 +500,7 @@ function VacationApprovalList({
                 {formatShortDate(v.vacation.endDate)}
               </td>
               <td className="px-4 py-2.5 text-[var(--text-muted)] text-xs">
-                {new Date(v.vacation.createdAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
+                {formatDateMedium(v.vacation.createdAt)}
               </td>
               <td className="px-4 py-2.5 text-right">
                 <div className="flex items-center justify-end gap-1">
@@ -558,17 +530,6 @@ function VacationApprovalList({
     </div>
   );
 }
-
-const STATUS_BADGE_MAP: Record<string, { label: string; variant: 'default' | 'amber' | 'green' | 'destructive' | 'outline' }> = {
-  not_started: { label: 'Not Started', variant: 'outline' },
-  draft: { label: 'Draft', variant: 'default' },
-  submitted: { label: 'Submitted', variant: 'amber' },
-  approved: { label: 'Approved', variant: 'green' },
-  manager_approved: { label: 'Approved', variant: 'green' },
-  cc_approved: { label: 'Approved', variant: 'green' },
-  locked: { label: 'Locked', variant: 'green' },
-  rejected: { label: 'Rejected', variant: 'destructive' },
-};
 
 /* ── CC Access Request List ─────────────────────── */
 
@@ -632,7 +593,7 @@ function CCRequestList({ requests, onRefresh }: { requests: CCAccessRequest[]; o
                 {req.reason || '-'}
               </td>
               <td className="px-4 py-3 text-[var(--text-muted)] text-xs">
-                {new Date(req.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                {formatDateTimeMedium(req.createdAt)}
               </td>
               <td className="px-4 py-3 text-right">
                 <div className="flex items-center justify-end gap-1.5">
