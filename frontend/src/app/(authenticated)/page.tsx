@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { formatCurrencyStatic } from '@/lib/currency';
 import { StatCard } from '@/components/shared/StatCard';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Clock, Percent, ClipboardCheck, Tag, CheckCircle, Users, Bell, AlertTriangle } from 'lucide-react';
+import { Clock, Percent, Tag, CheckCircle, Users, Bell, AlertTriangle } from 'lucide-react';
 import { ChargeabilityTrend } from '@/components/dashboard/ChargeabilityTrend';
 import { ProgramDistribution } from '@/components/dashboard/ProgramDistribution';
 
@@ -372,9 +372,9 @@ export default function DashboardPage() {
       </div>
 
       {/* ROW 2: Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
+          Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-28 rounded-lg" />
           ))
         ) : (
@@ -394,13 +394,6 @@ export default function DashboardPage() {
               icon={Percent}
               accent={chargeability >= 80 ? 'var(--accent-green)' : chargeability > 0 ? 'var(--accent-amber)' : undefined}
               trend={chargeabilityDelta !== undefined ? { value: `${chargeabilityDelta >= 0 ? '+' : ''}${chargeabilityDelta}% vs prior`, direction: chargeabilityDelta >= 0 ? 'up' : 'down' } : undefined}
-            />
-            <StatCard
-              label="Pending approvals"
-              value={String(pendingCount)}
-              subtext={pendingCount > 0 ? 'Awaiting your review' : 'All clear'}
-              icon={ClipboardCheck}
-              accent={pendingCount > 0 ? 'var(--accent-amber)' : undefined}
             />
             <StatCard
               label="Active charge codes"
