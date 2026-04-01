@@ -230,9 +230,7 @@ export default function DashboardPage() {
     .reduce((s, e) => s + parseFloat(e.hours), 0);
   const chargeability =
     weeklyHours > 0 ? Math.round((billableHours / weeklyHours) * 100) : 0;
-  const pendingCount = pending
-    ? pending.pending.length
-    : 0;
+  const pendingCount = (pending ? pending.pending.length : 0) + pendingCcRequests.length;
   const prevWeeklyHours = prevEntries.reduce((s, e) => s + parseFloat(e.hours), 0);
   const prevBillableHours = prevEntries
     .filter((e) => e.isBillable)
