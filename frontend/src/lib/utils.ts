@@ -8,7 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 export { formatCurrencyStatic as formatCurrency } from './currency';
 
 export function formatShortDate(dateStr: string): string {
-  const d = new Date(dateStr + 'T00:00:00');
+  // Handle both date-only "2026-03-31" and ISO timestamps "2026-03-31T10:30:00Z"
+  const d = dateStr.includes('T') ? new Date(dateStr) : new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return dateStr;
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 

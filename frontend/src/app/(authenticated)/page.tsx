@@ -204,6 +204,12 @@ export default function DashboardPage() {
     queryFn: () => api.get('/charge-codes/my-requests'),
   });
 
+  const { data: pendingCcRequests = [] } = useQuery<{ id: string; requesterId: string; chargeCodeId: string; chargeCodeName: string; requesterName: string | null; requesterEmail: string; reason: string | null; status: string; createdAt: string }[]>({
+    queryKey: ['pending-cc-requests'],
+    queryFn: () => api.get('/charge-codes/access-requests/list'),
+    enabled: isManager,
+  });
+
   // Compute metrics
   const dates = useMemo(
     () => Array.from({ length: 5 }, (_, i) => format(addDays(weekStart, i), 'yyyy-MM-dd')),
@@ -423,6 +429,7 @@ export default function DashboardPage() {
           chargeability={chargeability}
           teamStatus={teamStatus}
           teamStatusLoading={teamStatusLoading}
+          pendingCcRequests={pendingCcRequests}
         />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -563,6 +570,7 @@ function ManagerRow3({
   chargeability,
   teamStatus,
   teamStatusLoading,
+  pendingCcRequests = [],
 }: {
   pending?: PendingResponse;
   pendingCount: number;
@@ -570,6 +578,7 @@ function ManagerRow3({
   chargeability: number;
   teamStatus?: TeamStatusResponse;
   teamStatusLoading: boolean;
+  pendingCcRequests?: { id: string; requesterName: string | null; requesterEmail: string; chargeCodeName: string; chargeCodeId: string; reason: string | null }[];
 }) {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -761,6 +770,42 @@ function ManagerRow3({
           )}
         </CardContent>
       </Card>
+
+      {/* CC Requests */}
+      {pendingCcRequests.length > 0 && (
+        <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-base font-[family-name:var(--font-heading)] font-semibold text-[var(--text-primary)]">
+              CC Requests
+            </CardTitle>
+            <Badge className="bg-[var(--accent-amber-light)] text-[var(--accent-amber)]">
+              {pendingCcRequests.length}
+            </Badge>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {pendingCcRequests.slice(0, 5).map((req) => (
+                <div key={req.id} className="flex items-center gap-2 py-1.5 px-1 rounded hover:bg-[var(--bg-card-hover)] transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                      {req.requesterName || req.requesterEmail}
+                    </p>
+                    <p className="text-[11px] text-[var(--text-secondary)]">
+                      {req.chargeCodeName} &middot; {req.chargeCodeId}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <Link
+                href="/approvals"
+                className="text-xs text-[var(--accent-teal)] hover:underline block text-center pt-1"
+              >
+                Review in Approvals &rarr;
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Alerts */}
       <Card className="shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
