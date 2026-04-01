@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { formatCurrencyStatic } from '@/lib/currency';
 import { StatCard } from '@/components/shared/StatCard';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Clock, Percent, Tag, CheckCircle, Users, Bell, AlertTriangle } from 'lucide-react';
+import { Clock, Percent, Tag, CheckCircle, Users, Bell, AlertTriangle, Check as LucideCheck, X as LucideX } from 'lucide-react';
 import { ChargeabilityTrend } from '@/components/dashboard/ChargeabilityTrend';
 import { ProgramDistribution } from '@/components/dashboard/ProgramDistribution';
 
@@ -597,6 +597,26 @@ function ManagerRow3({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const allPending = pending?.pending || [];
 
+  const ccApproveMutation = useMutation({
+    mutationFn: (id: string) =>
+      api.patch(`/charge-codes/access-requests/${id}`, { status: 'approved' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pending-cc-requests'] });
+      toast.success('Request approved');
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const ccRejectMutation = useMutation({
+    mutationFn: (id: string) =>
+      api.patch(`/charge-codes/access-requests/${id}`, { status: 'rejected' }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pending-cc-requests'] });
+      toast.success('Request rejected');
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
   const bulkApproveMutation = useMutation({
     mutationFn: (ids: string[]) =>
       api.post('/approvals/bulk-approve', { timesheet_ids: ids }),
@@ -694,14 +714,12 @@ function ManagerRow3({
                   </div>
                 </label>
               ))}
-              {allPending.length > 8 && (
-                <Link
-                  href="/approvals"
-                  className="text-xs text-[var(--accent-teal)] hover:underline block text-center pt-1"
-                >
-                  View all {allPending.length} &rarr;
-                </Link>
-              )}
+              <Link
+                href="/approvals"
+                className="text-xs text-[var(--accent-teal)] hover:underline block text-center pt-2 mt-1 border-t border-[var(--border-default)]"
+              >
+                Review in Approvals &rarr;
+              </Link>
             </div>
           )}
         </CardContent>
@@ -737,6 +755,28 @@ function ManagerRow3({
                     <p className="text-[11px] text-[var(--text-secondary)]">
                       {req.chargeCodeName} &middot; {req.chargeCodeId}
                     </p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => ccApproveMutation.mutate(req.id)}
+                      disabled={ccApproveMutation.isPending || ccRejectMutation.isPending}
+                      title="Approve"
+                      className="text-[var(--accent-green)] hover:text-emerald-700 hover:bg-[var(--accent-green-light)]"
+                    >
+                      <LucideCheck className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => ccRejectMutation.mutate(req.id)}
+                      disabled={ccApproveMutation.isPending || ccRejectMutation.isPending}
+                      title="Reject"
+                      className="text-[var(--accent-red)] hover:text-red-700 hover:bg-[var(--accent-red-light)]"
+                    >
+                      <LucideX className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               ))}

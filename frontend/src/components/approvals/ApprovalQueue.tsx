@@ -23,7 +23,7 @@ import {
 import { TimesheetReview } from './TimesheetReview';
 import { BulkApprovalBar } from './BulkApprovalBar';
 import { Eye, Check, X, AlertTriangle, CheckCircle } from 'lucide-react';
-import { formatShortDate } from '@/lib/utils';
+import { formatShortDate, formatDateTimeMedium } from '@/lib/utils';
 import { EmptyState } from '@/components/shared/EmptyState';
 
 interface PendingTimesheet {
@@ -202,7 +202,12 @@ export function ApprovalQueue({ items, onRefresh }: ApprovalQueueProps) {
                     )}
                   </TableCell>
                   <TableCell className="text-xs text-[var(--text-secondary)]">
-                    {formatShortDate(ts.periodStart)} - {formatShortDate(ts.periodEnd)}
+                    <div>{formatShortDate(ts.periodStart)} - {formatShortDate(ts.periodEnd)}</div>
+                    {ts.submittedAt && (
+                      <div className="text-[11px] text-[var(--text-muted)]">
+                        Submitted: {formatDateTimeMedium(ts.submittedAt)}
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <span
