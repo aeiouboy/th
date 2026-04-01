@@ -118,12 +118,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 46731,
+                  "duration": 48505,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:10:02.062Z",
+                  "startTime": "2026-04-01T02:29:01.234Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -167,12 +167,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5287,
+                      "duration": 3891,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:10:51.817Z",
+                      "startTime": "2026-04-01T02:29:52.269Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -201,12 +201,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5242,
+                      "duration": 5138,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:10:58.052Z",
+                      "startTime": "2026-04-01T02:29:56.717Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -235,12 +235,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2259,
+                      "duration": 2753,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:03.304Z",
+                      "startTime": "2026-04-01T02:30:01.864Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -286,12 +286,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1888,
+                      "duration": 1773,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:05.578Z",
+                      "startTime": "2026-04-01T02:30:04.632Z",
                       "annotations": [],
                       "attachments": []
                     },
@@ -299,12 +299,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3029,
+                      "duration": 2029,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:11:12.094Z",
+                      "startTime": "2026-04-01T02:30:10.774Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -339,7 +339,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 3325,
+                      "duration": 3378,
                       "error": {
                         "message": "Error: Error reading storage state from frontend/e2e/.auth/tachongrak.json:\nENOENT: no such file or directory, open 'frontend/e2e/.auth/tachongrak.json'",
                         "stack": "Error: Error reading storage state from frontend/e2e/.auth/tachongrak.json:\nENOENT: no such file or directory, open 'frontend/e2e/.auth/tachongrak.json'\n    at /Users/tachongrak/Projects/ts/frontend/e2e/admin-rates.spec.ts:10:21",
@@ -363,7 +363,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:07.476Z",
+                      "startTime": "2026-04-01T02:30:06.412Z",
                       "annotations": [],
                       "attachments": [],
                       "errorLocation": {
@@ -376,7 +376,7 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 3473,
+                      "duration": 3915,
                       "error": {
                         "message": "Error: Error reading storage state from frontend/e2e/.auth/tachongrak.json:\nENOENT: no such file or directory, open 'frontend/e2e/.auth/tachongrak.json'",
                         "stack": "Error: Error reading storage state from frontend/e2e/.auth/tachongrak.json:\nENOENT: no such file or directory, open 'frontend/e2e/.auth/tachongrak.json'\n    at /Users/tachongrak/Projects/ts/frontend/e2e/admin-rates.spec.ts:10:21",
@@ -400,7 +400,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:11:16.253Z",
+                      "startTime": "2026-04-01T02:30:13.411Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -457,12 +457,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3214,
+                      "duration": 2201,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:20.818Z",
+                      "startTime": "2026-04-01T02:30:18.611Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -491,12 +491,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2891,
+                      "duration": 2571,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:24.942Z",
+                      "startTime": "2026-04-01T02:30:21.385Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -541,22 +541,76 @@
                     {
                       "workerIndex": 3,
                       "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 33051,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.fixed.bottom-20, .fixed.bottom-6').last().locator(':text-matches(\"เรียบร้อย|Logged|บันทึก\")')\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for locator('.fixed.bottom-20, .fixed.bottom-6').last().locator(':text-matches(\"เรียบร้อย|Logged|บันทึก\")')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.fixed.bottom-20, .fixed.bottom-6').last().locator(':text-matches(\"เรียบร้อย|Logged|บันทึก\")')\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for locator('.fixed.bottom-20, .fixed.bottom-6').last().locator(':text-matches(\"เรียบร้อย|Logged|บันทึก\")')\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/ai-chatbox.spec.ts:124:7",
+                        "location": {
+                          "file": "/Users/tachongrak/Projects/ts/frontend/e2e/ai-chatbox.spec.ts",
+                          "column": 7,
+                          "line": 124
+                        },
+                        "snippet": "  122 |     await expect(\n  123 |       panel.locator(':text-matches(\"เรียบร้อย|Logged|บันทึก\")'),\n> 124 |     ).toBeVisible({ timeout: 30000 });\n      |       ^\n  125 |\n  126 |     const panelText = await panel.innerText();\n  127 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/tachongrak/Projects/ts/frontend/e2e/ai-chatbox.spec.ts",
+                            "column": 7,
+                            "line": 124
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('.fixed.bottom-20, .fixed.bottom-6').last().locator(':text-matches(\"เรียบร้อย|Logged|บันทึก\")')\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for locator('.fixed.bottom-20, .fixed.bottom-6').last().locator(':text-matches(\"เรียบร้อย|Logged|บันทึก\")')\u001b[22m\n\n\n  122 |     await expect(\n  123 |       panel.locator(':text-matches(\"เรียบร้อย|Logged|บันทึก\")'),\n> 124 |     ).toBeVisible({ timeout: 30000 });\n      |       ^\n  125 |\n  126 |     const panelText = await panel.innerText();\n  127 |\n    at /Users/tachongrak/Projects/ts/frontend/e2e/ai-chatbox.spec.ts:124:7"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-04-01T02:30:23.978Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/ai-chatbox-AI-ChatBox-—-Ti-f8950-x-and-gets-success-response-desktop/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/ai-chatbox-AI-ChatBox-—-Ti-f8950-x-and-gets-success-response-desktop/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/ai-chatbox.spec.ts",
+                        "column": 7,
+                        "line": 124
+                      }
+                    },
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 13234,
+                      "duration": 9743,
                       "errors": [],
                       "stdout": [
                         {
-                          "text": "Bot panel text (truncated): ผู้ช่วย Timesheet\n\nกรอกเวลา, ตรวจสอบสถานะ\n\nสวัสดีค่ะ! ฉันช่วยเรื่องการกรอกเวลาได้ค่ะ ลองพิมพ์ \"กรอก 4 ชม. [รหัส Charge Code] วันนี้\" หรือถาม \"วันนี้กรอกไปกี่ชั่วโมงแล้ว?\"\nแสดง Timesheet สัปดาห์นี้\nวันนี้กรอกไปกี่ชั่วโมงแล้ว?\nฉันมี Charge Code อะไรบ้าง?\nกรอก 6 ชม. OMS วันนี้\nบันทึกเวลา 6 ชั่วโมง สำหร\n"
+                          "text": "Bot panel text (truncated): ผู้ช่วย Timesheet\n\nกรอกเวลา, ตรวจสอบสถานะ\n\nสวัสดีค่ะ! ฉันช่วยเรื่องการกรอกเวลาได้ค่ะ ลองพิมพ์ \"กรอก 4 ชม. [รหัส Charge Code] วันนี้\" หรือถาม \"วันนี้กรอกไปกี่ชั่วโมงแล้ว?\"\nแสดง Timesheet สัปดาห์นี้\nวันนี้กรอกไปกี่ชั่วโมงแล้ว?\nฉันมี Charge Code อะไรบ้าง?\nกรอก 6 ชม. OMS วันนี้\nฉันไม่พบ charge code \"OMS\n"
                         }
                       ],
                       "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-03-31T16:11:27.847Z",
+                      "retry": 1,
+                      "startTime": "2026-04-01T02:30:58.005Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/tachongrak/Projects/ts/frontend/test-results/ai-chatbox-AI-ChatBox-—-Ti-f8950-x-and-gets-success-response-desktop-retry1/trace.zip"
+                        }
+                      ]
                     }
                   ],
-                  "status": "expected"
+                  "status": "flaky"
                 }
               ],
               "id": "0e8b0dbf96abf3ce0957-93610973d808bb240989",
@@ -594,15 +648,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3539,
+                      "duration": 3343,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:41.094Z",
+                      "startTime": "2026-04-01T02:31:08.563Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -628,15 +682,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3589,
+                      "duration": 3557,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:44.640Z",
+                      "startTime": "2026-04-01T02:31:11.916Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -679,15 +733,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3739,
+                      "duration": 3786,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:48.240Z",
+                      "startTime": "2026-04-01T02:31:15.485Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -713,15 +767,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2394,
+                      "duration": 2398,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:51.986Z",
+                      "startTime": "2026-04-01T02:31:19.280Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -764,15 +818,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2900,
+                      "duration": 2692,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:54.390Z",
+                      "startTime": "2026-04-01T02:31:21.692Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -798,15 +852,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2527,
+                      "duration": 2590,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:57.296Z",
+                      "startTime": "2026-04-01T02:31:24.390Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -832,15 +886,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2578,
+                      "duration": 2790,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:11:59.830Z",
+                      "startTime": "2026-04-01T02:31:26.990Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -876,15 +930,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 4,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 26066,
+                  "duration": 23643,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:12:02.423Z",
+                  "startTime": "2026-04-01T02:31:29.796Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -910,10 +964,10 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 4,
                   "parallelIndex": 0,
                   "status": "failed",
-                  "duration": 36375,
+                  "duration": 36837,
                   "error": {
                     "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-slot=\"badge\"]:has-text(\"Rejected\")')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-slot=\"badge\"]:has-text(\"Rejected\")')\u001b[22m\n",
                     "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-slot=\"badge\"]:has-text(\"Rejected\")')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-slot=\"badge\"]:has-text(\"Rejected\")')\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/bf-approval-workflow.spec.ts:344:31",
@@ -937,7 +991,7 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:12:30.538Z",
+                  "startTime": "2026-04-01T02:31:55.214Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -968,10 +1022,10 @@
                   }
                 },
                 {
-                  "workerIndex": 4,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "failed",
-                  "duration": 40218,
+                  "duration": 39783,
                   "error": {
                     "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-slot=\"badge\"]:has-text(\"Rejected\")')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-slot=\"badge\"]:has-text(\"Rejected\")')\u001b[22m\n",
                     "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[data-slot=\"badge\"]:has-text(\"Rejected\")')\nExpected: visible\nTimeout: 10000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-slot=\"badge\"]:has-text(\"Rejected\")')\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/bf-approval-workflow.spec.ts:344:31",
@@ -995,7 +1049,7 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 1,
-                  "startTime": "2026-03-31T16:13:08.376Z",
+                  "startTime": "2026-04-01T02:32:33.912Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -1052,15 +1106,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 6,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6228,
+                  "duration": 6148,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:13:53.206Z",
+                  "startTime": "2026-04-01T02:33:18.490Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1101,15 +1155,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4277,
+                      "duration": 4432,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:14:03.141Z",
+                      "startTime": "2026-04-01T02:33:27.301Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1143,15 +1197,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 10376,
+                      "duration": 8886,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:14:09.677Z",
+                      "startTime": "2026-04-01T02:33:33.327Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1187,15 +1241,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 6,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8622,
+                  "duration": 7658,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:14:20.091Z",
+                  "startTime": "2026-04-01T02:33:42.233Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1221,15 +1275,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 6,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10709,
+                  "duration": 10244,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:14:30.588Z",
+                  "startTime": "2026-04-01T02:33:51.665Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1255,15 +1309,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 6,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 9732,
+                  "duration": 9321,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:14:41.307Z",
+                  "startTime": "2026-04-01T02:34:01.917Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1289,15 +1343,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 6,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3866,
+                  "duration": 1643,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:14:51.048Z",
+                  "startTime": "2026-04-01T02:34:11.245Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1323,10 +1377,10 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 6,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 7664,
+                  "duration": 7881,
                   "errors": [],
                   "stdout": [
                     {
@@ -1335,7 +1389,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:14:54.923Z",
+                  "startTime": "2026-04-01T02:34:12.896Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1376,15 +1430,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3102,
+                      "duration": 2487,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:02.603Z",
+                      "startTime": "2026-04-01T02:34:20.789Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1410,15 +1464,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3888,
+                      "duration": 3727,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:05.713Z",
+                      "startTime": "2026-04-01T02:34:23.284Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1461,15 +1515,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1955,
+                      "duration": 1871,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:09.613Z",
+                      "startTime": "2026-04-01T02:34:27.022Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1495,15 +1549,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 18110,
+                      "duration": 11490,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:11.575Z",
+                      "startTime": "2026-04-01T02:34:28.900Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1546,15 +1600,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 7809,
+                      "duration": 6788,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:29.703Z",
+                      "startTime": "2026-04-01T02:34:40.403Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1588,15 +1642,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4230,
+                      "duration": 3178,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:37.524Z",
+                      "startTime": "2026-04-01T02:34:47.199Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1630,15 +1684,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 961,
+                      "duration": 937,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:41.764Z",
+                      "startTime": "2026-04-01T02:34:50.385Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1672,15 +1726,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1447,
+                      "duration": 1568,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:42.745Z",
+                      "startTime": "2026-04-01T02:34:51.330Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1706,15 +1760,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 10002,
+                      "duration": 3781,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:44.212Z",
+                      "startTime": "2026-04-01T02:34:52.908Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1740,15 +1794,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4158,
+                      "duration": 3437,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:54.230Z",
+                      "startTime": "2026-04-01T02:34:56.699Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1791,15 +1845,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5829,
+                      "duration": 5352,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:15:58.412Z",
+                      "startTime": "2026-04-01T02:35:00.148Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1825,15 +1879,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1132,
+                      "duration": 1070,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:16:04.255Z",
+                      "startTime": "2026-04-01T02:35:05.507Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1859,15 +1913,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4266,
+                      "duration": 4280,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:16:05.401Z",
+                      "startTime": "2026-04-01T02:35:06.584Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1893,15 +1947,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5111,
+                      "duration": 4557,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:16:09.677Z",
+                      "startTime": "2026-04-01T02:35:10.870Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1944,28 +1998,28 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 16054,
+                      "duration": 13196,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:16:14.801Z",
+                      "startTime": "2026-04-01T02:35:15.442Z",
                       "annotations": [],
                       "attachments": []
                     },
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 7,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 14099,
+                      "duration": 13944,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:17:32.540Z",
+                      "startTime": "2026-04-01T02:36:24.742Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1997,28 +2051,28 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 18225,
+                      "duration": 15632,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:16:30.863Z",
+                      "startTime": "2026-04-01T02:35:28.644Z",
                       "annotations": [],
                       "attachments": []
                     },
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 7,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 17257,
+                      "duration": 15331,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:17:47.890Z",
+                      "startTime": "2026-04-01T02:36:39.481Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2050,28 +2104,28 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 13017,
+                      "duration": 11978,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:16:49.095Z",
+                      "startTime": "2026-04-01T02:35:44.285Z",
                       "annotations": [],
                       "attachments": []
                     },
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 7,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 12617,
+                      "duration": 13116,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:18:05.300Z",
+                      "startTime": "2026-04-01T02:36:54.933Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2103,28 +2157,28 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 17269,
+                      "duration": 16206,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:17:02.123Z",
+                      "startTime": "2026-04-01T02:35:56.272Z",
                       "annotations": [],
                       "attachments": []
                     },
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 7,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 17245,
+                      "duration": 16803,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:18:18.019Z",
+                      "startTime": "2026-04-01T02:37:08.188Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2156,10 +2210,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 11936,
+                      "duration": 11221,
                       "error": {
                         "message": "Error: Error reading storage state from frontend/e2e/.auth/tachongrak.json:\nENOENT: no such file or directory, open 'frontend/e2e/.auth/tachongrak.json'",
                         "stack": "Error: Error reading storage state from frontend/e2e/.auth/tachongrak.json:\nENOENT: no such file or directory, open 'frontend/e2e/.auth/tachongrak.json'\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:13:21",
@@ -2183,7 +2237,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:17:19.402Z",
+                      "startTime": "2026-04-01T02:36:12.487Z",
                       "annotations": [],
                       "attachments": [],
                       "errorLocation": {
@@ -2193,10 +2247,10 @@
                       }
                     },
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 7,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 13801,
+                      "duration": 11320,
                       "error": {
                         "message": "Error: Error reading storage state from frontend/e2e/.auth/tachongrak.json:\nENOENT: no such file or directory, open 'frontend/e2e/.auth/tachongrak.json'",
                         "stack": "Error: Error reading storage state from frontend/e2e/.auth/tachongrak.json:\nENOENT: no such file or directory, open 'frontend/e2e/.auth/tachongrak.json'\n    at /Users/tachongrak/Projects/ts/frontend/e2e/charge-codes.spec.ts:13:21",
@@ -2220,7 +2274,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:18:35.392Z",
+                      "startTime": "2026-04-01T02:37:25.275Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -2267,15 +2321,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 7,
+                  "workerIndex": 8,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3083,
+                  "duration": 2182,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:18:50.853Z",
+                  "startTime": "2026-04-01T02:37:37.765Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2301,15 +2355,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 7,
+                  "workerIndex": 8,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2111,
+                  "duration": 2291,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:18:55.392Z",
+                  "startTime": "2026-04-01T02:37:40.669Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2335,15 +2389,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 7,
+                  "workerIndex": 8,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 660,
+                  "duration": 644,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:18:57.511Z",
+                  "startTime": "2026-04-01T02:37:42.968Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2369,15 +2423,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 7,
+                  "workerIndex": 8,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4055,
+                  "duration": 4052,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:18:58.179Z",
+                  "startTime": "2026-04-01T02:37:43.624Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2392,7 +2446,7 @@
         },
         {
           "title": "E2E-CR12-01: Approvals search filters by employee name or charge code",
-          "ok": true,
+          "ok": false,
           "tags": [],
           "tests": [
             {
@@ -2403,20 +2457,108 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 7,
+                  "workerIndex": 8,
                   "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5142,
-                  "errors": [],
+                  "status": "failed",
+                  "duration": 3024,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m1\u001b[39m\nReceived:    \u001b[31m6\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m1\u001b[39m\nReceived:    \u001b[31m6\u001b[39m\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:341:24",
+                    "location": {
+                      "file": "/Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts",
+                      "column": 24,
+                      "line": 341
+                    },
+                    "snippet": "  339 |     // No items that DON'T match wichai should be visible (filter works)\n  340 |     // This is a soft assertion — some rows may be header rows\n> 341 |     expect(otherCount).toBeLessThanOrEqual(1); // Allow 1 for header row\n      |                        ^\n  342 |\n  343 |     // Step 5: Clear search to see all approvals\n  344 |     // Post-check: clearing shows all pending approvals again"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts",
+                        "column": 24,
+                        "line": 341
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m1\u001b[39m\nReceived:    \u001b[31m6\u001b[39m\n\n  339 |     // No items that DON'T match wichai should be visible (filter works)\n  340 |     // This is a soft assertion — some rows may be header rows\n> 341 |     expect(otherCount).toBeLessThanOrEqual(1); // Allow 1 for header row\n      |                        ^\n  342 |\n  343 |     // Step 5: Clear search to see all approvals\n  344 |     // Post-check: clearing shows all pending approvals again\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:341:24"
+                    }
+                  ],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:19:02.243Z",
+                  "startTime": "2026-04-01T02:37:47.683Z",
                   "annotations": [],
-                  "attachments": []
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/tachongrak/Projects/ts/frontend/test-results/cr1-remaining-E2E-CR12-01--ac9cd-mployee-name-or-charge-code-desktop/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/tachongrak/Projects/ts/frontend/test-results/cr1-remaining-E2E-CR12-01--ac9cd-mployee-name-or-charge-code-desktop/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts",
+                    "column": 24,
+                    "line": 341
+                  }
+                },
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3482,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m1\u001b[39m\nReceived:    \u001b[31m6\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m1\u001b[39m\nReceived:    \u001b[31m6\u001b[39m\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:341:24",
+                    "location": {
+                      "file": "/Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts",
+                      "column": 24,
+                      "line": 341
+                    },
+                    "snippet": "  339 |     // No items that DON'T match wichai should be visible (filter works)\n  340 |     // This is a soft assertion — some rows may be header rows\n> 341 |     expect(otherCount).toBeLessThanOrEqual(1); // Allow 1 for header row\n      |                        ^\n  342 |\n  343 |     // Step 5: Clear search to see all approvals\n  344 |     // Post-check: clearing shows all pending approvals again"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts",
+                        "column": 24,
+                        "line": 341
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m1\u001b[39m\nReceived:    \u001b[31m6\u001b[39m\n\n  339 |     // No items that DON'T match wichai should be visible (filter works)\n  340 |     // This is a soft assertion — some rows may be header rows\n> 341 |     expect(otherCount).toBeLessThanOrEqual(1); // Allow 1 for header row\n      |                        ^\n  342 |\n  343 |     // Step 5: Clear search to see all approvals\n  344 |     // Post-check: clearing shows all pending approvals again\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:341:24"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-04-01T02:37:51.631Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/tachongrak/Projects/ts/frontend/test-results/cr1-remaining-E2E-CR12-01--ac9cd-mployee-name-or-charge-code-desktop-retry1/test-failed-1.png"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/Users/tachongrak/Projects/ts/frontend/test-results/cr1-remaining-E2E-CR12-01--ac9cd-mployee-name-or-charge-code-desktop-retry1/error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "/Users/tachongrak/Projects/ts/frontend/test-results/cr1-remaining-E2E-CR12-01--ac9cd-mployee-name-or-charge-code-desktop-retry1/trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts",
+                    "column": 24,
+                    "line": 341
+                  }
                 }
               ],
-              "status": "expected"
+              "status": "unexpected"
             }
           ],
           "id": "d2ce0aaacfb30dbefa9b-3b96a257158c9b172464",
@@ -2437,15 +2579,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 7,
+                  "workerIndex": 10,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 5327,
+                  "duration": 5298,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:19:07.394Z",
+                  "startTime": "2026-04-01T02:37:56.606Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2471,15 +2613,15 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 7,
+                  "workerIndex": 10,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2202,
+                  "duration": 1862,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:19:12.728Z",
+                  "startTime": "2026-04-01T02:38:02.396Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2505,13 +2647,13 @@
               "projectName": "desktop",
               "results": [
                 {
-                  "workerIndex": 7,
+                  "workerIndex": 10,
                   "parallelIndex": 0,
                   "status": "failed",
-                  "duration": 2613,
+                  "duration": 2518,
                   "error": {
-                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m20\u001b[39m",
-                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m20\u001b[39m\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:552:30",
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m24\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m24\u001b[39m\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:552:30",
                     "location": {
                       "file": "/Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts",
                       "column": 30,
@@ -2526,17 +2668,17 @@
                         "column": 30,
                         "line": 552
                       },
-                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m20\u001b[39m\n\n  550 |     }\n  551 |     // We log but don't hard-fail here since cleanup is best-effort\n> 552 |     expect(testItems.length).toBeLessThanOrEqual(5); // Allow some tolerance\n      |                              ^\n  553 |   }\n  554 |\n  555 |   // Step 3: Check for test cost rates\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:552:30"
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m24\u001b[39m\n\n  550 |     }\n  551 |     // We log but don't hard-fail here since cleanup is best-effort\n> 552 |     expect(testItems.length).toBeLessThanOrEqual(5); // Allow some tolerance\n      |                              ^\n  553 |   }\n  554 |\n  555 |   // Step 3: Check for test cost rates\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:552:30"
                     }
                   ],
                   "stdout": [],
                   "stderr": [
                     {
-                      "text": "Found 20 test charge codes that should have been cleaned up: [\n  \u001b[32m'Test-Program-1774008314519'\u001b[39m,\n  \u001b[32m'Test-Program-1774008563920'\u001b[39m,\n  \u001b[32m'Test-Program-1774009195059'\u001b[39m,\n  \u001b[32m'Test-Program-1774121378677'\u001b[39m,\n  \u001b[32m'Test-Program-1774860590165'\u001b[39m,\n  \u001b[32m'Test-Program-1774965330743'\u001b[39m,\n  \u001b[32m'Test-Program-1774008109311'\u001b[39m,\n  \u001b[32m'Test-Program-1774008707704'\u001b[39m,\n  \u001b[32m'Test-Program-1774009054283'\u001b[39m,\n  \u001b[32m'Test-Program-1774009516343'\u001b[39m,\n  \u001b[32m'Test-Program-1774965421198'\u001b[39m,\n  \u001b[32m'Test-Program-1774965487868'\u001b[39m,\n  \u001b[32m'Test-Program-1774973853810'\u001b[39m,\n  \u001b[32m'Test-Program-1774008200370'\u001b[39m,\n  \u001b[32m'Test-Program-1774008451194'\u001b[39m,\n  \u001b[32m'Test-Program-1774009366448'\u001b[39m,\n  \u001b[32m'Test-Program-1774014511842'\u001b[39m,\n  \u001b[32m'Test-Program-1774860458051'\u001b[39m,\n  \u001b[32m'Test-Program-1774973774906'\u001b[39m,\n  \u001b[32m'Test-Program-1774008861670'\u001b[39m\n]\n"
+                      "text": "Found 24 test charge codes that should have been cleaned up: [\n  \u001b[32m'Test-Program-1774008314519'\u001b[39m,\n  \u001b[32m'Test-Program-1774008563920'\u001b[39m,\n  \u001b[32m'Test-Program-1774978184318'\u001b[39m,\n  \u001b[32m'Test-Program-1774009195059'\u001b[39m,\n  \u001b[32m'Test-Program-1774121378677'\u001b[39m,\n  \u001b[32m'Test-Program-1774860590165'\u001b[39m,\n  \u001b[32m'Test-Program-1774965330743'\u001b[39m,\n  \u001b[32m'Test-Program-1774008109311'\u001b[39m,\n  \u001b[32m'Test-Program-1774008707704'\u001b[39m,\n  \u001b[32m'Test-Program-1774009054283'\u001b[39m,\n  \u001b[32m'Test-Program-1774009516343'\u001b[39m,\n  \u001b[32m'Test-Program-1774965421198'\u001b[39m,\n  \u001b[32m'Test-Program-1774965487868'\u001b[39m,\n  \u001b[32m'Test-Program-1774973853810'\u001b[39m,\n  \u001b[32m'Test-Program-1775010915555'\u001b[39m,\n  \u001b[32m'Test-Program-1775010985538'\u001b[39m,\n  \u001b[32m'Test-Program-1774008200370'\u001b[39m,\n  \u001b[32m'Test-Program-1774008451194'\u001b[39m,\n  \u001b[32m'Test-Program-1774009366448'\u001b[39m,\n  \u001b[32m'Test-Program-1774014511842'\u001b[39m,\n  \u001b[32m'Test-Program-1774860458051'\u001b[39m,\n  \u001b[32m'Test-Program-1774973774906'\u001b[39m,\n  \u001b[32m'Test-Program-1774978253470'\u001b[39m,\n  \u001b[32m'Test-Program-1774008861670'\u001b[39m\n]\n"
                     }
                   ],
                   "retry": 0,
-                  "startTime": "2026-03-31T16:19:14.940Z",
+                  "startTime": "2026-04-01T02:38:04.267Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -2557,13 +2699,13 @@
                   }
                 },
                 {
-                  "workerIndex": 8,
+                  "workerIndex": 11,
                   "parallelIndex": 0,
                   "status": "failed",
-                  "duration": 2882,
+                  "duration": 3454,
                   "error": {
-                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m20\u001b[39m",
-                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m20\u001b[39m\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:552:30",
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m24\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m24\u001b[39m\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:552:30",
                     "location": {
                       "file": "/Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts",
                       "column": 30,
@@ -2578,17 +2720,17 @@
                         "column": 30,
                         "line": 552
                       },
-                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m20\u001b[39m\n\n  550 |     }\n  551 |     // We log but don't hard-fail here since cleanup is best-effort\n> 552 |     expect(testItems.length).toBeLessThanOrEqual(5); // Allow some tolerance\n      |                              ^\n  553 |   }\n  554 |\n  555 |   // Step 3: Check for test cost rates\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:552:30"
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m5\u001b[39m\nReceived:    \u001b[31m24\u001b[39m\n\n  550 |     }\n  551 |     // We log but don't hard-fail here since cleanup is best-effort\n> 552 |     expect(testItems.length).toBeLessThanOrEqual(5); // Allow some tolerance\n      |                              ^\n  553 |   }\n  554 |\n  555 |   // Step 3: Check for test cost rates\n    at /Users/tachongrak/Projects/ts/frontend/e2e/cr1-remaining.spec.ts:552:30"
                     }
                   ],
                   "stdout": [],
                   "stderr": [
                     {
-                      "text": "Found 20 test charge codes that should have been cleaned up: [\n  \u001b[32m'Test-Program-1774008314519'\u001b[39m,\n  \u001b[32m'Test-Program-1774008563920'\u001b[39m,\n  \u001b[32m'Test-Program-1774009195059'\u001b[39m,\n  \u001b[32m'Test-Program-1774121378677'\u001b[39m,\n  \u001b[32m'Test-Program-1774860590165'\u001b[39m,\n  \u001b[32m'Test-Program-1774965330743'\u001b[39m,\n  \u001b[32m'Test-Program-1774008109311'\u001b[39m,\n  \u001b[32m'Test-Program-1774008707704'\u001b[39m,\n  \u001b[32m'Test-Program-1774009054283'\u001b[39m,\n  \u001b[32m'Test-Program-1774009516343'\u001b[39m,\n  \u001b[32m'Test-Program-1774965421198'\u001b[39m,\n  \u001b[32m'Test-Program-1774965487868'\u001b[39m,\n  \u001b[32m'Test-Program-1774973853810'\u001b[39m,\n  \u001b[32m'Test-Program-1774008200370'\u001b[39m,\n  \u001b[32m'Test-Program-1774008451194'\u001b[39m,\n  \u001b[32m'Test-Program-1774009366448'\u001b[39m,\n  \u001b[32m'Test-Program-1774014511842'\u001b[39m,\n  \u001b[32m'Test-Program-1774860458051'\u001b[39m,\n  \u001b[32m'Test-Program-1774973774906'\u001b[39m,\n  \u001b[32m'Test-Program-1774008861670'\u001b[39m\n]\n"
+                      "text": "Found 24 test charge codes that should have been cleaned up: [\n  \u001b[32m'Test-Program-1774008314519'\u001b[39m,\n  \u001b[32m'Test-Program-1774008563920'\u001b[39m,\n  \u001b[32m'Test-Program-1774978184318'\u001b[39m,\n  \u001b[32m'Test-Program-1774009195059'\u001b[39m,\n  \u001b[32m'Test-Program-1774121378677'\u001b[39m,\n  \u001b[32m'Test-Program-1774860590165'\u001b[39m,\n  \u001b[32m'Test-Program-1774965330743'\u001b[39m,\n  \u001b[32m'Test-Program-1774008109311'\u001b[39m,\n  \u001b[32m'Test-Program-1774008707704'\u001b[39m,\n  \u001b[32m'Test-Program-1774009054283'\u001b[39m,\n  \u001b[32m'Test-Program-1774009516343'\u001b[39m,\n  \u001b[32m'Test-Program-1774965421198'\u001b[39m,\n  \u001b[32m'Test-Program-1774965487868'\u001b[39m,\n  \u001b[32m'Test-Program-1774973853810'\u001b[39m,\n  \u001b[32m'Test-Program-1775010915555'\u001b[39m,\n  \u001b[32m'Test-Program-1775010985538'\u001b[39m,\n  \u001b[32m'Test-Program-1774008200370'\u001b[39m,\n  \u001b[32m'Test-Program-1774008451194'\u001b[39m,\n  \u001b[32m'Test-Program-1774009366448'\u001b[39m,\n  \u001b[32m'Test-Program-1774014511842'\u001b[39m,\n  \u001b[32m'Test-Program-1774860458051'\u001b[39m,\n  \u001b[32m'Test-Program-1774973774906'\u001b[39m,\n  \u001b[32m'Test-Program-1774978253470'\u001b[39m,\n  \u001b[32m'Test-Program-1774008861670'\u001b[39m\n]\n"
                     }
                   ],
                   "retry": 1,
-                  "startTime": "2026-03-31T16:19:18.533Z",
+                  "startTime": "2026-04-01T02:38:08.549Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -2650,15 +2792,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1095,
+                      "duration": 2732,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:19:23.283Z",
+                      "startTime": "2026-04-01T02:38:16.899Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2684,15 +2826,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2095,
+                      "duration": 2805,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:19:25.209Z",
+                      "startTime": "2026-04-01T02:38:21.086Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2718,15 +2860,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2521,
+                      "duration": 4931,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:19:27.312Z",
+                      "startTime": "2026-04-01T02:38:23.924Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2769,15 +2911,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 814,
+                      "duration": 2855,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:19:29.848Z",
+                      "startTime": "2026-04-01T02:38:28.883Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2803,15 +2945,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1122,
+                      "duration": 1792,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:19:30.675Z",
+                      "startTime": "2026-04-01T02:38:31.765Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2854,15 +2996,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15573,
+                      "duration": 16402,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:19:31.818Z",
+                      "startTime": "2026-04-01T02:38:33.581Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2888,15 +3030,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 7894,
+                      "duration": 7554,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:19:47.401Z",
+                      "startTime": "2026-04-01T02:38:49.992Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2940,15 +3082,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "skipped",
-                      "duration": 5747,
+                      "duration": 5590,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:19:55.302Z",
+                      "startTime": "2026-04-01T02:38:57.555Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -2994,15 +3136,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "skipped",
-                      "duration": 5738,
+                      "duration": 6349,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:01.056Z",
+                      "startTime": "2026-04-01T02:39:03.161Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -3055,15 +3197,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3759,
+                      "duration": 4705,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:06.805Z",
+                      "startTime": "2026-04-01T02:39:09.567Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3089,15 +3231,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2143,
+                      "duration": 2247,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:10.572Z",
+                      "startTime": "2026-04-01T02:39:14.281Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3123,15 +3265,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 755,
+                      "duration": 782,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:12.723Z",
+                      "startTime": "2026-04-01T02:39:16.537Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3157,15 +3299,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6544,
+                      "duration": 5079,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:13.485Z",
+                      "startTime": "2026-04-01T02:39:17.327Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3208,15 +3350,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1340,
+                      "duration": 1570,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:20.038Z",
+                      "startTime": "2026-04-01T02:39:22.419Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3242,15 +3384,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1621,
+                      "duration": 1301,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:21.386Z",
+                      "startTime": "2026-04-01T02:39:23.999Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3276,15 +3418,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 801,
+                      "duration": 1009,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:23.013Z",
+                      "startTime": "2026-04-01T02:39:25.309Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3327,15 +3469,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 783,
+                      "duration": 964,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:23.827Z",
+                      "startTime": "2026-04-01T02:39:26.348Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3369,15 +3511,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 8661,
+                      "duration": 8609,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:24.616Z",
+                      "startTime": "2026-04-01T02:39:27.323Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3411,15 +3553,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 11570,
+                      "duration": 11354,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:33.283Z",
+                      "startTime": "2026-04-01T02:39:35.942Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3445,15 +3587,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 12337,
+                      "duration": 12157,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:44.860Z",
+                      "startTime": "2026-04-01T02:39:47.312Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3496,15 +3638,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15207,
+                      "duration": 13680,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:20:57.206Z",
+                      "startTime": "2026-04-01T02:39:59.495Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3530,15 +3672,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 12126,
+                      "duration": 12859,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:21:12.419Z",
+                      "startTime": "2026-04-01T02:40:13.183Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3564,15 +3706,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1843,
+                      "duration": 1974,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:21:24.553Z",
+                      "startTime": "2026-04-01T02:40:26.050Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -3622,15 +3764,15 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 9,
+                          "workerIndex": 12,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 5889,
+                          "duration": 6188,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:21:26.407Z",
+                          "startTime": "2026-04-01T02:40:28.042Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3664,15 +3806,15 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 9,
+                          "workerIndex": 12,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 5945,
+                          "duration": 6176,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:21:32.305Z",
+                          "startTime": "2026-04-01T02:40:34.238Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3706,15 +3848,15 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 9,
+                          "workerIndex": 12,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 8679,
+                          "duration": 8932,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:21:38.257Z",
+                          "startTime": "2026-04-01T02:40:40.425Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3748,15 +3890,15 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 9,
+                          "workerIndex": 12,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 749,
+                          "duration": 904,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:21:46.944Z",
+                          "startTime": "2026-04-01T02:40:49.365Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3790,15 +3932,15 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 9,
+                          "workerIndex": 12,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2608,
+                          "duration": 2639,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:21:47.700Z",
+                          "startTime": "2026-04-01T02:40:50.278Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3843,10 +3985,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 12,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 626,
+                      "duration": 494,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:174:27",
@@ -3870,7 +4012,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:21:50.325Z",
+                      "startTime": "2026-04-01T02:40:52.934Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -3886,10 +4028,10 @@
                       }
                     },
                     {
-                      "workerIndex": 10,
+                      "workerIndex": 13,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 712,
+                      "duration": 594,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:174:27",
@@ -3913,7 +4055,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:21:51.791Z",
+                      "startTime": "2026-04-01T02:40:54.738Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -3963,10 +4105,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 11,
+                      "workerIndex": 14,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 464,
+                      "duration": 1648,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:334:21",
@@ -3990,7 +4132,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:21:54.054Z",
+                      "startTime": "2026-04-01T02:40:57.417Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4006,10 +4148,10 @@
                       }
                     },
                     {
-                      "workerIndex": 12,
+                      "workerIndex": 15,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 532,
+                      "duration": 796,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:334:21",
@@ -4033,7 +4175,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:21:56.051Z",
+                      "startTime": "2026-04-01T02:41:00.892Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4083,10 +4225,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 13,
+                      "workerIndex": 16,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 551,
+                      "duration": 744,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:370:5",
@@ -4110,7 +4252,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:21:58.031Z",
+                      "startTime": "2026-04-01T02:41:03.774Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4126,10 +4268,10 @@
                       }
                     },
                     {
-                      "workerIndex": 14,
+                      "workerIndex": 17,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 559,
+                      "duration": 690,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:370:5",
@@ -4153,7 +4295,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:22:00.095Z",
+                      "startTime": "2026-04-01T02:41:06.348Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4203,10 +4345,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 15,
+                      "workerIndex": 18,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 540,
+                      "duration": 4761,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:394:21",
@@ -4230,7 +4372,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:02.196Z",
+                      "startTime": "2026-04-01T02:41:08.780Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4246,10 +4388,10 @@
                       }
                     },
                     {
-                      "workerIndex": 16,
+                      "workerIndex": 19,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 716,
+                      "duration": 854,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:394:21",
@@ -4273,7 +4415,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:22:04.280Z",
+                      "startTime": "2026-04-01T02:41:15.033Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4323,10 +4465,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 17,
+                      "workerIndex": 20,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 679,
+                      "duration": 580,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:444:5",
@@ -4350,7 +4492,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:06.634Z",
+                      "startTime": "2026-04-01T02:41:17.287Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4366,10 +4508,10 @@
                       }
                     },
                     {
-                      "workerIndex": 18,
+                      "workerIndex": 21,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 712,
+                      "duration": 536,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:444:5",
@@ -4393,7 +4535,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:22:08.876Z",
+                      "startTime": "2026-04-01T02:41:19.264Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4443,10 +4585,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 19,
+                      "workerIndex": 22,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 555,
+                      "duration": 623,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:509:5",
@@ -4470,7 +4612,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:11.177Z",
+                      "startTime": "2026-04-01T02:41:21.176Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4486,10 +4628,10 @@
                       }
                     },
                     {
-                      "workerIndex": 20,
+                      "workerIndex": 23,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 548,
+                      "duration": 681,
                       "error": {
                         "message": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n",
                         "stack": "Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:3307/login\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3307/login\", waiting until \"load\"\u001b[22m\n\n    at loginAs (/Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:49:14)\n    at /Users/tachongrak/Projects/ts/frontend/e2e/reject-cases-test.spec.ts:509:5",
@@ -4513,7 +4655,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:22:13.297Z",
+                      "startTime": "2026-04-01T02:41:23.121Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -4572,15 +4714,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 22510,
+                      "duration": 23000,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:15.397Z",
+                      "startTime": "2026-04-01T02:41:25.288Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4606,15 +4748,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2688,
+                      "duration": 2771,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:38.608Z",
+                      "startTime": "2026-04-01T02:41:48.802Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4648,15 +4790,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 12888,
+                      "duration": 14397,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:41.303Z",
+                      "startTime": "2026-04-01T02:41:51.580Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4682,15 +4824,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2149,
+                      "duration": 2288,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:54.200Z",
+                      "startTime": "2026-04-01T02:42:05.985Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4733,15 +4875,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1154,
+                      "duration": 1384,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:56.359Z",
+                      "startTime": "2026-04-01T02:42:08.287Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4767,15 +4909,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2103,
+                      "duration": 849,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:57.521Z",
+                      "startTime": "2026-04-01T02:42:09.681Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4801,15 +4943,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2441,
+                      "duration": 2420,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:22:59.635Z",
+                      "startTime": "2026-04-01T02:42:10.545Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4852,15 +4994,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2460,
+                      "duration": 2725,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:23:02.088Z",
+                      "startTime": "2026-04-01T02:42:12.978Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4886,15 +5028,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 788,
+                      "duration": 911,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:23:04.555Z",
+                      "startTime": "2026-04-01T02:42:15.710Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4937,15 +5079,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4637,
+                      "duration": 4496,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:23:05.362Z",
+                      "startTime": "2026-04-01T02:42:16.639Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -4979,15 +5121,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5241,
+                      "duration": 5525,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:23:10.006Z",
+                      "startTime": "2026-04-01T02:42:21.143Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5021,15 +5163,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 31826,
+                      "duration": 31013,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:23:15.257Z",
+                      "startTime": "2026-04-01T02:42:26.676Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5063,15 +5205,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 33328,
+                      "duration": 27778,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:23:47.091Z",
+                      "startTime": "2026-04-01T02:42:57.696Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5105,15 +5247,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 24954,
+                      "duration": 22230,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:24:20.428Z",
+                      "startTime": "2026-04-01T02:43:25.480Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5154,15 +5296,15 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 21,
+                          "workerIndex": 24,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 14795,
+                          "duration": 13603,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:24:45.392Z",
+                          "startTime": "2026-04-01T02:43:47.719Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -5196,15 +5338,15 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 21,
+                          "workerIndex": 24,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 7645,
+                          "duration": 7122,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:25:00.196Z",
+                          "startTime": "2026-04-01T02:44:01.330Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -5238,15 +5380,15 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 21,
+                          "workerIndex": 24,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2631,
+                          "duration": 2644,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:25:07.848Z",
+                          "startTime": "2026-04-01T02:44:08.459Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -5291,15 +5433,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1238,
+                      "duration": 759,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:10.491Z",
+                      "startTime": "2026-04-01T02:44:11.114Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5325,15 +5467,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1895,
+                      "duration": 1708,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:11.738Z",
+                      "startTime": "2026-04-01T02:44:11.881Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5359,15 +5501,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2091,
+                      "duration": 2108,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:13.639Z",
+                      "startTime": "2026-04-01T02:44:13.597Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5393,15 +5535,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2010,
+                      "duration": 2045,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:15.738Z",
+                      "startTime": "2026-04-01T02:44:15.712Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5427,15 +5569,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2346,
+                      "duration": 1792,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:17.755Z",
+                      "startTime": "2026-04-01T02:44:17.765Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5461,15 +5603,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 904,
+                      "duration": 870,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:20.109Z",
+                      "startTime": "2026-04-01T02:44:19.567Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5512,15 +5654,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6120,
+                      "duration": 3903,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:21.028Z",
+                      "startTime": "2026-04-01T02:44:20.452Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5546,15 +5688,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3444,
+                      "duration": 3084,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:27.155Z",
+                      "startTime": "2026-04-01T02:44:24.360Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5580,15 +5722,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4364,
+                      "duration": 4769,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:30.605Z",
+                      "startTime": "2026-04-01T02:44:27.452Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5614,15 +5756,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1919,
+                      "duration": 2011,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:34.975Z",
+                      "startTime": "2026-04-01T02:44:32.228Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5648,15 +5790,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4044,
+                      "duration": 4158,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:36.903Z",
+                      "startTime": "2026-04-01T02:44:34.246Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5682,15 +5824,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2427,
+                      "duration": 2544,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:40.953Z",
+                      "startTime": "2026-04-01T02:44:38.412Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5716,15 +5858,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2066,
+                      "duration": 2139,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:43.388Z",
+                      "startTime": "2026-04-01T02:44:40.965Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5767,15 +5909,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3686,
+                      "duration": 4144,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:45.467Z",
+                      "startTime": "2026-04-01T02:44:43.118Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5801,15 +5943,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 623,
+                      "duration": 751,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:49.160Z",
+                      "startTime": "2026-04-01T02:44:47.271Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5835,15 +5977,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1839,
+                      "duration": 1910,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:49.789Z",
+                      "startTime": "2026-04-01T02:44:48.029Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5869,15 +6011,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3951,
+                      "duration": 4073,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:51.636Z",
+                      "startTime": "2026-04-01T02:44:49.947Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -5920,10 +6062,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 24,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 552,
+                      "duration": 485,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('ภาพรวมระบบ')\nExpected: visible\nError: strict mode violation: getByText('ภาพรวมระบบ') resolved to 2 elements:\n    1) <span>ภาพรวมระบบ</span> aka getByRole('link', { name: 'ภาพรวมระบบ' })\n    2) <div data-slot=\"card-title\" class=\"font-semibold font-[family-name:var(--font-heading)] group-data-[size=sm]/card:text-sm flex-1 text-lg\">…</div> aka getByText('บทที่ 1. ภาพรวมระบบ')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('ภาพรวมระบบ')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('ภาพรวมระบบ')\nExpected: visible\nError: strict mode violation: getByText('ภาพรวมระบบ') resolved to 2 elements:\n    1) <span>ภาพรวมระบบ</span> aka getByRole('link', { name: 'ภาพรวมระบบ' })\n    2) <div data-slot=\"card-title\" class=\"font-semibold font-[family-name:var(--font-heading)] group-data-[size=sm]/card:text-sm flex-1 text-lg\">…</div> aka getByText('บทที่ 1. ภาพรวมระบบ')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('ภาพรวมระบบ')\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/user-manual.spec.ts:18:48",
@@ -5947,7 +6089,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:25:55.605Z",
+                      "startTime": "2026-04-01T02:44:54.031Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -5968,10 +6110,10 @@
                       }
                     },
                     {
-                      "workerIndex": 22,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 744,
+                      "duration": 808,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('ภาพรวมระบบ')\nExpected: visible\nError: strict mode violation: getByText('ภาพรวมระบบ') resolved to 2 elements:\n    1) <span>ภาพรวมระบบ</span> aka getByRole('link', { name: 'ภาพรวมระบบ' })\n    2) <div data-slot=\"card-title\" class=\"font-semibold font-[family-name:var(--font-heading)] group-data-[size=sm]/card:text-sm flex-1 text-lg\">…</div> aka getByText('บทที่ 1. ภาพรวมระบบ')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('ภาพรวมระบบ')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('ภาพรวมระบบ')\nExpected: visible\nError: strict mode violation: getByText('ภาพรวมระบบ') resolved to 2 elements:\n    1) <span>ภาพรวมระบบ</span> aka getByRole('link', { name: 'ภาพรวมระบบ' })\n    2) <div data-slot=\"card-title\" class=\"font-semibold font-[family-name:var(--font-heading)] group-data-[size=sm]/card:text-sm flex-1 text-lg\">…</div> aka getByText('บทที่ 1. ภาพรวมระบบ')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('ภาพรวมระบบ')\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/user-manual.spec.ts:18:48",
@@ -5995,7 +6137,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:25:57.401Z",
+                      "startTime": "2026-04-01T02:44:55.487Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -6042,10 +6184,10 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 23,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 690,
+                      "duration": 718,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('เข้าสู่ระบบ (Login)')\nExpected: visible\nError: strict mode violation: getByText('เข้าสู่ระบบ (Login)') resolved to 2 elements:\n    1) <h4 class=\"font-semibold\">2.1 เข้าสู่ระบบ (Login)</h4> aka getByRole('heading', { name: 'เข้าสู่ระบบ (Login)' })\n    2) <figcaption class=\"mt-1.5 text-xs text-[var(--text-muted)] text-center group-hover:text-teal-600 transition-colors\">หน้าเข้าสู่ระบบ (Login) — กดเพื่อขยาย</figcaption> aka getByText('หน้าเข้าสู่ระบบ (Login')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('เข้าสู่ระบบ (Login)')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('เข้าสู่ระบบ (Login)')\nExpected: visible\nError: strict mode violation: getByText('เข้าสู่ระบบ (Login)') resolved to 2 elements:\n    1) <h4 class=\"font-semibold\">2.1 เข้าสู่ระบบ (Login)</h4> aka getByRole('heading', { name: 'เข้าสู่ระบบ (Login)' })\n    2) <figcaption class=\"mt-1.5 text-xs text-[var(--text-muted)] text-center group-hover:text-teal-600 transition-colors\">หน้าเข้าสู่ระบบ (Login) — กดเพื่อขยาย</figcaption> aka getByText('หน้าเข้าสู่ระบบ (Login')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('เข้าสู่ระบบ (Login)')\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/user-manual.spec.ts:33:57",
@@ -6069,7 +6211,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:26:00.027Z",
+                      "startTime": "2026-04-01T02:44:58.267Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -6090,10 +6232,10 @@
                       }
                     },
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 27,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 929,
+                      "duration": 981,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('เข้าสู่ระบบ (Login)')\nExpected: visible\nError: strict mode violation: getByText('เข้าสู่ระบบ (Login)') resolved to 2 elements:\n    1) <h4 class=\"font-semibold\">2.1 เข้าสู่ระบบ (Login)</h4> aka getByRole('heading', { name: 'เข้าสู่ระบบ (Login)' })\n    2) <figcaption class=\"mt-1.5 text-xs text-[var(--text-muted)] text-center group-hover:text-teal-600 transition-colors\">หน้าเข้าสู่ระบบ (Login) — กดเพื่อขยาย</figcaption> aka getByText('หน้าเข้าสู่ระบบ (Login')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('เข้าสู่ระบบ (Login)')\u001b[22m\n",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('เข้าสู่ระบบ (Login)')\nExpected: visible\nError: strict mode violation: getByText('เข้าสู่ระบบ (Login)') resolved to 2 elements:\n    1) <h4 class=\"font-semibold\">2.1 เข้าสู่ระบบ (Login)</h4> aka getByRole('heading', { name: 'เข้าสู่ระบบ (Login)' })\n    2) <figcaption class=\"mt-1.5 text-xs text-[var(--text-muted)] text-center group-hover:text-teal-600 transition-colors\">หน้าเข้าสู่ระบบ (Login) — กดเพื่อขยาย</figcaption> aka getByText('หน้าเข้าสู่ระบบ (Login')\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('เข้าสู่ระบบ (Login)')\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/user-manual.spec.ts:33:57",
@@ -6117,7 +6259,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 1,
-                      "startTime": "2026-03-31T16:26:02.335Z",
+                      "startTime": "2026-04-01T02:45:00.430Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -6164,15 +6306,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 25,
+                      "workerIndex": 28,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 914,
+                      "duration": 973,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:26:04.976Z",
+                      "startTime": "2026-04-01T02:45:02.959Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -6198,15 +6340,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 25,
+                      "workerIndex": 28,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 569,
+                      "duration": 633,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:26:06.685Z",
+                      "startTime": "2026-04-01T02:45:04.412Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -6232,15 +6374,15 @@
                   "projectName": "desktop",
                   "results": [
                     {
-                      "workerIndex": 25,
+                      "workerIndex": 28,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 592,
+                      "duration": 642,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-03-31T16:26:07.263Z",
+                      "startTime": "2026-04-01T02:45:05.057Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -6290,28 +6432,28 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 25,
+                          "workerIndex": 28,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3279,
+                          "duration": 3474,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:07.887Z",
+                          "startTime": "2026-04-01T02:45:05.733Z",
                           "annotations": [],
                           "attachments": []
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3091,
+                          "duration": 3051,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:26:49.125Z",
+                          "startTime": "2026-04-01T02:45:45.280Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -6351,28 +6493,28 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 25,
+                          "workerIndex": 28,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 4316,
+                          "duration": 2771,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:11.175Z",
+                          "startTime": "2026-04-01T02:45:09.216Z",
                           "annotations": [],
                           "attachments": []
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2772,
+                          "duration": 2724,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:26:53.050Z",
+                          "startTime": "2026-04-01T02:45:48.912Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -6412,10 +6554,10 @@
                       "projectName": "desktop",
                       "results": [
                         {
-                          "workerIndex": 25,
+                          "workerIndex": 28,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 32802,
+                          "duration": 32335,
                           "error": {
                             "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/No pending approvals/i)\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/No pending approvals/i)\u001b[22m\n",
                             "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/No pending approvals/i)\nExpected: visible\nTimeout: 30000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 30000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/No pending approvals/i)\u001b[22m\n\n    at /Users/tachongrak/Projects/ts/frontend/e2e/workflow-approval.spec.ts:301:63",
@@ -6439,7 +6581,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:15.506Z",
+                          "startTime": "2026-04-01T02:45:11.996Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -6460,15 +6602,15 @@
                           }
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2567,
+                          "duration": 2579,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:26:55.887Z",
+                          "startTime": "2026-04-01T02:45:51.692Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -6516,20 +6658,20 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:48.343Z",
+                          "startTime": "2026-04-01T02:45:44.369Z",
                           "annotations": [],
                           "attachments": []
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2973,
+                          "duration": 3064,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:26:58.511Z",
+                          "startTime": "2026-04-01T02:45:54.323Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -6577,20 +6719,20 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:48.343Z",
+                          "startTime": "2026-04-01T02:45:44.369Z",
                           "annotations": [],
                           "attachments": []
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1911,
+                          "duration": 2166,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:27:01.550Z",
+                          "startTime": "2026-04-01T02:45:57.437Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -6638,20 +6780,20 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:48.344Z",
+                          "startTime": "2026-04-01T02:45:44.369Z",
                           "annotations": [],
                           "attachments": []
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1850,
+                          "duration": 2147,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:27:03.513Z",
+                          "startTime": "2026-04-01T02:45:59.655Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -6715,15 +6857,15 @@
                               "stdout": [],
                               "stderr": [],
                               "retry": 0,
-                              "startTime": "2026-03-31T16:26:48.344Z",
+                              "startTime": "2026-04-01T02:45:44.369Z",
                               "annotations": [],
                               "attachments": []
                             },
                             {
-                              "workerIndex": 26,
+                              "workerIndex": 29,
                               "parallelIndex": 0,
                               "status": "skipped",
-                              "duration": 3929,
+                              "duration": 3835,
                               "errors": [],
                               "stdout": [
                                 {
@@ -6732,7 +6874,7 @@
                               ],
                               "stderr": [],
                               "retry": 1,
-                              "startTime": "2026-03-31T16:27:05.419Z",
+                              "startTime": "2026-04-01T02:46:01.853Z",
                               "annotations": [
                                 {
                                   "type": "skip",
@@ -6798,15 +6940,15 @@
                               "stdout": [],
                               "stderr": [],
                               "retry": 0,
-                              "startTime": "2026-03-31T16:26:48.344Z",
+                              "startTime": "2026-04-01T02:45:44.369Z",
                               "annotations": [],
                               "attachments": []
                             },
                             {
-                              "workerIndex": 26,
+                              "workerIndex": 29,
                               "parallelIndex": 0,
                               "status": "skipped",
-                              "duration": 3999,
+                              "duration": 4121,
                               "errors": [],
                               "stdout": [
                                 {
@@ -6815,7 +6957,7 @@
                               ],
                               "stderr": [],
                               "retry": 1,
-                              "startTime": "2026-03-31T16:27:09.449Z",
+                              "startTime": "2026-04-01T02:46:05.775Z",
                               "annotations": [
                                 {
                                   "type": "skip",
@@ -6883,15 +7025,15 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:48.344Z",
+                          "startTime": "2026-04-01T02:45:44.369Z",
                           "annotations": [],
                           "attachments": []
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "skipped",
-                          "duration": 3628,
+                          "duration": 4080,
                           "errors": [],
                           "stdout": [
                             {
@@ -6900,7 +7042,7 @@
                           ],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:27:13.505Z",
+                          "startTime": "2026-04-01T02:46:09.949Z",
                           "annotations": [
                             {
                               "type": "skip",
@@ -6957,12 +7099,12 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:48.344Z",
+                          "startTime": "2026-04-01T02:45:44.369Z",
                           "annotations": [],
                           "attachments": []
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "passed",
                           "duration": 1492,
@@ -6970,7 +7112,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:27:17.211Z",
+                          "startTime": "2026-04-01T02:46:14.118Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -7018,20 +7160,20 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-03-31T16:26:48.344Z",
+                          "startTime": "2026-04-01T02:45:44.369Z",
                           "annotations": [],
                           "attachments": []
                         },
                         {
-                          "workerIndex": 26,
+                          "workerIndex": 29,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2543,
+                          "duration": 2617,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-03-31T16:27:18.757Z",
+                          "startTime": "2026-04-01T02:46:15.661Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -7059,11 +7201,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-31T16:01:33.323Z",
-    "duration": 1548302.014,
-    "expected": 119,
+    "startTime": "2026-04-01T02:28:53.088Z",
+    "duration": 1045451.169,
+    "expected": 117,
     "skipped": 5,
-    "unexpected": 12,
-    "flaky": 1
+    "unexpected": 13,
+    "flaky": 2
   }
 }

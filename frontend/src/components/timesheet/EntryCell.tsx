@@ -10,9 +10,10 @@ interface EntryCellProps {
   onNavigate?: (direction: 'right' | 'down') => void;
   description?: string;
   onNoteClick?: () => void;
+  maxHours?: number;
 }
 
-export function EntryCell({ value, onChange, disabled, isBillable, onNavigate, description, onNoteClick }: EntryCellProps) {
+export function EntryCell({ value, onChange, disabled, isBillable, onNavigate, description, onNoteClick, maxHours }: EntryCellProps) {
   const [editing, setEditing] = useState(false);
   const [localValue, setLocalValue] = useState('');
   const [hovered, setHovered] = useState(false);
@@ -23,17 +24,19 @@ export function EntryCell({ value, onChange, disabled, isBillable, onNavigate, d
     setLocalValue(value > 0 ? value.toFixed(2) : '');
   }, [value]);
 
+  const upperLimit = maxHours ?? 24;
+
   const commit = useCallback(() => {
     setEditing(false);
     const parsed = parseFloat(localValue);
     if (isNaN(parsed) || parsed < 0) {
       onChange(0);
-    } else if (parsed > 24) {
-      onChange(24);
+    } else if (parsed > upperLimit) {
+      onChange(upperLimit);
     } else {
       onChange(Math.round(parsed * 100) / 100);
     }
-  }, [localValue, onChange]);
+  }, [localValue, onChange, upperLimit]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -72,6 +75,7 @@ export function EntryCell({ value, onChange, disabled, isBillable, onNavigate, d
       }}
       onBlur={commit}
       onKeyDown={handleKeyDown}
+      placeholder={maxHours ? `max ${maxHours}` : undefined}
       autoFocus
       className="h-9 w-full text-center font-[family-name:var(--font-mono)] text-sm border-2 border-[var(--border-focus)] rounded bg-[var(--bg-card)] outline-none focus:ring-2 focus:ring-[var(--accent-teal-light)] px-1 transition-colors duration-100"
     />

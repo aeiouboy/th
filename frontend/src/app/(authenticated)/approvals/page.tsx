@@ -335,7 +335,7 @@ export default function ApprovalsPage() {
 
         {showTeamStatus && (
           <TabsContent value="team_status" className="mt-4">
-            <TeamLoggingStatus data={teamStatus} />
+            <TeamLoggingStatus data={teamStatus} search={search} />
           </TabsContent>
         )}
       </Tabs>
@@ -580,12 +580,24 @@ const STATUS_BADGE_MAP: Record<string, { label: string; variant: 'default' | 'am
   rejected: { label: 'Rejected', variant: 'destructive' },
 };
 
-function TeamLoggingStatus({ data }: { data: TeamStatusResponse | null }) {
+function TeamLoggingStatus({ data, search }: { data: TeamStatusResponse | null; search?: string }) {
   if (!data) {
     return <ApprovalSkeleton />;
   }
 
-  if (data.members.length === 0) {
+  // Filter members by search term
+  const members = search?.trim()
+    ? data.members.filter((m) => {
+        const q = search.toLowerCase();
+        return (
+          m.fullName.toLowerCase().includes(q) ||
+          m.email.toLowerCase().includes(q) ||
+          (m.department || '').toLowerCase().includes(q)
+        );
+      })
+    : data.members;
+
+  if (members.length === 0 && data.members.length === 0) {
     return (
       <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <EmptyState
@@ -597,7 +609,19 @@ function TeamLoggingStatus({ data }: { data: TeamStatusResponse | null }) {
     );
   }
 
-  const incompleteCount = data.members.filter((m) => m.incompleteDays > 0).length;
+  if (members.length === 0) {
+    return (
+      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <EmptyState
+          icon={Search}
+          title="No results"
+          description={`No team members match "${search}"`}
+        />
+      </div>
+    );
+  }
+
+  const incompleteCount = members.filter((m) => m.incompleteDays > 0).length;
 
   return (
     <div className="space-y-4">
@@ -646,7 +670,7 @@ function TeamLoggingStatus({ data }: { data: TeamStatusResponse | null }) {
             </tr>
           </thead>
           <tbody>
-            {data.members.map((member, idx) => {
+            {members.map((member, idx) => {
               const pct = member.targetHours > 0
                 ? Math.min(100, Math.round((member.totalHours / member.targetHours) * 100))
                 : 0;

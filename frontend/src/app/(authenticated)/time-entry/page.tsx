@@ -257,11 +257,23 @@ function TimeEntryContent() {
       }
     }
 
+    // Auto-add LEAVE-001 row when user has approved vacations in the current week
+    if ((vacationDates.size > 0 || halfDayDates.size > 0) && !rowMap.has('LEAVE-001')) {
+      rowMap.set('LEAVE-001', { chargeCodeId: 'LEAVE-001', name: 'Annual Leave', isBillable: null });
+      newGrid['LEAVE-001'] = {};
+      for (const dateStr of vacationDates) {
+        newGrid['LEAVE-001'][dateStr] = 8;
+      }
+      for (const dateStr of halfDayDates) {
+        newGrid['LEAVE-001'][dateStr] = 4;
+      }
+    }
+
     setGridData(newGrid);
     setDescriptions(newDescriptions);
     setActiveRows(Array.from(rowMap.values()));
     setIsDirty(false);
-  }, [entriesData, weekStart]);
+  }, [entriesData, weekStart, vacationDates, halfDayDates]);
 
   // Save mutation
   const saveMutation = useMutation({

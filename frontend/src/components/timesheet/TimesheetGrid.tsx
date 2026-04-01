@@ -150,7 +150,7 @@ export function TimesheetGrid({
               >
                 <div>{DAYS[i]}</div>
                 <div className="font-[family-name:var(--font-mono)] font-normal text-[var(--text-muted)] mt-0.5 text-[11px]">
-                  {format(parseISO(date), 'd')}
+                  {format(parseISO(date), 'd')}{isHalfDayVacation(date) && ' (½)'}
                 </div>
                 {isVacation(date) && !isHalfDayVacation(date) && (
                   <div className="text-[10px] text-purple-500 font-medium mt-0.5">Vacation</div>
@@ -226,6 +226,7 @@ export function TimesheetGrid({
                       isHoliday(date) ||
                       (isVacation(date) && !isHalfDayVacation(date))
                     }
+                    maxHours={isHalfDayVacation(date) && !SYSTEM_CHARGE_CODES.has(row.chargeCodeId) ? 4 : undefined}
                     isBillable={row.isBillable ?? false}
                     description={descriptions?.[row.chargeCodeId]?.[date]}
                     onNoteClick={() => setActiveNote({ chargeCodeId: row.chargeCodeId, date })}
