@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ApprovalQueue } from '@/components/approvals/ApprovalQueue';
 import { MultiSelectFilter } from '@/components/budget/MultiSelectFilter';
-import { Search, CheckCircle, History, Palmtree, CheckIcon, XIcon, Users, AlertTriangle } from 'lucide-react';
+import { Search, CheckCircle, History, Palmtree, CheckIcon, XIcon, Users, AlertTriangle, Tag } from 'lucide-react';
 import { formatShortDate } from '@/lib/utils';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageHeader } from '@/components/shared/PageHeader';
@@ -41,6 +41,18 @@ interface PendingTimesheet {
 
 interface PendingResponse {
   pending: PendingTimesheet[];
+}
+
+interface CCAccessRequest {
+  id: string;
+  requesterId: string;
+  chargeCodeId: string;
+  reason: string | null;
+  status: string;
+  createdAt: string;
+  requesterName: string | null;
+  requesterEmail: string;
+  chargeCodeName: string;
 }
 
 interface PendingVacation {
@@ -106,6 +118,7 @@ export default function ApprovalsPage() {
   });
   const [history, setHistory] = useState<ApprovalHistoryItem[]>([]);
   const [pendingVacations, setPendingVacations] = useState<PendingVacation[]>([]);
+  const [ccRequests, setCcRequests] = useState<CCAccessRequest[]>([]);
   const [teamStatus, setTeamStatus] = useState<TeamStatusResponse | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -142,6 +155,15 @@ export default function ApprovalsPage() {
     }
   }, []);
 
+  const fetchCcRequests = useCallback(async () => {
+    try {
+      const data = await api.get<CCAccessRequest[]>('/charge-codes/access-requests/list');
+      setCcRequests(data);
+    } catch {
+      // User may not have permission — ignore
+    }
+  }, []);
+
   const fetchTeamStatus = useCallback(async () => {
     try {
       const data = await api.get<TeamStatusResponse>('/approvals/team-status');
@@ -172,6 +194,7 @@ export default function ApprovalsPage() {
   useEffect(() => {
     if (showTeamStatus) {
       fetchTeamStatus();
+      fetchCcRequests();
     }
   }, [showTeamStatus, fetchTeamStatus]);
 
@@ -309,6 +332,16 @@ export default function ApprovalsPage() {
             )}
           </TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
+          {showTeamStatus && (
+            <TabsTrigger value="cc_requests">
+              CC Requests
+              {ccRequests.length > 0 && (
+                <Badge variant="amber" className="ml-1.5 text-[10px]">
+                  {ccRequests.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="manager" className="mt-4">
@@ -336,6 +369,12 @@ export default function ApprovalsPage() {
         {showTeamStatus && (
           <TabsContent value="team_status" className="mt-4">
             <TeamLoggingStatus data={teamStatus} search={search} />
+          </TabsContent>
+        )}
+
+        {showTeamStatus && (
+          <TabsContent value="cc_requests" className="mt-4">
+            <CCRequestList requests={ccRequests} onRefresh={fetchCcRequests} />
           </TabsContent>
         )}
       </Tabs>
@@ -736,6 +775,102 @@ function TeamLoggingStatus({ data, search }: { data: TeamStatusResponse | null; 
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+/* ── CC Access Request List ─────────────────────── */
+
+function CCRequestList({ requests, onRefresh }: { requests: CCAccessRequest[]; onRefresh: () => void }) {
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
+
+  const handleReview = async (id: string, status: 'approved' | 'rejected') => {
+    setReviewingId(id);
+    try {
+      await api.patch(`/charge-codes/access-requests/${id}`, { status });
+      toast.success(status === 'approved' ? 'Request approved' : 'Request rejected');
+      onRefresh();
+    } catch {
+      toast.error('Failed to update request');
+    } finally {
+      setReviewingId(null);
+    }
+  };
+
+  if (requests.length === 0) {
+    return (
+      <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <EmptyState
+          icon={Tag}
+          title="No pending requests"
+          description="No charge code access requests awaiting your review"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-[var(--border-default)] bg-stone-50 dark:bg-stone-900">
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">Requester</th>
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">Charge Code</th>
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">Reason</th>
+            <th className="text-left px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">Requested</th>
+            <th className="text-right px-4 py-2.5 font-medium text-[var(--text-secondary)] text-xs tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map((req, idx) => (
+            <tr
+              key={req.id}
+              className={`border-b border-[var(--border-default)] transition-colors hover:bg-[var(--bg-card-hover)] ${
+                idx % 2 === 0 ? 'bg-[var(--bg-card)]' : 'bg-stone-50 dark:bg-stone-900/50'
+              }`}
+            >
+              <td className="px-4 py-3">
+                <div className="font-medium text-[var(--text-primary)]">{req.requesterName || 'Unknown'}</div>
+                <div className="text-xs text-[var(--text-muted)]">{req.requesterEmail}</div>
+              </td>
+              <td className="px-4 py-3">
+                <span className="font-medium text-[var(--text-primary)]">{req.chargeCodeName}</span>
+                <div className="text-xs text-[var(--text-muted)]">{req.chargeCodeId}</div>
+              </td>
+              <td className="px-4 py-3 text-[var(--text-secondary)] max-w-[200px] truncate">
+                {req.reason || '-'}
+              </td>
+              <td className="px-4 py-3 text-[var(--text-muted)] text-xs">
+                {formatShortDate(req.createdAt)}
+              </td>
+              <td className="px-4 py-3 text-right">
+                <div className="flex items-center justify-end gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0 text-[var(--accent-green)] hover:bg-[var(--accent-green-light)]"
+                    onClick={() => handleReview(req.id, 'approved')}
+                    disabled={reviewingId === req.id}
+                    title="Approve"
+                  >
+                    <CheckIcon className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0 text-[var(--accent-red)] hover:bg-[var(--accent-red-light)]"
+                    onClick={() => handleReview(req.id, 'rejected')}
+                    disabled={reviewingId === req.id}
+                    title="Reject"
+                  >
+                    <XIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

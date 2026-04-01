@@ -24,11 +24,28 @@ interface ChargeCodeResult {
   ownerId: string | null;
 }
 
+interface MyRequest {
+  id: string;
+  chargeCodeId: string;
+  chargeCodeName?: string;
+  reason: string | null;
+  status: string;
+  createdAt: string;
+}
+
 export function RequestChargeCode() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedCode, setSelectedCode] = useState<ChargeCodeResult | null>(null);
   const [reason, setReason] = useState('');
+
+  const { data: myRequests = [] } = useQuery<MyRequest[]>({
+    queryKey: ['my-cc-requests'],
+    queryFn: ({ signal }) => api.get('/charge-codes/my-requests', signal),
+    enabled: open,
+  });
+
+  const pendingCount = myRequests.filter((r) => r.status === 'pending').length;
 
   const { data: searchResults = [] } = useQuery<ChargeCodeResult[]>({
     queryKey: ['charge-codes-search', search],
@@ -63,6 +80,11 @@ export function RequestChargeCode() {
         onClick={() => setOpen(true)}
       >
         + Request New CC
+        {pendingCount > 0 && (
+          <Badge className="ml-1.5 text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+            {pendingCount}
+          </Badge>
+        )}
       </Button>
 
       <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setSelectedCode(null); setSearch(''); setReason(''); } }}>
@@ -73,6 +95,27 @@ export function RequestChargeCode() {
 
           {!selectedCode ? (
             <div className="space-y-3">
+              {myRequests.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-xs font-medium text-[var(--text-secondary)]">My Requests</p>
+                  <div className="max-h-[120px] overflow-y-auto space-y-1">
+                    {myRequests.map((r) => (
+                      <div key={r.id} className="flex items-center justify-between px-3 py-1.5 rounded-md bg-stone-50 dark:bg-stone-800 text-xs">
+                        <span className="text-[var(--text-primary)] truncate mr-2">
+                          {r.chargeCodeName || r.chargeCodeId}
+                        </span>
+                        <Badge className={`text-[10px] shrink-0 ${
+                          r.status === 'pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
+                          r.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                          'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                        }`}>
+                          {r.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <Input
                 placeholder="Search charge codes..."
                 value={search}

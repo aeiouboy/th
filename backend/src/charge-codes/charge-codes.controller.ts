@@ -108,6 +108,11 @@ export class ChargeCodesController {
     return this.chargeCodesService.requestAccess(id, user.id, reason);
   }
 
+  @Get('my-requests')
+  getMyRequests(@CurrentUser() user: any) {
+    return this.chargeCodesService.getMyRequests(user.id);
+  }
+
   @Get('access-requests/list')
   @Roles('admin', 'charge_manager')
   getAccessRequests(@CurrentUser() user: any) {

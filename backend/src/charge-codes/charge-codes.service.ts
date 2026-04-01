@@ -540,6 +540,23 @@ export class ChargeCodesService {
     return created;
   }
 
+  async getMyRequests(userId: string) {
+    return this.db
+      .select({
+        id: chargeCodeRequests.id,
+        chargeCodeId: chargeCodeRequests.chargeCodeId,
+        reason: chargeCodeRequests.reason,
+        status: chargeCodeRequests.status,
+        createdAt: chargeCodeRequests.createdAt,
+        chargeCodeName: chargeCodes.name,
+      })
+      .from(chargeCodeRequests)
+      .innerJoin(chargeCodes, eq(chargeCodeRequests.chargeCodeId, chargeCodes.id))
+      .where(eq(chargeCodeRequests.requesterId, userId))
+      .orderBy(chargeCodeRequests.createdAt)
+      .limit(50);
+  }
+
   async getAccessRequests(userId: string, role: string) {
     // Admins see all pending requests; CC owners/managers see requests for their codes
     if (role === 'admin') {
