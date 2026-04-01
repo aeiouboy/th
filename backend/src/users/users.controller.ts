@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Put,
   Body,
   Param,
@@ -10,6 +11,7 @@ import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { UpdateJobGradeDto } from './dto/update-job-grade.dto';
@@ -47,6 +49,12 @@ export class UsersController {
       limit: limit ? Math.min(parseInt(limit, 10) || 100, 500) : 100,
       offset: offset ? parseInt(offset, 10) || 0 : 0,
     });
+  }
+
+  @Post()
+  @Roles('admin')
+  createUser(@Body() dto: CreateUserDto) {
+    return this.usersService.createUser(dto);
   }
 
   @Put(':id/role')

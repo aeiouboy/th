@@ -36,7 +36,9 @@ import {
   Loader2Icon,
   UsersIcon,
   ShieldIcon,
+  PlusIcon,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { formatRole } from '@/lib/utils';
 import { StatCard } from '@/components/shared/StatCard';
 import { EmptyState } from '@/components/shared/EmptyState';
@@ -77,6 +79,13 @@ export default function AdminUsersPage() {
   const [editRole, setEditRole] = useState('');
   const [editJobGrade, setEditJobGrade] = useState('');
   const [saving, setSaving] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [addEmail, setAddEmail] = useState('');
+  const [addFullName, setAddFullName] = useState('');
+  const [addRole, setAddRole] = useState('employee');
+  const [addDepartment, setAddDepartment] = useState('');
+  const [addJobGrade, setAddJobGrade] = useState('');
+  const [addSaving, setAddSaving] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: users = [], isLoading } = useQuery<User[]>({
@@ -125,6 +134,37 @@ export default function AdminUsersPage() {
     }
   }
 
+  function openAddDialog() {
+    setAddEmail('');
+    setAddFullName('');
+    setAddRole('employee');
+    setAddDepartment('');
+    setAddJobGrade('');
+    setAddDialogOpen(true);
+  }
+
+  async function handleAddUser() {
+    if (!addEmail.trim() || !addFullName.trim()) return;
+    setAddSaving(true);
+    try {
+      await api.post('/users', {
+        email: addEmail.trim(),
+        fullName: addFullName.trim(),
+        role: addRole,
+        department: addDepartment.trim() || undefined,
+        jobGrade: addJobGrade.trim() || undefined,
+      });
+      toast.success('User invited successfully');
+      await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      setAddDialogOpen(false);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to add user';
+      toast.error(message);
+    } finally {
+      setAddSaving(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Summary cards */}
@@ -147,6 +187,10 @@ export default function AdminUsersPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>User Management</CardTitle>
+          <Button size="sm" onClick={openAddDialog}>
+            <PlusIcon className="w-4 h-4" />
+            Add User
+          </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Filters */}
@@ -237,6 +281,82 @@ export default function AdminUsersPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Add User Dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">
+                Email <span className="text-red-500">*</span>
+              </label>
+              <Input
+                type="email"
+                value={addEmail}
+                onChange={(e) => setAddEmail(e.target.value)}
+                placeholder="user@example.com"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">
+                Full Name <span className="text-red-500">*</span>
+              </label>
+              <Input
+                value={addFullName}
+                onChange={(e) => setAddFullName(e.target.value)}
+                placeholder="e.g., John Smith"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">Role</label>
+              <Select value={addRole} onValueChange={(v) => v && setAddRole(v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ROLE_OPTIONS.filter((r) => r.value !== 'all').map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">Department</label>
+              <Input
+                value={addDepartment}
+                onChange={(e) => setAddDepartment(e.target.value)}
+                placeholder="e.g., Engineering"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-[var(--text-primary)] mb-1.5 block">Job Grade</label>
+              <Input
+                value={addJobGrade}
+                onChange={(e) => setAddJobGrade(e.target.value)}
+                placeholder="e.g., L3"
+                className="font-[family-name:var(--font-mono)]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline" />}>
+              Cancel
+            </DialogClose>
+            <Button
+              onClick={handleAddUser}
+              disabled={addSaving || !addEmail.trim() || !addFullName.trim()}
+            >
+              {addSaving && <Loader2Icon className="w-4 h-4 animate-spin mr-1" />}
+              Add User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit User Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
