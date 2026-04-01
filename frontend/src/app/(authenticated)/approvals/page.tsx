@@ -323,15 +323,6 @@ export default function ApprovalsPage() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="vacations">
-            Vacations
-            {pendingVacations.length > 0 && (
-              <Badge variant="amber" className="ml-1.5 text-[10px]">
-                {pendingVacations.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
           {showTeamStatus && (
             <TabsTrigger value="cc_requests">
               CC Requests
@@ -342,6 +333,15 @@ export default function ApprovalsPage() {
               )}
             </TabsTrigger>
           )}
+          <TabsTrigger value="vacations">
+            Vacations
+            {pendingVacations.length > 0 && (
+              <Badge variant="amber" className="ml-1.5 text-[10px]">
+                {pendingVacations.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
 
         <TabsContent value="manager" className="mt-4">
