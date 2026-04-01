@@ -361,9 +361,9 @@ export default function DashboardPage() {
           <Link href="/approvals">
             <Button variant="outline" className="gap-1.5">
               <CheckIcon /> Approvals
-              {pendingCount > 0 && (
+              {(pendingCount + pendingCcRequests.length) > 0 && (
                 <Badge className="ml-1 bg-[var(--accent-amber-light)] text-[var(--accent-amber)] text-[10px]">
-                  {pendingCount}
+                  {pendingCount + pendingCcRequests.length}
                 </Badge>
               )}
             </Button>
